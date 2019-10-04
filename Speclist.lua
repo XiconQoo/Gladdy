@@ -6,9 +6,9 @@ local L = Gladdy.L
 function Gladdy:GetSpecBuffs()
     return {
         -- DRUID
-		[GetSpellInfo(33881)] = L["Restoration"],         -- Natural Perfection
-		[GetSpellInfo(16880)] = L["Restoration"],         -- Nature's Grace; Dreamstate spec in TBC equals Restoration
-		[GetSpellInfo(24858)] = L["Restoration"],         -- Moonkin Form; Dreamstate spec in TBC equals Restoration 
+        [GetSpellInfo(33881)] = L["Restoration"],         -- Natural Perfection
+        [GetSpellInfo(16880)] = L["Restoration"],         -- Nature's Grace; Dreamstate spec in TBC equals Restoration
+        [GetSpellInfo(24858)] = L["Restoration"],         -- Moonkin Form; Dreamstate spec in TBC equals Restoration 
 
         -- HUNTER
         [GetSpellInfo(34692)] = L["Beast Mastery"],     -- The Beast Within
