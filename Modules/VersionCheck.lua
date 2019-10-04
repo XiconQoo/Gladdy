@@ -17,17 +17,16 @@ function VersionCheck:Reset()
 end
 
 function VersionCheck:JOINED_ARENA()
-	DEFAULT_CHAT_FRAME:AddMessage("VersionCheck:JOINED_ARENA")
     self:RegisterComm("GladdyVersionCheck")
 end
 
 function VersionCheck:OnCommReceived(prefix, serverVersion)
-	local addonVersion = "2"
+	local addonVersion = "1"
 	if (serverVersion == addonVersion) then
 		-- DEFAULT_CHAT_FRAME:AddMessage("GladdyVersionCheck: |cff33ff99Version " .. addonVersion .. " is up to date|r")
 	else
-		DEFAULT_CHAT_FRAME:AddMessage("GladdyVersionCheck: |cffff0000Version " .. addonVersion .. " is outdated. New version: " ..  serverVersion .. ".|r")
-		DEFAULT_CHAT_FRAME:AddMessage("Please download the last Gladdy version at:)
+		DEFAULT_CHAT_FRAME:AddMessage("GladdyVersionCheck: |cffff0000Current version " .. addonVersion .. " is outdated. Server version: " ..  serverVersion .. ".|r")
+		DEFAULT_CHAT_FRAME:AddMessage("Please download the last Gladdy version at:")
 		DEFAULT_CHAT_FRAME:AddMessage("https://github.com/SunstriderEmu/GladdyEndless/releases")
 	end
 end
