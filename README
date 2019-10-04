@@ -1,3 +1,11 @@
 Gladdy - the most powerful arena addon for WoW 2.4.3
 
 https://github.com/SunstriderEmu/GladdyEndless/releases
+
+Based on https://github.com/Schaka/gladdy
+
+What is changed:
+
+- Removed TrinketTracker
+- Handle the 10 seconds left before opening message
+- Added a version check (upon receiving a message from the server)
