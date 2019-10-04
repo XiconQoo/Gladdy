@@ -79,19 +79,19 @@ end)
 function ACDFrame:CHAT_MSG_BG_SYSTEM_NEUTRAL(arg1)
 	if (event == "CHAT_MSG_BG_SYSTEM_NEUTRAL") then
 		if (string.find(arg1, "One minute until the Arena battle begins!")) then
-			self.countdown = 61;
+			self.countdown = 60;
 			return;
 		end
 		if (string.find(arg1, "Thirty seconds until the Arena battle begins!")) then
-			self.countdown = 31;
+			self.countdown = 30;
 			return;
 		end
 		if (string.find(arg1, "Fifteen seconds until the Arena battle begins!")) then
-			self.countdown = 16;
+			self.countdown = 15;
 			return;
 		end		
 		if (string.find(arg1, "Ten seconds until the Arena battle begins!")) then
-			self.countdown = 11;
+			self.countdown = 10;
 			return;
 		end		
   end
