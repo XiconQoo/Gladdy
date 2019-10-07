@@ -6,6 +6,6 @@ Based on https://github.com/Schaka/gladdy
 
 What is changed:
 
-- Removed TrinketTracker
-- Handle the 10 seconds left before opening message
+- Removed TrinketTracker module that guessed when PvP trinket was used. Now using a server message to reliably show trinket usage.
+- Updates the "seconds until game starts" if the start time changes (a ready button has been clicked and the game starts earlier).
 - Added a version check (upon receiving a message from the server)
