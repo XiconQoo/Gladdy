@@ -118,7 +118,7 @@ function Diminishings:CreateFrame(unit)
     end
 
     drFrame.tracked = {}
-
+    Gladdy.buttons[unit].drFrame = drFrame
     self.frames[unit] = drFrame
     self:ResetUnit(unit)
 end
@@ -136,11 +136,51 @@ function Diminishings:UpdateFrame(unit)
     local offset = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight
 
     drFrame:ClearAllPoints()
-    if (Gladdy.db.classIconPos == "LEFT") then
-        drFrame:SetPoint("TOPRIGHT", Gladdy.buttons[unit], "TOPLEFT", 962, -10)
+    if (Gladdy.db.drCooldownPos == "LEFT") then
+        if (Gladdy.db.trinketPos == "LEFT") then
+            if (Gladdy.db.castBarPos == "LEFT") then
+                drFrame:SetPoint("BOTTOMRIGHT", Gladdy.buttons[unit].trinketButton, "BOTTOMLEFT", -Gladdy.db.padding, 0)
+            else
+                drFrame:SetPoint("RIGHT", Gladdy.buttons[unit].trinketButton, "LEFT", -Gladdy.db.padding, 0)
+            end
+        else
+            if Gladdy.db.classIconPos == "LEFT" then
+                if (Gladdy.db.castBarPos == "LEFT") then
+                    drFrame:SetPoint("BOTTOMRIGHT", Gladdy.buttons[unit].classIcon, "BOTTOMLEFT", -Gladdy.db.padding, 0)
+                else
+                    drFrame:SetPoint("RIGHT", Gladdy.buttons[unit].classIcon, "LEFT", -Gladdy.db.padding, 0)
+                end
+            else
+                if (Gladdy.db.castBarPos == "LEFT") then
+                    drFrame:SetPoint("BOTTOMRIGHT", Gladdy.buttons[unit].powerBar, "BOTTOMLEFT", -Gladdy.db.padding, 0)
+                else
+                    drFrame:SetPoint("RIGHT", Gladdy.buttons[unit].healthBar, "LEFT", -Gladdy.db.padding, 0)
+                end
+            end
+        end
     end
-	if (Gladdy.db.classIconPos == "RIGHT") then
-        drFrame:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", 72, -10) -- Trinket icon
+	if (Gladdy.db.drCooldownPos == "RIGHT") then
+        if (Gladdy.db.trinketPos == "RIGHT") then
+            if (Gladdy.db.castBarPos == "RIGHT") then
+                drFrame:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].trinketButton, "BOTTOMRIGHT", Gladdy.db.padding, 0)
+            else
+                drFrame:SetPoint("LEFT", Gladdy.buttons[unit].trinketButton, "RIGHT", Gladdy.db.padding, 0)
+            end
+        else
+            if Gladdy.db.classIconPos == "RIGHT" then
+                if (Gladdy.db.castBarPos == "RIGHT") then
+                    drFrame:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].classIcon, "BOTTOMRIGHT", Gladdy.db.padding, 0)
+                else
+                    drFrame:SetPoint("LEFT", Gladdy.buttons[unit].classIcon, "RIGHT", Gladdy.db.padding, 0)
+                end
+            else
+                if (Gladdy.db.castBarPos == "RIGHT") then
+                    drFrame:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].powerBar, "BOTTOMRIGHT", Gladdy.db.padding, 0)
+                else
+                    drFrame:SetPoint("LEFT", Gladdy.buttons[unit].healthBar, "RIGHT", Gladdy.db.padding, 0)
+                end
+            end
+        end
     end
 
     drFrame:SetWidth(Gladdy.db.drIconSize * 16)
@@ -162,7 +202,7 @@ function Diminishings:UpdateFrame(unit)
             if (i == 1) then
                 icon:SetPoint("TOPRIGHT")
             else
-                icon:SetPoint("LEFT", drFrame["icon" .. (i - 1)], "RIGHT")
+                icon:SetPoint("RIGHT", drFrame["icon" .. (i - 1)], "LEFT")
             end
         else
             if (i == 1) then

@@ -54,26 +54,26 @@ function Highlight:UpdateFrame(unit)
     if (not button) then return end
 
     local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight
-    local width = 184
-    local height = 54
+    local width = Gladdy.db.barWidth + 4
+    local height = Gladdy.db.healthBarHeight + 4
     local offset = iconSize / 2
 
     button.targetBorder:SetWidth(width)
     button.targetBorder:SetHeight(height)
     button.targetBorder:ClearAllPoints()
-    button.targetBorder:SetPoint("TOP", button, "TOP", offset, 3)
+    button.targetBorder:SetPoint("TOP", button, "TOP", offset, 2)
     button.targetBorder:SetBackdropBorderColor(Gladdy.db.targetBorderColor.r, Gladdy.db.targetBorderColor.g, Gladdy.db.targetBorderColor.b, Gladdy.db.targetBorderColor.a)
 
     button.focusBorder:SetWidth(width)
     button.focusBorder:SetHeight(height)
     button.focusBorder:ClearAllPoints()
-    button.focusBorder:SetPoint("TOP", button, "TOP", offset, 3)
+    button.focusBorder:SetPoint("TOP", button, "TOP", offset, 2)
     button.focusBorder:SetBackdropBorderColor(Gladdy.db.focusBorderColor.r, Gladdy.db.focusBorderColor.g, Gladdy.db.focusBorderColor.b, Gladdy.db.focusBorderColor.a)
 
     button.leaderBorder:SetWidth(width)
     button.leaderBorder:SetHeight(height)
     button.leaderBorder:ClearAllPoints()
-    button.leaderBorder:SetPoint("TOP", button, "TOP", offset, 3)
+    button.leaderBorder:SetPoint("TOP", button, "TOP", offset, 2)
     button.leaderBorder:SetBackdropBorderColor(Gladdy.db.leaderBorderColor.r, Gladdy.db.leaderBorderColor.g, Gladdy.db.leaderBorderColor.b, Gladdy.db.leaderBorderColor.a)
 end
 

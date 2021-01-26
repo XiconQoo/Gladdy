@@ -3,8 +3,9 @@ local L = Gladdy.L
 
 local Cooldown = Gladdy:NewModule("Cooldown", nil, {
     cooldown = true,
-	cooldownPos = "RIGHT",
-	cooldownSize = 15,
+    cooldownYPos = "TOP",
+    cooldownXPos = "LEFT",
+    cooldownSize = 15,
 })
 
 function Cooldown:Test(unit)
@@ -22,11 +23,12 @@ local function option(params)
         set = function(info, value)
             local key = info.arg or info[#info]
             -- hackfix to prevent DR/cooldown to be on the same side
-            if( key == "cooldownPos" and value == "LEFT" ) then
+            --[[if( key == "cooldownPos" and value == "LEFT" ) then
               Gladdy.db.drCooldownPos = "RIGHT"
             elseif ( key == "cooldownPos" and value == "RIGHT" ) then
               Gladdy.db.drCooldownPos = "RIGHT"
-            end
+            end--]]
+            --Gladdy.db.cooldownPos = value
             Gladdy.dbi.profile[key] = value
             Gladdy:UpdateFrame()
         end,
@@ -41,7 +43,7 @@ end
 
 function Cooldown:GetOptions()
     return {
-		cooldown = option({
+        cooldown = option({
             type = "toggle",
             name = L["Enable"],
             desc = L["Enabled cooldown module"],
@@ -53,13 +55,23 @@ function Cooldown:GetOptions()
             desc = L["Size of each cd icon"],
             order = 5,
             min = 5,
-            max = (Gladdy.db.healthBarHeight+Gladdy.db.castBarHeight+Gladdy.db.powerBarHeight+Gladdy.db.bottomMargin)/4,
+            max = (Gladdy.db.healthBarHeight+Gladdy.db.castBarHeight+Gladdy.db.powerBarHeight+Gladdy.db.bottomMargin)/2,
         }),
-		cooldownPos = option({
+		cooldownYPos = option({
             type = "select",
             name = L["Position"],
-            desc = L["Choose where cooldowns are displayed"],
+            desc = L["Position of the cooldown icons"],
             order = 6,
+            values = {
+                ["TOP"] = L["Top"],
+                ["BOTTOM"] = L["Bottom"],
+            },
+        }),
+        cooldownXPos = option({
+            type = "select",
+            name = L["Position"],
+            desc = L["Position of the cooldown icons"],
+            order = 7,
             values = {
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],
@@ -74,6 +86,7 @@ function Gladdy:UpdateTestCooldowns(i)
 
     button.lastCooldownSpell = 1
     Gladdy:UpdateCooldowns(button)
+    button.spec = ""
     Gladdy:DetectSpec(unit, button.testSpec)
 
     -- use class spells

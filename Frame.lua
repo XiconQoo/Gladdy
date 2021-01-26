@@ -127,7 +127,7 @@ function Gladdy:UpdateFrame()
     local teamSize = self.curBracket or 5
 
     local iconSize = self.db.healthBarHeight
-    local margin = 25
+    local margin = 0
     local width = self.db.barWidth + self.db.padding * 2 + 5
     local height = self.db.healthBarHeight * teamSize + margin * (teamSize - 1) + self.db.padding * 2 + 5
     local extraBarWidth = 0
@@ -140,9 +140,8 @@ function Gladdy:UpdateFrame()
     extraBarHeight = extraBarHeight + self.db.powerBarHeight
 
     -- Castbar
-    margin = margin + self.db.castBarHeight
-    height = height + self.db.castBarHeight * teamSize
-    extraBarHeight = extraBarHeight + self.db.castBarHeight
+    margin = margin + self.db.cooldownSize + self.db.padding + 5 -- extra 5
+    height = height + self.db.cooldownSize * teamSize
 
     -- Classicon
     width = width + iconSize
@@ -193,53 +192,62 @@ function Gladdy:UpdateFrame()
         button.secure:ClearAllPoints()
         if (self.db.growUp) then
             if (i == 1) then
-                button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", self.db.padding + 2, self.db.padding + extraBarHeight)
+                button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", self.db.padding + 2, self.db.padding)
                 button.secure:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", self.db.padding + 2, self.db.padding)
             else
-                button:SetPoint("BOTTOMLEFT", self.buttons["arena" .. (i - 1)], "TOPLEFT", 0, margin)
-                button.secure:SetPoint("BOTTOMLEFT", self.buttons["arena" .. (i - 1)], "TOPLEFT", 0, margin - extraBarHeight)
+                button:SetPoint("BOTTOMLEFT", self.buttons["arena" .. (i - 1)], "TOPLEFT", 0, margin + self.db.bottomMargin)
+                button.secure:SetPoint("BOTTOMLEFT", self.buttons["arena" .. (i - 1)], "TOPLEFT", 0, margin + self.db.bottomMargin)
             end
         else
             if (i == 1) then
                 button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self.db.padding + 2, -self.db.padding)
                 button.secure:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self.db.padding + 2, -self.db.padding)
             else
-                button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "BOTTOMLEFT", 0, -margin)
-                button.secure:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "BOTTOMLEFT", 0, -margin)
+                button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "BOTTOMLEFT", 0, -margin - self.db.bottomMargin)
+                button.secure:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "BOTTOMLEFT", 0, -margin - self.db.bottomMargin)
             end
         end
 
         -- Cooldown frame
         if (self.db.cooldown) then
             button.spellCooldownFrame:ClearAllPoints()
-            if self.db.cooldownPos == "RIGHT" then
-                button.spellCooldownFrame:SetPoint("BOTTOMLEFT", button, "TOPLEFT", iconSize, self.db.padding - margin + extraBarHeight) -- needs to be properly anchored after trinket
+            if self.db.cooldownYPos == "TOP" then
+                if self.db.cooldownXPos == "RIGHT" then
+                    button.spellCooldownFrame:SetPoint("BOTTOMRIGHT", button.healthBar, "TOPRIGHT", 0, 2) -- needs to be properly anchored after trinket
+                else
+                    button.spellCooldownFrame:SetPoint("BOTTOMLEFT", button.healthBar, "TOPLEFT", 0, 2)
+                end
             else
-                button.spellCooldownFrame:SetPoint("BOTTOMLEFT", button, "TOPLEFT", iconSize, self.db.padding - margin + extraBarHeight)
+                if self.db.cooldownGrowDirection == "RIGHT" then
+                    button.spellCooldownFrame:SetPoint("TOPRIGHT", button.powerBar, "BOTTOMRIGHT", 0, -2) -- needs to be properly anchored after trinket
+                else
+                    button.spellCooldownFrame:SetPoint("TOPLEFT", button.powerBar, "BOTTOMLEFT", 0, -2)
+                end
             end
             --button.spellCooldownFrame:SetHeight(self.db.healthBarHeight+extraBarHeight)
-            button.spellCooldownFrame:SetHeight(55)
+            button.spellCooldownFrame:SetHeight(self.db.cooldownSize)
             --button.spellCooldownFrame:SetWidth(self.db.healthBarHeight+extraBarHeight)
-            button.spellCooldownFrame:SetWidth(55)
+            button.spellCooldownFrame:SetWidth(1)
             button.spellCooldownFrame:Show()
             -- Update each cooldown icon
             for i = 1, 14 do
                 local icon = button.spellCooldownFrame["icon" .. i]
-                icon:SetHeight(button.spellCooldownFrame:GetHeight() / 2)
-                icon:SetWidth(button.spellCooldownFrame:GetWidth() / 2)
+                icon:SetHeight(self.db.cooldownSize)
+                icon:SetWidth(self.db.cooldownSize)
+                icon.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", self.db.cooldownSize/2.5, "OUTLINE")
                 icon:ClearAllPoints()
-                if (self.db.cooldownPos == "RIGHT") then
+                if (self.db.cooldownXPos == "RIGHT") then
+                    if (i == 1) then
+                        icon:SetPoint("TOPRIGHT", button.spellCooldownFrame, 0, 0)
+                    else
+                        icon:SetPoint("RIGHT", button.spellCooldownFrame["icon" .. i - 1], "LEFT", -1, 0)
+                    end
+                end
+                if (self.db.cooldownXPos == "LEFT") then
                     if (i == 1) then
                         icon:SetPoint("TOPLEFT", button.spellCooldownFrame, 0, 0)
                     else
                         icon:SetPoint("LEFT", button.spellCooldownFrame["icon" .. i - 1], "RIGHT", 1, 0)
-                    end
-                end
-                if (self.db.cooldownPos == "LEFT") then
-                    if (i == 1) then
-                        icon:SetPoint("TOPLEFT", button.spellCooldownFrame, -250, 28)
-                    else
-                        icon:SetPoint("LEFT", button.spellCooldownFrame["icon" .. i - 2], "RIGHT", 1, 0)
                     end
                 end
 
@@ -267,6 +275,7 @@ function Gladdy:UpdateFrame()
         for k, v in self:IterModules() do
             self:Call(v, "UpdateFrame", button.unit)
         end
+        Gladdy:UpdateTestCooldowns(i)
     end
 end
 

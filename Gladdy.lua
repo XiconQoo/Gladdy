@@ -1233,16 +1233,16 @@ function Gladdy:CooldownStart(button, spellId, duration)
                 local timeLeft = ceil(self.timeLeft)
                 local timeLeftMilliSec = formatTimer(self.timeLeft, 1)
                 if timeLeft >= 60 then
-                    -- more than 1 minute
-                    self.cooldownFont:SetTextColor(1, 1, 0)
-                    self.cooldownFont:SetText(floor(timeLeft / 60) .. ":" .. string.format("%02.f", floor(timeLeft - floor(timeLeft / 60) * 60)))
-                elseif timeLeft < 60 and timeLeft >= 21 then
-                    -- between 60s and 21s (green)
+                    -- more than 1 minute (green)
                     self.cooldownFont:SetTextColor(0.7, 1, 0)
+                    self.cooldownFont:SetText(floor(timeLeft / 60) .. "m")
+                elseif timeLeft < 60 and timeLeft >= 21 then
+                    -- between 60s and 21s (yellow)
+                    self.cooldownFont:SetTextColor(1, 1, 0)
                     self.cooldownFont:SetText(timeLeft)
                 elseif timeLeft < 20.9 and timeLeft >= 11 then
-                    -- between 20s and 11s (green)
-                    self.cooldownFont:SetTextColor(0, 1, 0)
+                    -- between 20s and 11s (yellow)
+                    self.cooldownFont:SetTextColor(1, 1, 0)
                     self.cooldownFont:SetText(timeLeft)
                 elseif timeLeftMilliSec <= 10 and timeLeftMilliSec >= 5 then
                     -- between 10s and 5s (orange)

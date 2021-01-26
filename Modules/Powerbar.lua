@@ -30,12 +30,13 @@ function Powerbar:CreateFrame(unit)
     local powerBar = CreateFrame("StatusBar", nil, Gladdy.buttons[unit])
     powerBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
     powerBar:SetMinMaxValues(0, 100)
-	
-	local powerBarBorder = CreateFrame("Frame", nil, powerBar)
-    powerBarBorder:SetBackdrop({edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
+
+    powerBar.border = CreateFrame("Frame", nil, powerBar)
+    powerBar.border:SetBackdrop({edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
 	edgeSize = 13,
 	insets = {left = 4, right = 4, top = 4, bottom = 4},})
-    powerBarBorder:SetFrameStrata("HIGH")
+    powerBar.border:SetBackdropBorderColor(0, 0, 0, 1)
+    powerBar.border:SetFrameStrata("HIGH")
 	
     powerBar.bg = powerBar:CreateTexture(nil, "BACKGROUND")
     powerBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
@@ -60,7 +61,7 @@ function Powerbar:CreateFrame(unit)
     powerBar.powerText:SetJustifyH("CENTER")
     powerBar.powerText:SetPoint("RIGHT", -5, 1)
 	
-	button.powerBarBorder = powerBarBorder
+	button.powerBar = powerBar
     self.frames[unit] = powerBar
     self:ResetUnit(unit)
 end
@@ -80,12 +81,11 @@ function Powerbar:UpdateFrame(unit)
 
     powerBar:ClearAllPoints()
     powerBar:SetPoint("TOPLEFT", healthBar, "BOTTOMLEFT", 0, -1)
-	
-	button.powerBarBorder:SetWidth(184)
-	button.powerBarBorder:SetHeight(20)
-    button.powerBarBorder:ClearAllPoints()
-    button.powerBarBorder:SetPoint("RIGHT", powerBar, "RIGHT", 2, 0)
-    button.powerBarBorder:SetBackdropBorderColor(0, 0, 0, 1)
+
+    powerBar.border:SetWidth(powerBar:GetWidth()+2)
+    powerBar.border:SetHeight(powerBar:GetHeight()+2)
+    powerBar.border:ClearAllPoints()
+    powerBar.border:SetPoint("CENTER", powerBar, "CENTER", 0, 0)
 	
     powerBar.raceText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.powerBarFontSize)
     powerBar.raceText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)

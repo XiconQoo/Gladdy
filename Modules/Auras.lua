@@ -66,6 +66,11 @@ function Auras:UpdateFrame(unit)
     auraFrame:SetHeight(classIcon:GetHeight())
     auraFrame:SetAllPoints(classIcon)
 
+    auraFrame.cooldown:SetWidth(classIcon:GetWidth()-4)
+    auraFrame.cooldown:SetHeight(classIcon:GetHeight()-4)
+    auraFrame.cooldown:ClearAllPoints()
+    auraFrame.cooldown:SetPoint("CENTER", auraFrame, "CENTER")
+
     auraFrame.text:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.auraFontSize)
     auraFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
 end
@@ -79,7 +84,7 @@ function Auras:Test(unit)
 
     if (unit == "arena1") then
         aura, _, icon = GetSpellInfo(12826)
-    elseif (unit == "arena2") then
+    elseif (unit == "arena4") then
         aura, _, icon = GetSpellInfo(6770)
     elseif (unit == "arena3") then
         aura, _, icon = GetSpellInfo(31224)
