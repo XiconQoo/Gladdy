@@ -5,7 +5,7 @@ local CreateFrame = CreateFrame
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local Highlight = Gladdy:NewModule("Highlight", nil, {
-    targetBorderColor = {r = 1, g = .7, b = 0, a = 1},
+    targetBorderColor = {r = 1, g = 0.8, b = 0, a = 1},
     focusBorderColor = {r = 1, g = 0, b = 0, a = 1},
     leaderBorderColor = {r = 0, g = 1, b = 0, a = 1},
     highlight = true,
@@ -21,17 +21,17 @@ function Highlight:CreateFrame(unit)
     local healthBar = Gladdy.modules.Healthbar.frames[unit]
 
     local targetBorder = CreateFrame("Frame", nil, button)
-    targetBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 1})
+    targetBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 3})
     targetBorder:SetFrameStrata("HIGH")
     targetBorder:Hide()
 
     local focusBorder = CreateFrame("Frame", nil, button)
-    focusBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 1})
+    focusBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 3})
     focusBorder:SetFrameStrata("LOW")
     focusBorder:Hide()
 
     local leaderBorder = CreateFrame("Frame", nil, button)
-    leaderBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 1})
+    leaderBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 3})
     leaderBorder:SetFrameStrata("MEDIUM")
     leaderBorder:Hide()
 
@@ -54,8 +54,8 @@ function Highlight:UpdateFrame(unit)
     if (not button) then return end
 
     local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight
-    local width = Gladdy.db.barWidth + iconSize * 2 + 9
-    local height = iconSize + Gladdy.db.castBarHeight + 9
+    local width = 184
+    local height = 54
     local offset = iconSize / 2
 
     button.targetBorder:SetWidth(width)

@@ -40,7 +40,7 @@ local CombatLog_Object_IsA = CombatLog_Object_IsA
 local COMBATLOG_OBJECT_TARGET = COMBATLOG_OBJECT_TARGET
 local COMBATLOG_OBJECT_FOCUS = COMBATLOG_OBJECT_FOCUS
 
-local channelSpells ={
+local channelSpells = {
     [GetSpellInfo(15407)] = true,
     [GetSpellInfo(10)] = true,
     [GetSpellInfo(5740)] = true,
@@ -53,39 +53,39 @@ local channelSpells ={
 }
 
 local unitsToCheck = {
-  ["mouseover"] = true,
-  ["mouseovertarget"] = true,
-  ["mouseovertargettarget"] = true,
-  ["targettarget"] = true,
-  ["targettargettarget"] = true,
-  ["focustargettarget"] = true,
-  ["focustarget"] = true,
-  ["pettarget"] = true,
-  ["pettargettarget"] = true,
-  ["party1target"] = true,
-  ["party2target"] = true,
-  ["party3target"] = true,
-  ["party4target"] = true,
-  ["partypet1target"] = true,
-  ["partypet2target"] = true,
-  ["partypet3target"] = true,
-  ["partypet4target"] = true,
-  ["party1targettarget"] = true,
-  ["party2targettarget"] = true,
-  ["party3targettarget"] = true,
-  ["party4targettarget"] = true,
-  ["raid1target"] = true,
-  ["raid2target"] = true,
-  ["raid3target"] = true,
-  ["raid4target"] = true,
-  ["raidpet1target"] = true,
-  ["raidpet2target"] = true,
-  ["raidpet3target"] = true,
-  ["raidpet4target"] = true,
-  ["raid1targettarget"] = true,
-  ["raid2targettarget"] = true,
-  ["raid3targettarget"] = true,
-  ["raid4targettarget"] = true,
+    ["mouseover"] = true,
+    ["mouseovertarget"] = true,
+    ["mouseovertargettarget"] = true,
+    ["targettarget"] = true,
+    ["targettargettarget"] = true,
+    ["focustargettarget"] = true,
+    ["focustarget"] = true,
+    ["pettarget"] = true,
+    ["pettargettarget"] = true,
+    ["party1target"] = true,
+    ["party2target"] = true,
+    ["party3target"] = true,
+    ["party4target"] = true,
+    ["partypet1target"] = true,
+    ["partypet2target"] = true,
+    ["partypet3target"] = true,
+    ["partypet4target"] = true,
+    ["party1targettarget"] = true,
+    ["party2targettarget"] = true,
+    ["party3targettarget"] = true,
+    ["party4targettarget"] = true,
+    ["raid1target"] = true,
+    ["raid2target"] = true,
+    ["raid3target"] = true,
+    ["raid4target"] = true,
+    ["raidpet1target"] = true,
+    ["raidpet2target"] = true,
+    ["raidpet3target"] = true,
+    ["raidpet4target"] = true,
+    ["raid1targettarget"] = true,
+    ["raid2targettarget"] = true,
+    ["raid3targettarget"] = true,
+    ["raid4targettarget"] = true,
 }
 
 local MAJOR, MINOR = "Gladdy", 3
@@ -141,9 +141,11 @@ end
 local function pairsByPrio(t)
     local a = {}
     for k, v in pairs(t) do
-        tinsert(a, {k, v.priority})
+        tinsert(a, { k, v.priority })
     end
-    tsort(a, function(x, y) return x[2] > y[2] end)
+    tsort(a, function(x, y)
+        return x[2] > y[2]
+    end)
 
     local i = 0
     return function()
@@ -208,46 +210,46 @@ function Gladdy:OnInitialise()
 
     self.LSM = LibStub("LibSharedMedia-3.0")
     self.LSM:Register("statusbar", "Gloss", "Interface\\AddOns\\Gladdy\\Images\\Gloss")
-    self.LSM:Register("statusbar", "Minimalist", "Interface\\AddOns\\Gladdy\\Images\\Minimalist")
+    self.LSM:Register("statusbar", "Minimalist", "Interface\\AddOns\\Gladdy\\Images\\Minimalist")--*
 
     L = self.L
 
     self.testData = {
-        ["arena1"] = {name = "Swift", raceLoc = L["Undead"], classLoc = L["Warrior"], class = "WARRIOR", health = 9635, healthMax = 14207, power = 76, powerMax = 100, powerType = 1, spec = L["Arms"]},
-        ["arena2"] = {name = "Vilden", raceLoc = L["Undead"], classLoc = L["Mage"], class = "MAGE", health = 10969, healthMax = 11023, power = 7833, powerMax = 10460, powerType = 0, spec = L["Frost"]},
-        ["arena3"] = {name = "Krymu", raceLoc = L["Night Elf"], classLoc = L["Rogue"], class = "ROGUE", health = 1592, healthMax = 11740, power = 45, powerMax = 110, powerType = 3, spec = L["Subtlety"]},
-        ["arena4"] = {name = "Talmon", raceLoc = L["Human"], classLoc = L["Warlock"], class = "WARLOCK", health = 10221, healthMax = 14960, power = 9855, powerMax = 9855, powerType = 0, spec = L["Demonology"]},
-        ["arena5"] = {name = "Hydra", raceLoc = L["Undead"], classLoc = L["Priest"], class = "PRIEST", health = 11960, healthMax = 11960, power = 2515, powerMax = 10240, powerType = 0, spec = L["Discipline"]},
+        ["arena1"] = { name = "Swift", raceLoc = L["Undead"], classLoc = L["Warrior"], class = "WARRIOR", health = 9635, healthMax = 14207, power = 76, powerMax = 100, powerType = 1, testSpec = L["Arms"], race = "Scourge" },
+        ["arena2"] = { name = "Vilden", raceLoc = L["Undead"], classLoc = L["Mage"], class = "MAGE", health = 10969, healthMax = 11023, power = 7833, powerMax = 10460, powerType = 0, testSpec = L["Frost"], race = "Scourge" },
+        ["arena3"] = { name = "Krymu", raceLoc = L["Night Elf"], classLoc = L["Rogue"], class = "ROGUE", health = 1592, healthMax = 11740, power = 45, powerMax = 110, powerType = 3, testSpec = L["Subtlety"], race = "Human" },
+        ["arena4"] = { name = "Talmon", raceLoc = L["Human"], classLoc = L["Warlock"], class = "WARLOCK", health = 10221, healthMax = 14960, power = 9855, powerMax = 9855, powerType = 0, testSpec = L["Demonology"], race = "Human" },
+        ["arena5"] = { name = "Hydra", raceLoc = L["Undead"], classLoc = L["Priest"], class = "PRIEST", health = 11960, healthMax = 11960, power = 2515, powerMax = 10240, powerType = 0, testSpec = L["Discipline"], race = "Human" },
     }
     self.specBuffs = self:GetSpecBuffs()
     self.specSpells = self:GetSpecSpells()
-	
-	-- Get Cooldown Spells
-	self.cooldownSpells = self:GetCooldownList()
-	self.cooldownSpellIds = {}
-	self.spellTextures = {}
-	for class, t in pairs(self.cooldownSpells) do
-      for k,v in pairs(t) do
-         local spellName, _, texture = GetSpellInfo(k)
-		 if spellName then
-			self.cooldownSpellIds[spellName] = k
-			self.spellTextures[k] = texture
-		 else
-			self:Print("spellid does not exist  "..k)
-		 end
-      end
-	end
+
+    -- Get Cooldown Spells
+    self.cooldownSpells = self:GetCooldownList()
+    self.cooldownSpellIds = {}
+    self.spellTextures = {}
+    for class, t in pairs(self.cooldownSpells) do
+        for k, v in pairs(t) do
+            local spellName, _, texture = GetSpellInfo(k)
+            if spellName then
+                self.cooldownSpellIds[spellName] = k
+                self.spellTextures[k] = texture
+            else
+                self:Print("spellid does not exist  " .. k)
+            end
+        end
+    end
 
     self.NS = GetSpellInfo(16188)
     self.POM = GetSpellInfo(12043)
     self.NF = GetSpellInfo(18095)
     self.SHADOWBOLT = GetSpellInfo(27209)
     self.INSTANT = {
-        [GetSpellInfo(172)] = true,     -- Corruption
-        [GetSpellInfo(2645)] = true,    -- Ghost Wolf
+        [GetSpellInfo(172)] = true, -- Corruption
+        [GetSpellInfo(2645)] = true, -- Ghost Wolf
     }
     self.CAST_TIMES = {
-        [GetSpellInfo(26985)] = 1.5,    -- Wrath
+        [GetSpellInfo(26985)] = 1.5, -- Wrath
     }
     self.FD = GetSpellInfo(18708)
     self.SUMMON = {
@@ -342,11 +344,11 @@ function Gladdy:PLAYER_ENTERING_WORLD()
 end
 
 function Gladdy:Reset()
-	if type(self.guids) == "table" then
-		for k,v in pairs(self.guids) do
-			self.guids[k] = nil
-		end
-	end
+    if type(self.guids) == "table" then
+        for k, v in pairs(self.guids) do
+            self.guids[k] = nil
+        end
+    end
     self.guids = {}
     self.curBracket = nil
     self.curUnit = 1
@@ -358,30 +360,31 @@ function Gladdy:Reset()
     for k2 in pairs(self.buttons) do
         self:ResetUnit(k2)
     end
-	
+
 end
 
 function Gladdy:ResetUnit(unit)
     local button = self.buttons[unit]
-    if (not button) then return end
+    if (not button) then
+        return
+    end
 
     button:SetAlpha(0)
 
     button._health = nil
     button._power = nil
-	
-	button.name = nil
-	button.health = nil
-	button.healthMax = nil
-	button.power = nil
-	button.powerMax = nil
-	button.powerType = nil
+
+    button.name = nil
+    button.health = nil
+    button.healthMax = nil
+    button.power = nil
+    button.powerMax = nil
+    button.powerType = nil
     button.guid = nil
     button.class = nil
     button.classLoc = nil
     button.raceLoc = nil
     button.spec = nil
-	
 
     for k1, v1 in pairs(self.BUTTON_DEFAULTS) do
         button[k1] = v1
@@ -413,22 +416,24 @@ function Gladdy:JoinedArena()
     self:RegisterEvent("PLAYER_FOCUS_CHANGED")
     self:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
     self:RegisterEvent("UNIT_TARGET")
-	
+
     self:ScheduleRepeatingTimer("UpdateUnits", 0.25, self)
     self:ScheduleRepeatingTimer("UpdateCastBars", 0.05, self)
     self:RegisterComm("Gladdy")
 
     for i = 1, MAX_BATTLEFIELD_QUEUES do
         local status, _, _, _, _, teamSize = GetBattlefieldStatus(i)
-		if teamSize > 5 then teamSize = 3 end
+        if teamSize > 5 then
+            teamSize = 3
+        end
         if (status == "active" and teamSize > 0) then
             self.curBracket = teamSize
             break
         end
     end
-    
+
     if not self.curBracket then
-      self.curBracket = 2
+        self.curBracket = 2
     end
 
     for i = 1, self.curBracket do
@@ -446,7 +451,9 @@ end
 
 function Gladdy:UNIT_AURA(event, uid)
     local button = self:GetButton(uid)
-    if (not button) then return end
+    if (not button) then
+        return
+    end
 
     local Auras = Gladdy.modules.Auras
     local auraName, auraIcon, auraExpTime
@@ -455,7 +462,9 @@ function Gladdy:UNIT_AURA(event, uid)
     local index = 1
     while (true) do
         local name, _, icon, _, _, expTime = UnitBuff(uid, index)
-        if (not name) then break end
+        if (not name) then
+            break
+        end
 
         self:AuraGain(button.unit, name)
 
@@ -472,7 +481,9 @@ function Gladdy:UNIT_AURA(event, uid)
     index = 1
     while (true) do
         local name, _, icon, _, _, _, expTime = UnitDebuff(uid, index)
-        if (not name) then break end
+        if (not name) then
+            break
+        end
 
         self:AuraGain(button.unit, name)
 
@@ -503,7 +514,9 @@ end
 
 function Gladdy:UNIT_HEALTH(event, uid)
     local button = self:GetButton(uid)
-    if (not button) then return end
+    if (not button) then
+        return
+    end
 
     if (not UnitIsDeadOrGhost(uid)) then
         button.health = UnitHealth(uid)
@@ -517,7 +530,9 @@ end
 
 function Gladdy:UNIT_POWER(event, uid)
     local button = self:GetButton(uid)
-    if (not button) then return end
+    if (not button) then
+        return
+    end
 
     if (not UnitIsDeadOrGhost(uid)) then
         button.power = UnitMana(uid)
@@ -532,10 +547,14 @@ end
 
 function Gladdy:UNIT_SPELLCAST_START(event, uid)
     local button = self:GetButton(uid)
-    if (not button) then return end
+    if (not button) then
+        return
+    end
 
     local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo(uid)
-    if not endTime then return end
+    if not endTime then
+        return
+    end
     local value = (startTime / 1000) - GetTime()
     local maxValue = (endTime - startTime) / 1000
     self:CastStart(button.unit, spell, icon, value, maxValue, "cast")
@@ -543,10 +562,14 @@ end
 
 function Gladdy:UNIT_SPELLCAST_CHANNEL_START(event, uid)
     local button = self:GetButton(uid)
-    if (not button) then return end
+    if (not button) then
+        return
+    end
 
     local spell, rank, displayName, icon, startTime, endTime = UnitChannelInfo(uid)
-    if not endTime then return end
+    if not endTime then
+        return
+    end
     local value = (endTime / 1000) - GetTime()
     local maxValue = (endTime - startTime) / 1000
 
@@ -555,13 +578,17 @@ end
 
 function Gladdy:UNIT_SPELLCAST_SUCCEEDED(event, uid, spell)
     local button = self:GetButton(uid)
-    if (not button) then return end
+    if (not button) then
+        return
+    end
     self:CastSuccess(button.unit, spell)
 end
 
 function Gladdy:UNIT_SPELLCAST_DELAYED(event, uid)
     local button = self:GetButton(uid)
-    if (not button) then return end
+    if (not button) then
+        return
+    end
 
     local spell, rank, displayName, icon, startTime, endTime
     local value
@@ -581,14 +608,18 @@ end
 
 function Gladdy:UNIT_SPELLCAST_STOP(event, uid)
     local button = self:GetButton(uid)
-    if (not button) then return end
+    if (not button) then
+        return
+    end
     self:SendMessage("CAST_STOP", button.unit)
 end
 
 function Gladdy:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, spellID, spellName, ...)
     local srcUnit = self.guids[sourceGUID]
     local destUnit = self.guids[destGUID]
-    if (not srcUnit and not destUnit) then return end
+    if (not srcUnit and not destUnit) then
+        return
+    end
 
     local events = {
         ["PARTY_KILL"] = "DEATH",
@@ -619,7 +650,9 @@ function Gladdy:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceG
     }
 
     eventType = events[eventType]
-    if (not eventType) then return end
+    if (not eventType) then
+        return
+    end
 
     local t = ("%.1f"):format(GetTime())
 
@@ -627,12 +660,16 @@ function Gladdy:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceG
         self:SendMessage("UNIT_DEATH", destUnit)
     elseif (events[eventType] == "DAMAGE") then
         local button = self.buttons[destUnit]
-        if (not button) then return end
+        if (not button) then
+            return
+        end
 
         button.damaged = t
     elseif (eventType == "BUFF" and destUnit) then
         local button = self.buttons[destUnit]
-        if (not button) then return end
+        if (not button) then
+            return
+        end
 
         self:AuraGain(destUnit, spellName)
 
@@ -648,7 +685,9 @@ function Gladdy:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceG
         end
     elseif (eventType == "REFRESH" and destUnit) then
         local button = self.buttons[destUnit]
-        if (not button) then return end
+        if (not button) then
+            return
+        end
 
         if (button.spells[spellName] and t > button.spells[spellName]) then
             self:AuraGain(destUnit, spellName)
@@ -659,14 +698,16 @@ function Gladdy:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceG
             if (aura and aura.priority >= (Auras.frames[destUnit].priority or 0)) then
                 local auraIcon = select(3, GetSpellInfo(spellID))
                 local auraExpTime = aura.duration
-                
+
                 self:SendMessage("AURA_GAIN", destUnit, spellName, auraIcon, auraExpTime, aura.priority)
                 button.spells[spellName] = t
             end
         end
     elseif (eventType == "FADE" and destUnit) then
         local button = self.buttons[destUnit]
-        if (not button) then return end
+        if (not button) then
+            return
+        end
 
         self:AuraFade(destUnit, spellName)
 
@@ -696,29 +737,28 @@ function Gladdy:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceG
     elseif (eventType == "INTERRUPT" and srcUnit) then
         self:SendMessage("CAST_STOP", srcUnit)
     end
-	
-	-- cooldown tracker
-	if self.cooldownSpellIds[spellName] then
-		local unit = srcUnit
-		if self.buttons[unit] then
-		local unitClass
-		local spellId =  self.cooldownSpellIds[spellName] -- don't use spellId from combatlog, in case of different spellrank
-			if (self.cooldownSpells[self.buttons[unit].class][spellId]) then
-				unitClass = self.buttons[unit].class
-			else
-				unitClass = self.buttons[unit].race
-			end
-			self:CooldownUsed(unit, unitClass, spellId, spellName)
-		end
-	end
+
+    -- cooldown tracker
+    if self.cooldownSpellIds[spellName] then
+        local unit = srcUnit
+        if self.buttons[unit] then
+            local unitClass
+            local spellId = self.cooldownSpellIds[spellName] -- don't use spellId from combatlog, in case of different spellrank
+            if (self.cooldownSpells[self.buttons[unit].class][spellId]) then
+                unitClass = self.buttons[unit].class
+            else
+                unitClass = self.buttons[unit].race
+            end
+            self:CooldownUsed(unit, unitClass, spellId, spellName)
+        end
+    end
 end
 
 function Gladdy:UpdateUnits()
-	for unit,v in pairs(unitsToCheck) do
-		self:UpdateUnit(unit);
-	end
+    for unit, v in pairs(unitsToCheck) do
+        self:UpdateUnit(unit);
+    end
 end
-
 
 function Gladdy:UpdateCastBars()
 
@@ -727,21 +767,25 @@ function Gladdy:UpdateCastBars()
         information can either be lost by losing the unit (e.g. your pet doesn't target the player anymore)
         or they stop the actual cast. therefore sometimes the castbar may disappear, even though the player hasn't stopped the cast
      ]]
-    for i=1,5 do
-        local button = self.buttons["arena"..i]
+    for i = 1, 5 do
+        local button = self.buttons["arena" .. i]
         if button and button.guid ~= UnitGUID("target") and button.guid ~= UnitGUID("focus") then
             local spell, rank, displayName, icon, startTime, endTime, event
             local value
             -- check if any relevant unit that isn't target or focus, but still equal to arena1-5 is casting
-            for uid,v in pairs(unitsToCheck) do
+            for uid, v in pairs(unitsToCheck) do
                 if button.guid == UnitGUID(uid) then
                     spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo(uid)
                     event = "cast"
-                    if startTime then value = GetTime() - (startTime / 1000) end
+                    if startTime then
+                        value = GetTime() - (startTime / 1000)
+                    end
                     -- try to have a backup in case server returns UnitCastingInfo data when it should be UnitChannelInfo
                     if not spell or channelSpells[spell] then
                         spell, rank, displayName, icon, startTime, endTime = UnitChannelInfo(uid)
-                        if endTime then value = (endTime / 1000) - GetTime() end
+                        if endTime then
+                            value = (endTime / 1000) - GetTime()
+                        end
                         event = "channel"
                     end
                 end
@@ -757,10 +801,10 @@ function Gladdy:UpdateCastBars()
 end
 
 function Gladdy:UpdateUnit(unit)
-   local guid = UnitGUID(unit)
-   if (guid and self:IsValid(unit)) then
-       self:UpdateGUID(guid, unit)
-   end
+    local guid = UnitGUID(unit)
+    if (guid and self:IsValid(unit)) then
+        self:UpdateGUID(guid, unit)
+    end
 end
 
 function Gladdy:PLAYER_TARGET_CHANGED()
@@ -807,21 +851,27 @@ function Gladdy:UNIT_TARGET(event, uid)
 end
 
 function Gladdy:OnCommReceived(prefix, message, dest, sender)
-	-- hack, to avoid faulty messages from ArenaIdentify (not server sent)
-	if dest ~= "WHISPER" then return end
-	----
+    -- hack, to avoid faulty messages from ArenaIdentify (not server sent)
+    if dest ~= "WHISPER" then
+        return
+    end
+    ----
     if (prefix == "Gladdy" and sender ~= UnitName("player")) then
         local name, guid, class, classLoc, raceLoc, spec, health, healthMax, power, powerMax, powerType = strsplit(',', message)
         health, healthMax = tonumber(health), tonumber(healthMax)
         power, powerMax, powerType = tonumber(power), tonumber(powerMax), tonumber(powerType)
-		if self:IsInParty(guid) then return end
+        if self:IsInParty(guid) then
+            return
+        end
         local unit = self.guids[guid]
         if (not unit) then
             unit = self:EnemySpotted(name, guid, class, classLoc, raceLoc)
         end
 
         local button = self.buttons[unit]
-        if (not button) then return end
+        if (not button) then
+            return
+        end
 
         button.health = health
         button.healthMax = healthMax
@@ -847,7 +897,9 @@ end
 
 function Gladdy:AuraGain(unit, aura)
     local button = self.buttons[unit]
-    if (not button) then return end
+    if (not button) then
+        return
+    end
 
     if (aura == self.NS) then
         button.ns = true
@@ -865,7 +917,9 @@ end
 
 function Gladdy:AuraFade(unit, aura)
     local button = self.buttons[unit]
-    if (not button) then return end
+    if (not button) then
+        return
+    end
 
     if (aura == self.NS) then
         button.ns = false
@@ -880,7 +934,9 @@ end
 
 function Gladdy:CastStart(unit, spell, icon, value, maxValue, event)
     local button = self.buttons[unit]
-    if (not button) then return end
+    if (not button) then
+        return
+    end
 
     if (button.ns or button.pom or (button.nf and spell == self.SHADOWBOLT) or self.INSTANT[spell]) then
         self:CastSuccess(unit, spell)
@@ -898,77 +954,83 @@ end
 
 function Gladdy:DetectSpec(unit, spec)
     local button = self.buttons[unit]
-    if (not button or not spec or button.spec ~= "") then return end
+    if (not button or not spec or button.spec ~= "") then
+        return
+    end
 
     button.spec = spec
     self:SendMessage("UNIT_SPEC", unit, spec)
-	
-	-- update cooldown tracker
-	--[[
-		All of this could possibly be handled in a "once they're used, they show up"-manner
-		but I PERSONALLY prefer it this way. It also meant less work and makes spec-specific cooldowns easier
-	]]
-	if (self.db.cooldown) then
-      local class = self.buttons[unit].class
-	  local race = self.buttons[unit].race
-      for k,v in pairs(self.cooldownSpells[class]) do
-         --if (self.db.cooldownList[k] ~= false and self.db.cooldownList[class] ~= false) then      
+
+    -- update cooldown tracker
+    --[[
+        All of this could possibly be handled in a "once they're used, they show up"-manner
+        but I PERSONALLY prefer it this way. It also meant less work and makes spec-specific cooldowns easier
+    ]]
+    if (self.db.cooldown) then
+        local class = self.buttons[unit].class
+        local race = self.buttons[unit].race
+        for k, v in pairs(self.cooldownSpells[class]) do
+            --if (self.db.cooldownList[k] ~= false and self.db.cooldownList[class] ~= false) then
             if (type(v) == "table" and ((v.spec ~= nil and v.spec == spec) or (v.notSpec ~= nil and v.notSpec ~= spec))) then
-               local button = self.buttons[unit]
-               
-               local sharedCD = false
-               if (type(v) == "table" and v.sharedCD ~= nil and v.sharedCD.cd == nil) then
-                  for spellId, _ in pairs(v.sharedCD) do
-                     for i=1, button.lastCooldownSpell do
-                        local icon = button.spellCooldownFrame["icon" .. i]
-                        if (icon.spellId == spellId) then 
-                           sharedCD = true 
+                local button = self.buttons[unit]
+
+                local sharedCD = false
+                if (type(v) == "table" and v.sharedCD ~= nil and v.sharedCD.cd == nil) then
+                    for spellId, _ in pairs(v.sharedCD) do
+                        for i = 1, button.lastCooldownSpell do
+                            local icon = button.spellCooldownFrame["icon" .. i]
+                            if (icon.spellId == spellId) then
+                                sharedCD = true
+                            end
                         end
-                     end
-                  end
-               end
-               if sharedCD then return end
-               
-               local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
-               icon:Show()
-               icon.texture:SetTexture(self.spellTextures[k])
-               icon.spellId = k
-			   button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
-               button.lastCooldownSpell = button.lastCooldownSpell + 1
+                    end
+                end
+                if sharedCD then
+                    return
+                end
+
+                local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
+                icon:Show()
+                icon.texture:SetTexture(self.spellTextures[k])
+                icon.spellId = k
+                button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
+                button.lastCooldownSpell = button.lastCooldownSpell + 1
             end
-         end
-      --end
-   end
-   ----------------------
-   --- RACE FUNCTIONALITY
-   ----------------------
-	local race = self.buttons[unit].race
-    for k,v in pairs(self.cooldownSpells[race]) do
-         --if (self.db.cooldownList[k] ~= false and self.db.cooldownList[class] ~= false) then      
+        end
+        --end
+    end
+    ----------------------
+    --- RACE FUNCTIONALITY
+    ----------------------
+    local race = self.buttons[unit].race
+    for k, v in pairs(self.cooldownSpells[race]) do
+        --if (self.db.cooldownList[k] ~= false and self.db.cooldownList[class] ~= false) then
         if (type(v) == "table" and ((v.spec ~= nil and v.spec == spec) or (v.notSpec ~= nil and v.notSpec ~= spec))) then
-               local button = self.buttons[unit]
-               local sharedCD = false
-               if (type(v) == "table" and v.sharedCD ~= nil and v.sharedCD.cd == nil) then
-                  for spellId, _ in pairs(v.sharedCD) do
-                     for i=1, button.lastCooldownSpell do
+            local button = self.buttons[unit]
+            local sharedCD = false
+            if (type(v) == "table" and v.sharedCD ~= nil and v.sharedCD.cd == nil) then
+                for spellId, _ in pairs(v.sharedCD) do
+                    for i = 1, button.lastCooldownSpell do
                         local icon = button.spellCooldownFrame["icon" .. i]
-                        if (icon.spellId == spellId) then 
-                           sharedCD = true 
+                        if (icon.spellId == spellId) then
+                            sharedCD = true
                         end
-                     end
-                  end
-               end
-               if sharedCD then return end
-               
-               local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
-               icon:Show()
-               icon.texture:SetTexture(self.spellTextures[k])
-               icon.spellId = k
-			   button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
-               button.lastCooldownSpell = button.lastCooldownSpell + 1            
+                    end
+                end
+            end
+            if sharedCD then
+                return
+            end
+
+            local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
+            icon:Show()
+            icon.texture:SetTexture(self.spellTextures[k])
+            icon.spellId = k
+            button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
+            button.lastCooldownSpell = button.lastCooldownSpell + 1
         end
     end
-      --end
+    --end
 end
 
 function Gladdy:IsValid(uid)
@@ -978,51 +1040,51 @@ function Gladdy:IsValid(uid)
 end
 
 function Gladdy:UpdateCooldowns(button)
-	local class = button.class
-	local race = button.race
-	
-	if (self.db.cooldown) then         
-    	for k,v in pairs(self.cooldownSpells[class]) do
- 	       if (type(v) ~= "table" or (type(v) == "table" and v.spec == nil and v.notSpec == nil)) then
-           -- see if we have shared cooldowns without a cooldown defined
-           -- e.g. hunter traps have shared cooldowns, so only display one trap instead all of them
-           local sharedCD = false
-           if (type(v) == "table" and v.sharedCD ~= nil and v.sharedCD.cd == nil) then
-    	       for spellId, _ in pairs(v.sharedCD) do
-        	       for i=1, button.lastCooldownSpell do
-            	       local icon = button.spellCooldownFrame["icon" .. i]
-                       if (icon.spellId == spellId) then 
-                	       sharedCD = true 
-                       end
+    local class = button.class
+    local race = button.race
+
+    if (self.db.cooldown) then
+        for k, v in pairs(self.cooldownSpells[class]) do
+            if (type(v) ~= "table" or (type(v) == "table" and v.spec == nil and v.notSpec == nil)) then
+                -- see if we have shared cooldowns without a cooldown defined
+                -- e.g. hunter traps have shared cooldowns, so only display one trap instead all of them
+                local sharedCD = false
+                if (type(v) == "table" and v.sharedCD ~= nil and v.sharedCD.cd == nil) then
+                    for spellId, _ in pairs(v.sharedCD) do
+                        for i = 1, button.lastCooldownSpell do
+                            local icon = button.spellCooldownFrame["icon" .. i]
+                            if (icon.spellId == spellId) then
+                                sharedCD = true
+                            end
+                        end
                     end
-               	end
-           	end
-                  
-          	if (not sharedCD) then                              
-	            local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
-	            icon:Show()
-	            icon.spellId = k
-	            icon.texture:SetTexture(self.spellTextures[k])
-	            button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
-	            button.lastCooldownSpell = button.lastCooldownSpell + 1  
-          	end          
-         end
-	end
-	----
-	-- RACE FUNCTIONALITY
-	----
-	 
-	 for k,v in pairs(self.cooldownSpells[race]) do
-	 	if (type(v) ~= "table" or (type(v) == "table" and v.spec == nil and v.notSpec == nil)) then
-	        local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
-	        icon:Show()
-	        icon.spellId = k
-	        icon.texture:SetTexture(self.spellTextures[k])
-			button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
-			button.lastCooldownSpell = button.lastCooldownSpell + 1  
-	 	end	
-	 end
-	end	
+                end
+
+                if (not sharedCD) then
+                    local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
+                    icon:Show()
+                    icon.spellId = k
+                    icon.texture:SetTexture(self.spellTextures[k])
+                    button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
+                    button.lastCooldownSpell = button.lastCooldownSpell + 1
+                end
+            end
+        end
+        ----
+        -- RACE FUNCTIONALITY
+        ----
+
+        for k, v in pairs(self.cooldownSpells[race]) do
+            if (type(v) ~= "table" or (type(v) == "table" and v.spec == nil and v.notSpec == nil)) then
+                local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
+                icon:Show()
+                icon.spellId = k
+                icon.texture:SetTexture(self.spellTextures[k])
+                button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
+                button.lastCooldownSpell = button.lastCooldownSpell + 1
+            end
+        end
+    end
 end
 
 function Gladdy:UpdateGUID(guid, uid)
@@ -1033,25 +1095,25 @@ function Gladdy:UpdateGUID(guid, uid)
         local raceLoc, race = UnitRace(uid)
         unit = self:EnemySpotted(name, guid, class, classLoc, raceLoc)
     end
-	if unit then
-		local button = self.buttons[unit]
-		local classLoc, class = UnitClass(uid)
-		local raceLoc, race = UnitRace(uid)
-		-- update cooldown tracker
-		if button then
-			button.race = race
-			button.lastCooldownSpell = 1
-			self:UpdateCooldowns(button)
-		end
-	end
+    if unit then
+        local button = self.buttons[unit]
+        local classLoc, class = UnitClass(uid)
+        local raceLoc, race = UnitRace(uid)
+        -- update cooldown tracker
+        if button then
+            button.race = race
+            button.lastCooldownSpell = 1
+            self:UpdateCooldowns(button)
+        end
+    end
     self:UNIT_AURA(nil, uid)
     self:UNIT_HEALTH(nil, uid)
     self:UNIT_POWER(nil, uid)
-    
+
 end
 
 function Gladdy:EnemySpotted(name, guid, class, classLoc, raceLoc)
-	if name == "Unknown" or self:IsInParty(guid) then
+    if name == "Unknown" or self:IsInParty(guid) then
         return
     end
 
@@ -1060,7 +1122,9 @@ function Gladdy:EnemySpotted(name, guid, class, classLoc, raceLoc)
     self.guids[guid] = unit
 
     local button = self.buttons[unit]
-    if (not button) then return end
+    if (not button) then
+        return
+    end
 
     button.name = name
     button.guid = guid
@@ -1076,12 +1140,12 @@ function Gladdy:EnemySpotted(name, guid, class, classLoc, raceLoc)
 end
 
 function Gladdy:IsInParty(guid)
-    for i=1, GetNumPartyMembers() do
+    for i = 1, GetNumPartyMembers() do
         if guid == UnitGUID("party" .. i) then
             return true
         end
     end
-    for i=1, GetNumRaidMembers() do
+    for i = 1, GetNumRaidMembers() do
         if guid == UnitGUID("raid" .. i) then
             return true
         end
@@ -1090,94 +1154,129 @@ function Gladdy:IsInParty(guid)
 end
 
 function Gladdy:CooldownUsed(unit, unitClass, spellId, spellName)
-   local button = self.buttons[unit]
-   if not button then return end   
-  -- if (self.db.cooldownList[spellId] == false) then return end
-   
-   local cooldown = self.cooldownSpells[unitClass][spellId]
-   local cd = cooldown
-   if (type(cooldown) == "table") then
-      -- return if the spec doesn't have a cooldown for this spell
-      --if (arenaSpecs[unit] ~= nil and cooldown.notSpec ~= nil and arenaSpecs[unit] == cooldown.notSpec) then return end
-		if (button.spec ~= nil and cooldown.notSpec ~= nil and button.spec == cooldown.notSpec) then return end 
-      
-      -- check if we need to reset other cooldowns because of this spell
-      if (cooldown.resetCD ~= nil) then
-         for k,v in pairs(cooldown.resetCD) do
-            self:CooldownReady(button, k, false)
-         end
-      end
-      
-      -- check if there is a special cooldown for the units spec
-      --if (arenaSpecs[unit] ~= nil and cooldown[arenaSpecs[unit]] ~= nil) then
-	  if (button.spec ~= nil and cooldown[button.spec] ~= nil) then
-         cd = cooldown[button.spec]
-      else
-         cd = cooldown.cd
-      end     
-      
-      -- check if there is a shared cooldown with an other spell
-      if (cooldown.sharedCD ~= nil) then
-         local sharedCD = cooldown.sharedCD.cd and cooldown.sharedCD.cd or cd
-      
-         for k,v in pairs(cooldown.sharedCD) do
-            if (k ~= "cd") then            
-               self:CooldownStart(button, k, sharedCD)
-            end
-         end
-      end
-   end  
+    local button = self.buttons[unit]
+    if not button then
+        return
+    end
+    -- if (self.db.cooldownList[spellId] == false) then return end
 
-   if (self.db.cooldown) then     
-      -- start cooldown
-      self:CooldownStart(button, spellId, cd)
-   end
-   
-   --[[ announcement
-   if (self.db.cooldownAnnounce or self.db.cooldownAnnounceList[spellId] or self.db.cooldownAnnounceList[unitClass]) then   
-      self:SendAnnouncement(string.format(L["COOLDOWN USED: %s (%s) used %s - %s sec. cooldown"], UnitName(unit), UnitClass(unit), spellName, cd), RAID_CLASS_COLORS[UnitClass(unit)], self.db.cooldownAnnounceList[spellId] and self.db.cooldownAnnounceList[spellId] or self.db.announceType)
-   end]]
-   
-   --[[ sound file
-   if (db.cooldownSoundList[spellId] ~= nil and db.cooldownSoundList[spellId] ~= "disabled") then
-      PlaySoundFile(LSM:Fetch(LSM.MediaType.SOUND, db.cooldownSoundList[spellId]))
-   end  ]]
+    local cooldown = self.cooldownSpells[unitClass][spellId]
+    local cd = cooldown
+    if (type(cooldown) == "table") then
+        -- return if the spec doesn't have a cooldown for this spell
+        --if (arenaSpecs[unit] ~= nil and cooldown.notSpec ~= nil and arenaSpecs[unit] == cooldown.notSpec) then return end
+        if (button.spec ~= nil and cooldown.notSpec ~= nil and button.spec == cooldown.notSpec) then
+            return
+        end
+
+        -- check if we need to reset other cooldowns because of this spell
+        if (cooldown.resetCD ~= nil) then
+            for k, v in pairs(cooldown.resetCD) do
+                self:CooldownReady(button, k, false)
+            end
+        end
+
+        -- check if there is a special cooldown for the units spec
+        --if (arenaSpecs[unit] ~= nil and cooldown[arenaSpecs[unit]] ~= nil) then
+        if (button.spec ~= nil and cooldown[button.spec] ~= nil) then
+            cd = cooldown[button.spec]
+        else
+            cd = cooldown.cd
+        end
+
+        -- check if there is a shared cooldown with an other spell
+        if (cooldown.sharedCD ~= nil) then
+            local sharedCD = cooldown.sharedCD.cd and cooldown.sharedCD.cd or cd
+
+            for k, v in pairs(cooldown.sharedCD) do
+                if (k ~= "cd") then
+                    self:CooldownStart(button, k, sharedCD)
+                end
+            end
+        end
+    end
+
+    if (self.db.cooldown) then
+        -- start cooldown
+        self:CooldownStart(button, spellId, cd)
+    end
+
+    --[[ announcement
+    if (self.db.cooldownAnnounce or self.db.cooldownAnnounceList[spellId] or self.db.cooldownAnnounceList[unitClass]) then
+       self:SendAnnouncement(string.format(L["COOLDOWN USED: %s (%s) used %s - %s sec. cooldown"], UnitName(unit), UnitClass(unit), spellName, cd), RAID_CLASS_COLORS[UnitClass(unit)], self.db.cooldownAnnounceList[spellId] and self.db.cooldownAnnounceList[spellId] or self.db.announceType)
+    end]]
+
+    --[[ sound file
+    if (db.cooldownSoundList[spellId] ~= nil and db.cooldownSoundList[spellId] ~= "disabled") then
+       PlaySoundFile(LSM:Fetch(LSM.MediaType.SOUND, db.cooldownSoundList[spellId]))
+    end  ]]
 end
 
-function Gladdy:CooldownStart(button, spellId, duration) -- starts timer frame
-   if not duration or duration == nil or type(duration) ~= "number" then return end
-   for i=1, button.lastCooldownSpell+1 do
-   --self:Print("ID on CD Frame #"..i..":  "..button.spellCooldownFrame["icon" .. i].spellId.."   spellID just casted:"..spellId)
-      if (button.spellCooldownFrame["icon" .. i].spellId == spellId) then
-         local frame = button.spellCooldownFrame["icon" .. i]
-         frame.active = true
-         frame.timeLeft = duration
-         frame.cooldown:SetCooldown(GetTime(), duration)
-                  
-         frame:SetScript("OnUpdate", function(self, elapsed)
-            self.timeLeft = self.timeLeft - elapsed
-            if ( self.timeLeft <= 0 ) then
-               Gladdy:CooldownReady(button, spellId, frame)
-            end	
-         end)
-      end
-   end
+local function formatTimer(num, numDecimalPlaces)
+    return tonumber(string.format("%." .. (numDecimalPlaces or 0) .. "f", num))
+end
+
+function Gladdy:CooldownStart(button, spellId, duration)
+    -- starts timer frame
+    if not duration or duration == nil or type(duration) ~= "number" then
+        return
+    end
+    for i = 1, button.lastCooldownSpell + 1 do
+        --self:Print("ID on CD Frame #"..i..":  "..button.spellCooldownFrame["icon" .. i].spellId.."   spellID just casted:"..spellId)
+        if (button.spellCooldownFrame["icon" .. i].spellId == spellId) then
+            local frame = button.spellCooldownFrame["icon" .. i]
+            frame.active = true
+            frame.timeLeft = duration
+            frame.cooldown:SetCooldown(GetTime(), duration)
+            frame:SetScript("OnUpdate", function(self, elapsed)
+                self.timeLeft = self.timeLeft - elapsed
+                local timeLeft = ceil(self.timeLeft)
+                local timeLeftMilliSec = formatTimer(self.timeLeft, 1)
+                if timeLeft >= 60 then
+                    -- more than 1 minute
+                    self.cooldownFont:SetTextColor(1, 1, 0)
+                    self.cooldownFont:SetText(floor(timeLeft / 60) .. ":" .. string.format("%02.f", floor(timeLeft - floor(timeLeft / 60) * 60)))
+                elseif timeLeft < 60 and timeLeft >= 21 then
+                    -- between 60s and 21s (green)
+                    self.cooldownFont:SetTextColor(0.7, 1, 0)
+                    self.cooldownFont:SetText(timeLeft)
+                elseif timeLeft < 20.9 and timeLeft >= 11 then
+                    -- between 20s and 11s (green)
+                    self.cooldownFont:SetTextColor(0, 1, 0)
+                    self.cooldownFont:SetText(timeLeft)
+                elseif timeLeftMilliSec <= 10 and timeLeftMilliSec >= 5 then
+                    -- between 10s and 5s (orange)
+                    self.cooldownFont:SetTextColor(1, 0.7, 0)
+                    self.cooldownFont:SetFormattedText("%.1f", timeLeftMilliSec)
+                elseif timeLeftMilliSec < 5 and timeLeftMilliSec > 0 then
+                    -- between 5s and 1s (red)
+                    self.cooldownFont:SetTextColor(1, 0, 0)
+                    self.cooldownFont:SetFormattedText("%.1f", timeLeftMilliSec)
+                else
+                    self.cooldownFont:SetText("")
+                end
+                if (self.timeLeft <= 0) then
+                    Gladdy:CooldownReady(button, spellId, frame)
+                end
+            end)
+        end
+    end
 end
 
 function Gladdy:CooldownReady(button, spellId, frame)
-   if (frame == false) then
-      for i=1, button.lastCooldownSpell do
-         frame = button.spellCooldownFrame["icon" .. i]
-         
-         if (frame.spellId == spellId) then  
-            frame.active = false
-            frame.cooldown:Hide()
-            frame:SetScript("OnUpdate", nil)
-         end
-      end
-   else
-      frame.active = false
-      frame.cooldown:Hide()
-      frame:SetScript("OnUpdate", nil)
-   end
+    if (frame == false) then
+        for i = 1, button.lastCooldownSpell do
+            frame = button.spellCooldownFrame["icon" .. i]
+
+            if (frame.spellId == spellId) then
+                frame.active = false
+                frame.cooldown:Hide()
+                frame:SetScript("OnUpdate", nil)
+            end
+        end
+    else
+        frame.active = false
+        frame.cooldown:Hide()
+        frame:SetScript("OnUpdate", nil)
+    end
 end

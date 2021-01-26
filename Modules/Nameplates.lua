@@ -187,12 +187,9 @@ local function UpdateTotems(hp)
 
 	for totem in pairs(totems["Totems"]) do
 		if ( name == totem and totems["Totems"][totem] == true ) then
-			overlay:SetAlpha(0) 
-			hpborder:Hide()
-			oldname:Hide()
-			level:Hide()
+			overlay:SetAlpha(0)
+			oldname:Show()
 			hp:SetAlpha(0)
-			raidicon:Hide()
 			if not frame.totem then
 				frame.totem = frame:CreateTexture(nil, "BACKGROUND")
 				frame.totem:ClearAllPoints()
@@ -206,17 +203,10 @@ local function UpdateTotems(hp)
 			break
 		elseif ( name == totem ) then
 			overlay:SetAlpha(0)
-			hpborder:Hide()
-			oldname:Hide()
-			level:Hide()
+			oldname:Show()
 			hp:SetAlpha(0)
-			raidicon:Hide()
 			break
 		else
-			overlay:SetAlpha(1)
-			hpborder:Show()
-			oldname:Show()
-			level:Show()
 			hp:SetAlpha(1)
 			if frame.totem then frame.totem:Hide() end
 		end

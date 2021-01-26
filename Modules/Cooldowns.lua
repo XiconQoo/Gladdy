@@ -8,19 +8,9 @@ local Cooldown = Gladdy:NewModule("Cooldown", nil, {
 })
 
 function Cooldown:Test(unit)
-		local button = Gladdy.buttons[unit]
-		self.cooldownSpells = Gladdy:GetCooldownList()
-		button.lastCooldownSpell = 1
-		local class = "WARRIOR"
-		local classLoc = L["Warrior"]
-		for k,v in pairs(self.cooldownSpells[class]) do		
-			local icon = button.spellCooldownFrame["icon" .. button.lastCooldownSpell]
-			icon:Show()
-			icon.spellId = k
-			icon.texture:SetTexture(Gladdy.spellTextures[k])
-			button.spellCooldownFrame["icon" .. button.lastCooldownSpell] = icon
-			button.lastCooldownSpell = button.lastCooldownSpell + 1  
-		end
+    local button = Gladdy.buttons[unit]
+    button.spellCooldownFrame:Show()
+    button.lastCooldownSpell = 1
 end
 
 local function option(params)
@@ -35,7 +25,7 @@ local function option(params)
             if( key == "cooldownPos" and value == "LEFT" ) then
               Gladdy.db.drCooldownPos = "RIGHT"
             elseif ( key == "cooldownPos" and value == "RIGHT" ) then
-              Gladdy.db.drCooldownPos = "LEFT"
+              Gladdy.db.drCooldownPos = "RIGHT"
             end
             Gladdy.dbi.profile[key] = value
             Gladdy:UpdateFrame()
@@ -76,6 +66,26 @@ function Cooldown:GetOptions()
             },
         }),
     }
+end
+
+function Gladdy:UpdateTestCooldowns(i)
+    local unit = "arena"..i
+    local button = Gladdy.buttons[unit]
+
+    button.lastCooldownSpell = 1
+    Gladdy:UpdateCooldowns(button)
+    Gladdy:DetectSpec(unit, button.testSpec)
+
+    -- use class spells
+    for k,v in pairs(self.cooldownSpells[button.class]) do
+        --k is spellId
+        Gladdy:CooldownUsed(unit, button.class, k, nil)
+    end
+    -- use race spells
+    for k,v in pairs(self.cooldownSpells[button.race]) do
+        Gladdy:CooldownUsed(unit, button.race, k, nil)
+    end
+
 end
 
 function Gladdy:GetCooldownList()

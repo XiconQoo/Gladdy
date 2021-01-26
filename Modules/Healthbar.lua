@@ -8,8 +8,8 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
 local Healthbar = Gladdy:NewModule("Healthbar", 100, {
-    healthBarHeight = 24,
-    healthBarTexture = "Minimalist",
+    healthBarHeight = 50,
+    healthBarTexture = "Smooth",
     healthBarFontColor = {r = 1, g = 1, b = 1, a = 1},
     healthBarFontSize = 12,
     healthActual = false,
@@ -26,15 +26,36 @@ function Healthbar:Initialise()
 end
 
 function Healthbar:CreateFrame(unit)
+	local button = Gladdy.buttons[unit]
     local healthBar = CreateFrame("StatusBar", nil, Gladdy.buttons[unit])
     healthBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.healthBarTexture))
     healthBar:SetMinMaxValues(0, 100)
-
-    healthBar.bg = healthBar:CreateTexture(nil, "BACKGROUND")
+	
+	local healthBarBorder = CreateFrame("Frame", nil, healthBar)
+    healthBarBorder:SetBackdrop({edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
+	edgeSize = 13,
+	insets = {left = 4, right = 4, top = 4, bottom = 4},})
+    healthBarBorder:SetFrameStrata("HIGH")
+	
+	local classIconBarBorder = CreateFrame("Frame", nil, healthBar)
+    classIconBarBorder:SetBackdrop({edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
+	edgeSize = 30,
+	insets = {left = 4, right = 4, top = 4, bottom = 4},})
+    classIconBarBorder:SetFrameStrata("HIGH")
+	
+	local trinketBorder2 = CreateFrame("Frame", nil, healthBar)
+    trinketBorder2:SetBackdrop({edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
+	edgeSize = 30,
+	insets = {left = 4, right = 4, top = 4, bottom = 4},})
+    trinketBorder2:SetFrameStrata("HIGH")
+	
+   healthBar.bg = healthBar:CreateTexture(nil, "BACKGROUND")
     healthBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.healthBarTexture))
     healthBar.bg:ClearAllPoints()
     healthBar.bg:SetAllPoints(healthBar)
-    healthBar.bg:SetAlpha(.3)
+    healthBar.bg:SetAlpha(1)
+	healthBar.bg:SetVertexColor(0.7, 0.7, 0.7, 0.7)
+	
 
     healthBar.nameText = healthBar:CreateFontString(nil, "LOW")
     if( Gladdy.db.healthBarFontSize < 1 ) then
@@ -63,12 +84,16 @@ function Healthbar:CreateFrame(unit)
     healthBar.healthText:SetShadowColor(0, 0, 0, 1)
     healthBar.healthText:SetJustifyH("CENTER")
     healthBar.healthText:SetPoint("RIGHT", -5, 0)
-
+	
+	button.trinketBorder2 = trinketBorder2
+	button.classIconBarBorder = classIconBarBorder
+	button.healthBarBorder = healthBarBorder
     self.frames[unit] = healthBar
     self:ResetUnit(unit)
 end
 
 function Healthbar:UpdateFrame(unit)
+	local button = Gladdy.buttons[unit]
     local healthBar = self.frames[unit]
     if (not healthBar) then return end
 
@@ -80,7 +105,32 @@ function Healthbar:UpdateFrame(unit)
     healthBar:ClearAllPoints()
     healthBar:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPLEFT", iconSize, 0)
     healthBar:SetPoint("BOTTOMRIGHT", Gladdy.buttons[unit], "BOTTOMRIGHT")
-
+	
+	button.healthBarBorder:SetWidth(184)
+	button.healthBarBorder:SetHeight(54)
+    button.healthBarBorder:ClearAllPoints()
+    button.healthBarBorder:SetPoint("RIGHT", healthBar, "RIGHT", 2, 0)
+    button.healthBarBorder:SetBackdropBorderColor(0, 0, 0, 1)
+	
+	button.classIconBarBorder:SetWidth(73)
+	button.classIconBarBorder:SetHeight(78)
+    button.classIconBarBorder:ClearAllPoints()
+    button.classIconBarBorder:SetBackdropBorderColor(0, 0, 0, 1)
+	
+	button.trinketBorder2:SetWidth(70)
+	button.trinketBorder2:SetHeight(75)
+    button.trinketBorder2:ClearAllPoints()
+    button.trinketBorder2:SetBackdropBorderColor(0, 0, 0, 1)
+	
+	if( Gladdy.db.classIconPos == "RIGHT" ) then
+	button.classIconBarBorder:SetPoint("RIGHT", healthBar, "RIGHT", -180, -9)
+	button.trinketBorder2:SetPoint("RIGHT", healthBar, "RIGHT", 73, -9)
+	end
+	if( Gladdy.db.classIconPos == "LEFT" ) then
+	button.classIconBarBorder:SetPoint("RIGHT", healthBar, "RIGHT", 73, -9)
+	button.trinketBorder2:SetPoint("RIGHT", healthBar, "RIGHT", 140, -9)
+	end
+	
 	if(Gladdy.db.healthBarFontSize < 1) then
 		healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font"), 1)
 	    healthBar.healthText:SetFont(Gladdy.LSM:Fetch("font"), 1)

@@ -8,7 +8,7 @@ local L = Gladdy.L
 local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
 local Powerbar = Gladdy:NewModule("Powerbar", 90, {
     powerBarHeight = 16,
-    powerBarTexture = "Minimalist",
+    powerBarTexture = "Smooth",
     powerBarFontColor = {r = 1, g = 1, b = 1, a = 1},
     powerBarFontSize = 10,
     powerActual = true,
@@ -26,15 +26,23 @@ function Powerbar:Initialise()
 end
 
 function Powerbar:CreateFrame(unit)
+	local button = Gladdy.buttons[unit]
     local powerBar = CreateFrame("StatusBar", nil, Gladdy.buttons[unit])
     powerBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
     powerBar:SetMinMaxValues(0, 100)
-
+	
+	local powerBarBorder = CreateFrame("Frame", nil, powerBar)
+    powerBarBorder:SetBackdrop({edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
+	edgeSize = 13,
+	insets = {left = 4, right = 4, top = 4, bottom = 4},})
+    powerBarBorder:SetFrameStrata("HIGH")
+	
     powerBar.bg = powerBar:CreateTexture(nil, "BACKGROUND")
     powerBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
     powerBar.bg:ClearAllPoints()
     powerBar.bg:SetAllPoints(powerBar)
-    powerBar.bg:SetAlpha(.3)
+	powerBar.bg:SetVertexColor(1, 1, 1, 1)
+    powerBar.bg:SetAlpha(0.7)
 
     powerBar.raceText = powerBar:CreateFontString(nil, "LOW")
     powerBar.raceText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.powerBarFontSize)
@@ -42,7 +50,7 @@ function Powerbar:CreateFrame(unit)
     powerBar.raceText:SetShadowOffset(1, -1)
     powerBar.raceText:SetShadowColor(0, 0, 0, 1)
     powerBar.raceText:SetJustifyH("CENTER")
-    powerBar.raceText:SetPoint("LEFT", 5, 0)
+    powerBar.raceText:SetPoint("LEFT", 5, 1)
 
     powerBar.powerText = powerBar:CreateFontString(nil, "LOW")
     powerBar.powerText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.powerBarFontSize)
@@ -50,13 +58,15 @@ function Powerbar:CreateFrame(unit)
     powerBar.powerText:SetShadowOffset(1, -1)
     powerBar.powerText:SetShadowColor(0, 0, 0, 1)
     powerBar.powerText:SetJustifyH("CENTER")
-    powerBar.powerText:SetPoint("RIGHT", -5, 0)
-
+    powerBar.powerText:SetPoint("RIGHT", -5, 1)
+	
+	button.powerBarBorder = powerBarBorder
     self.frames[unit] = powerBar
     self:ResetUnit(unit)
 end
 
 function Powerbar:UpdateFrame(unit)
+	local button = Gladdy.buttons[unit]
     local powerBar = self.frames[unit]
     if (not powerBar) then return end
 
@@ -70,7 +80,13 @@ function Powerbar:UpdateFrame(unit)
 
     powerBar:ClearAllPoints()
     powerBar:SetPoint("TOPLEFT", healthBar, "BOTTOMLEFT", 0, -1)
-
+	
+	button.powerBarBorder:SetWidth(184)
+	button.powerBarBorder:SetHeight(20)
+    button.powerBarBorder:ClearAllPoints()
+    button.powerBarBorder:SetPoint("RIGHT", powerBar, "RIGHT", 2, 0)
+    button.powerBarBorder:SetBackdropBorderColor(0, 0, 0, 1)
+	
     powerBar.raceText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.powerBarFontSize)
     powerBar.raceText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)
     powerBar.powerText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.powerBarFontSize)

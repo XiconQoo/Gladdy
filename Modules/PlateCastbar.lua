@@ -271,6 +271,25 @@ local function keepCastbars(elapsed)
 	end
 end
 
+local function getName(namePlate)
+	local name
+	local _, _, _, _, eman, _, _ = namePlate:GetRegions()
+	if namePlate.aloftData then
+		name = namePlate.aloftData.name
+	elseif ElvUI then
+		name = namePlate.UnitFrame.oldName:GetText()
+	elseif sohighPlates then
+		--name = namePlate.name:GetText()
+		name = namePlate.oldname:GetText()
+	elseif strmatch(eman:GetText(), "%d") then
+		local _, _, _, _, _, nameRegion = namePlate:GetRegions()
+		name = nameRegion:GetText()
+	else
+		name = eman:GetText()
+	end
+	return name
+end
+
 local function createCastbars(elapsed)
 	-- decide whether castbar should be showing or not
 	
@@ -280,7 +299,7 @@ local function createCastbars(elapsed)
 	
 			for k, v in pairs(unitsToCheck) do
 				local unit = k
-				local name = oldname:GetText()
+				local name = getName(frame)
 				local Texture = _G[AddOn .. "_Texture_" .. unit .. "CastBar_CastBar"]
 				local CastTime = _G[AddOn .. "_FontString_" .. unit .. "CastBar_CastTime"]
 				local CastBar = _G[AddOn .. "_Frame_" .. unit .. "CastBar"]
@@ -353,6 +372,7 @@ local function Update(self, elapsed)
 			HookFrames(WorldFrame:GetChildren())
 		end
 	end
+	if sohighPlates then return end
 	createCastbars(elapsed)
 end
 

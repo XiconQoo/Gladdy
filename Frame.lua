@@ -30,15 +30,14 @@ Gladdy.BUTTON_DEFAULTS = {
 }
 
 function Gladdy:CreateFrame()
-	--self.db = self.dbi.profile ??
+    --self.db = self.dbi.profile ??
     self.frame = CreateFrame("Frame", "GladdyFrame", UIParent)
-    self.frame:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 16})
+
     self.frame:SetClampedToScreen(true)
     self.frame:EnableMouse(true)
     self.frame:SetMovable(true)
     self.frame:RegisterForDrag("LeftButton")
-	
-	
+
     self.frame:SetScript("OnDragStart", function(f)
         if (not InCombatLockdown() and not self.db.locked) then
             f:StartMoving()
@@ -56,7 +55,7 @@ function Gladdy:CreateFrame()
 
     self.anchor = CreateFrame("Button", "GladdyAnchor", self.frame)
     self.anchor:SetHeight(20)
-    self.anchor:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 16})
+    self.anchor:SetBackdrop({ bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 16 })
     self.anchor:SetBackdropColor(0, 0, 0, 1)
     self.anchor:SetClampedToScreen(true)
     self.anchor:EnableMouse(true)
@@ -107,8 +106,8 @@ end
 
 local function StyleActionButton(f)
     local name = f:GetName()
-    local button  = _G[name]
-    local icon  = _G[name .. "Icon"]
+    local button = _G[name]
+    local icon = _G[name .. "Icon"]
     local normalTex = _G[name .. "NormalTexture"]
 
     normalTex:SetHeight(button:GetHeight())
@@ -128,7 +127,7 @@ function Gladdy:UpdateFrame()
     local teamSize = self.curBracket or 5
 
     local iconSize = self.db.healthBarHeight
-    local margin = self.db.bottomMargin
+    local margin = 25
     local width = self.db.barWidth + self.db.padding * 2 + 5
     local height = self.db.healthBarHeight * teamSize + margin * (teamSize - 1) + self.db.padding * 2 + 5
     local extraBarWidth = 0
@@ -209,65 +208,61 @@ function Gladdy:UpdateFrame()
                 button.secure:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "BOTTOMLEFT", 0, -margin)
             end
         end
-		
-		-- Cooldown frame
-		if (self.db.cooldown) then
-			button.spellCooldownFrame:ClearAllPoints()
-			if self.db.cooldownPos == "RIGHT" then
-				button.spellCooldownFrame:SetPoint("TOPLEFT", button,"TOPRIGHT", iconSize+5, 1) -- needs to be properly anchored after trinket
-				
-			else
-				button.spellCooldownFrame:SetPoint("TOPRIGHT",button,"TOPLEFT",-5,-1)
-			end
-			--button.spellCooldownFrame:SetHeight(self.db.healthBarHeight+extraBarHeight)
-			button.spellCooldownFrame:SetHeight(self.db.cooldownSize*4)
-			--button.spellCooldownFrame:SetWidth(self.db.healthBarHeight+extraBarHeight)
-			button.spellCooldownFrame:SetWidth(self.db.cooldownSize*4)
-			button.spellCooldownFrame:Show()
-         -- Update each cooldown icon
-         for i=1,14 do
-            local icon = button.spellCooldownFrame["icon"..i]
-            icon:SetHeight(button.spellCooldownFrame:GetHeight()/2)
-            icon:SetWidth(button.spellCooldownFrame:GetWidth()/2)
-            icon:ClearAllPoints()
-            if(self.db.cooldownPos == "RIGHT") then
-					if(i==1) then
-						icon:SetPoint("TOPLEFT",button.spellCooldownFrame)
-					elseif(i==2) then
-						icon:SetPoint("TOP",button.spellCooldownFrame["icon"..i-1],"BOTTOM",0,-1)
-					elseif(i>=3) then
-						icon:SetPoint("LEFT",button.spellCooldownFrame["icon"..i-2],"RIGHT",1,0)
-					end
-				else
-					if(i==1) then
-						icon:SetPoint("TOPRIGHT",button.spellCooldownFrame)
-					elseif(i==2) then
-						icon:SetPoint("TOP",button.spellCooldownFrame["icon"..i-1],"BOTTOM",0,-1)
-					elseif(i>=3) then
-						icon:SetPoint("RIGHT",button.spellCooldownFrame["icon"..i-2],"LEFT",-1,0)
-					end
-				end	
-				
-				if (icon.active) then
-               icon.active = false
-               icon.cooldown:SetCooldown(GetTime(), 0)
-               icon:SetScript("OnUpdate", nil)            
-            end
-            icon.spellId = nil            
-            icon:SetAlpha(1)
-            icon.texture:SetTexture("Interface\\Icons\\Spell_Holy_PainSupression")
-            StyleActionButton(icon)
-            
-            if (not self.frame.testing) then
-               icon:Hide()
+
+        -- Cooldown frame
+        if (self.db.cooldown) then
+            button.spellCooldownFrame:ClearAllPoints()
+            if self.db.cooldownPos == "RIGHT" then
+                button.spellCooldownFrame:SetPoint("BOTTOMLEFT", button, "TOPLEFT", iconSize, self.db.padding - margin + extraBarHeight) -- needs to be properly anchored after trinket
             else
-               icon:Show()
+                button.spellCooldownFrame:SetPoint("BOTTOMLEFT", button, "TOPLEFT", iconSize, self.db.padding - margin + extraBarHeight)
             end
-         end
-         button.spellCooldownFrame:Show()
-      else
-         button.spellCooldownFrame:Hide()
-      end
+            --button.spellCooldownFrame:SetHeight(self.db.healthBarHeight+extraBarHeight)
+            button.spellCooldownFrame:SetHeight(55)
+            --button.spellCooldownFrame:SetWidth(self.db.healthBarHeight+extraBarHeight)
+            button.spellCooldownFrame:SetWidth(55)
+            button.spellCooldownFrame:Show()
+            -- Update each cooldown icon
+            for i = 1, 14 do
+                local icon = button.spellCooldownFrame["icon" .. i]
+                icon:SetHeight(button.spellCooldownFrame:GetHeight() / 2)
+                icon:SetWidth(button.spellCooldownFrame:GetWidth() / 2)
+                icon:ClearAllPoints()
+                if (self.db.cooldownPos == "RIGHT") then
+                    if (i == 1) then
+                        icon:SetPoint("TOPLEFT", button.spellCooldownFrame, 0, 0)
+                    else
+                        icon:SetPoint("LEFT", button.spellCooldownFrame["icon" .. i - 1], "RIGHT", 1, 0)
+                    end
+                end
+                if (self.db.cooldownPos == "LEFT") then
+                    if (i == 1) then
+                        icon:SetPoint("TOPLEFT", button.spellCooldownFrame, -250, 28)
+                    else
+                        icon:SetPoint("LEFT", button.spellCooldownFrame["icon" .. i - 2], "RIGHT", 1, 0)
+                    end
+                end
+
+                if (icon.active) then
+                    icon.active = false
+                    icon.cooldown:SetCooldown(GetTime(), 0)
+                    icon:SetScript("OnUpdate", nil)
+                end
+                icon.spellId = nil
+                icon:SetAlpha(1)
+                icon.texture:SetTexture("Interface\\Icons\\Spell_Holy_PainSupression")
+                StyleActionButton(icon)
+
+                if (not self.frame.testing) then
+                    icon:Hide()
+                else
+                    icon:Show()
+                end
+            end
+            button.spellCooldownFrame:Show()
+        else
+            button.spellCooldownFrame:Hide()
+        end
 
         for k, v in self:IterModules() do
             self:Call(v, "UpdateFrame", button.unit)
@@ -313,25 +308,30 @@ function Gladdy:CreateButton(i)
 
     local button = CreateFrame("Frame", "GladdyButtonFrame" .. i, self.frame)
     button:SetAlpha(0)
-	
-	-- Trinket presser
+
+    -- Trinket presser
     local trinketButton = CreateFrame("Button", "GladdyTrinketButton" .. i, button, "SecureActionButtonTemplate")
     trinketButton:RegisterForClicks("AnyUp")
     trinketButton:SetAttribute("*type*", "macro")
     --trinketButton:SetAttribute("macrotext1", string.format("/script Gladdy:TrinketUsed(\"%s\")", "arena" .. i))
-	-- Is there a way to NOT use a global function?
-	trinketButton:SetAttribute("macrotext1", string.format("/script Trinket:Used(\"%s\")", "arena" .. i))
-	
-	-- Cooldown frame
-	local spellCooldownFrame = CreateFrame("Frame", nil, button)
-	for x=1, 14 do
-		local icon = CreateFrame("CheckButton", "GladdyButton"..i.."SpellCooldownFrame"..x, spellCooldownFrame, "ActionButtonTemplate")
-		icon:EnableMouse(false)
-		icon.texture = _G[icon:GetName().."Icon"]
-		icon.cooldown = _G[icon:GetName().."Cooldown"]
-		icon.cooldown:SetReverse(false)
-		spellCooldownFrame["icon"..x] = icon
-	end
+    -- Is there a way to NOT use a global function?
+    trinketButton:SetAttribute("macrotext1", string.format("/script Trinket:Used(\"%s\")", "arena" .. i))
+
+    -- Cooldown frame
+    local spellCooldownFrame = CreateFrame("Frame", nil, button)
+    for x = 1, 14 do
+        local icon = CreateFrame("CheckButton", "GladdyButton" .. i .. "SpellCooldownFrame" .. x, spellCooldownFrame, "ActionButtonTemplate")
+        icon:EnableMouse(false)
+        icon.texture = _G[icon:GetName() .. "Icon"]
+        icon.cooldown = _G[icon:GetName() .. "Cooldown"]
+        icon.cooldown:SetReverse(false)
+        icon.cooldown.noCooldownCount = Gladdy.db.trinketDisableOmniCC
+        icon.cooldownFont = icon.cooldown:CreateFontString(nil, "OVERLAY")
+        icon.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", 10, "OUTLINE")
+        icon.cooldownFont:SetAllPoints(icon)
+
+        spellCooldownFrame["icon" .. x] = icon
+    end
 
     local secure = CreateFrame("Button", "GladdyButton" .. i, button, "SecureActionButtonTemplate")
     secure:RegisterForClicks("AnyUp")
@@ -340,8 +340,8 @@ function Gladdy:CreateButton(i)
     button.id = i
     button.unit = "arena" .. i
     button.secure = secure
-	button.trinketButton = trinketButton
-	button.spellCooldownFrame = spellCooldownFrame
+    button.trinketButton = trinketButton
+    button.spellCooldownFrame = spellCooldownFrame
 
     for k, v in pairs(self.BUTTON_DEFAULTS) do
         button[k] = v

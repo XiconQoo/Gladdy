@@ -1,5 +1,5 @@
 ## Interface: 20400
-## Title: Gladdy!
+## Title: Gladdy - Endless.gg - TotemPlatesEdited
 ## Notes: The most powerful arena AddOn for WoW 2.4.3
 ## Author: Mikhail "miraage" Osher / Schaka
 ## X-Email: miraage.wow@gmail.com / schakaqt@gmail.com

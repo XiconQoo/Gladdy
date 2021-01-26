@@ -19,9 +19,9 @@ function Classicon:CreateFrame(unit)
     local classIcon = Gladdy.buttons[unit]:CreateTexture(nil, "ARTWORK")
     classIcon:ClearAllPoints()
     if( Gladdy.db.classIconPos == "RIGHT" ) then
-	    classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", 2, 0)
+	    classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", -4, 2)
 	else
-		classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPLEFT", -2, 0)    	
+		classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPLEFT", 2, 2)
     end
     
     self.frames[unit] = classIcon
@@ -33,13 +33,13 @@ function Classicon:UpdateFrame(unit)
 
     local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight
 
-    classIcon:SetWidth(iconSize)
-    classIcon:SetHeight(iconSize + 1)
+    classIcon:SetWidth(65)
+    classIcon:SetHeight(70)
     
-    if( Gladdy.db.classIconPos == "RIGHT" ) then
-	    classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", 2, 0)
+    if( Gladdy.db.classIconPos == "LEFT" ) then
+	    classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", 3, 2)
 	else
-		classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPLEFT", -2, 0)    	
+		classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPLEFT", -2, 2)    	
     end
 end
 

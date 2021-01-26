@@ -13,8 +13,8 @@ local L = Gladdy.L
 local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drFontColor = {r = 1, g = 1, b = 0, a = 1},
     drFontSize = 20,
-    drCooldownPos = "LEFT",
-    drIconSize = 30,
+    drCooldownPos = "RIGHT",
+    drIconSize = 36,
     drEnabled = true
 })
 
@@ -136,10 +136,11 @@ function Diminishings:UpdateFrame(unit)
     local offset = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight
 
     drFrame:ClearAllPoints()
-    if (Gladdy.db.drCooldownPos == "LEFT") then
-        drFrame:SetPoint("TOPRIGHT", Gladdy.buttons[unit], "TOPLEFT", -margin, -1)
-    else
-        drFrame:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", offset + margin, -1) -- Trinket icon
+    if (Gladdy.db.classIconPos == "LEFT") then
+        drFrame:SetPoint("TOPRIGHT", Gladdy.buttons[unit], "TOPLEFT", 962, -10)
+    end
+	if (Gladdy.db.classIconPos == "RIGHT") then
+        drFrame:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", 72, -10) -- Trinket icon
     end
 
     drFrame:SetWidth(Gladdy.db.drIconSize * 16)
@@ -161,7 +162,7 @@ function Diminishings:UpdateFrame(unit)
             if (i == 1) then
                 icon:SetPoint("TOPRIGHT")
             else
-                icon:SetPoint("RIGHT", drFrame["icon" .. (i - 1)], "LEFT")
+                icon:SetPoint("LEFT", drFrame["icon" .. (i - 1)], "RIGHT")
             end
         else
             if (i == 1) then
@@ -235,7 +236,7 @@ function Diminishings:Positionate(unit)
                 if (not lastIcon) then
                     icon:SetPoint("TOPRIGHT")
                 else
-                    icon:SetPoint("RIGHT", lastIcon, "LEFT")
+                    icon:SetPoint("LEFT", lastIcon, "RIGHT")
                 end
             else
                 if (not lastIcon) then
@@ -262,7 +263,7 @@ local function option(params)
             if( key == "drCooldownPos" and value == "LEFT") then
               Gladdy.db.cooldownPos = "RIGHT"
             elseif ( key == "drCooldownPos" and value == "RIGHT" ) then
-              Gladdy.db.cooldownPos = "LEFT"
+              Gladdy.db.cooldownPos = "RIGHT"
             end
             Gladdy.dbi.profile[key] = value
             Gladdy:UpdateFrame()

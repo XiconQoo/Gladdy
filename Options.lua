@@ -27,10 +27,20 @@ SLASH_GLADDY1 = "/gladdy"
 SlashCmdList["GLADDY"] = function(msg)
     if (msg == "test2") then
         Gladdy:ToggleFrame(2)
+        Gladdy:UpdateTestCooldowns(1)
+        Gladdy:UpdateTestCooldowns(2)
     elseif (msg == "test5") then
         Gladdy:ToggleFrame(5)
+        Gladdy:UpdateTestCooldowns(1)
+        Gladdy:UpdateTestCooldowns(2)
+        Gladdy:UpdateTestCooldowns(3)
+        --Gladdy:UpdateTestCooldowns(4)
+        --Gladdy:UpdateTestCooldowns(5)
     elseif (msg:find("test")) then
         Gladdy:ToggleFrame(3)
+        Gladdy:UpdateTestCooldowns(1)
+        Gladdy:UpdateTestCooldowns(2)
+        Gladdy:UpdateTestCooldowns(3)
     elseif (msg == "ui" or msg == "options" or msg == "config") then
         Gladdy:ShowOptions()
     elseif (msg == "reset") then

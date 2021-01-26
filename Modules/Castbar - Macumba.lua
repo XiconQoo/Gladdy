@@ -32,7 +32,7 @@ function Castbar:CreateFrame(unit)
     castBar:SetMinMaxValues(0, 100)
 	local castBarBorder = CreateFrame("Frame", nil, castBar)
     castBarBorder:SetBackdrop({edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
-	edgeSize = 14,
+	edgeSize = 13,
 	insets = {left = 4, right = 4, top = 4, bottom = 4},})
     castBarBorder:SetFrameStrata("HIGH")
     castBarBorder:Hide()
@@ -74,7 +74,7 @@ function Castbar:CreateFrame(unit)
     castBar.spellText:SetShadowOffset(1, -1)
     castBar.spellText:SetShadowColor(0, 0, 0, 1)
     castBar.spellText:SetJustifyH("CENTER")
-    castBar.spellText:SetPoint("LEFT", 7, 2) -- Text of the spell
+    castBar.spellText:SetPoint("LEFT", 7, 1) -- Text of the spell
 
     castBar.timeText = castBar:CreateFontString(nil, "LOW")
     castBar.timeText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.castBarFontSize)
@@ -82,7 +82,7 @@ function Castbar:CreateFrame(unit)
     castBar.timeText:SetShadowOffset(1, -1)
     castBar.timeText:SetShadowColor(0, 0, 0, 1)
     castBar.timeText:SetJustifyH("CENTER")
-    castBar.timeText:SetPoint("RIGHT", -4, 2) -- text of cast timer
+    castBar.timeText:SetPoint("RIGHT", -4, 1) -- text of cast timer
 	
 	button.castBarBorder = castBarBorder
     self.frames[unit] = castBar
@@ -101,7 +101,7 @@ function Castbar:UpdateFrame(unit)
 	castBar.bg:SetWidth(160)
     castBar.bg:SetHeight(30)
 	castBar.bg:ClearAllPoints()
-    castBar.bg:SetPoint("RIGHT", castBar, "RIGHT", 2, -2)
+    castBar.bg:SetPoint("RIGHT", castBar, "RIGHT", 2, 0)
    
     castBar:SetWidth(160)
     castBar:SetHeight(30)
