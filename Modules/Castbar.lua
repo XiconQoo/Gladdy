@@ -26,7 +26,6 @@ function Castbar:Initialise()
 end
 
 function Castbar:CreateFrame(unit)
-    local button = Gladdy.buttons[unit]
     local castBar = CreateFrame("StatusBar", nil, Gladdy.buttons[unit])
     castBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
     castBar:SetStatusBarColor(Gladdy.db.castBarColor.r, Gladdy.db.castBarColor.g, Gladdy.db.castBarColor.b, Gladdy.db.castBarColor.a)
@@ -96,9 +95,8 @@ function Castbar:UpdateFrame(unit)
         return
     end
 
-    local healthBar = Gladdy.modules.Healthbar.frames[unit]
-    local classIcon = Gladdy.modules.Classicon.frames[unit]
-    local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight
+    castBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
+    castBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
 
     castBar.bg:SetWidth(160)
     castBar.bg:SetHeight(Gladdy.db.castBarHeight)

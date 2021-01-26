@@ -114,7 +114,7 @@ local function StyleActionButton(f)
     normalTex:SetWidth(button:GetWidth())
     normalTex:SetPoint("CENTER")
 
-    button:SetNormalTexture("Interface\\AddOns\\Gladdy\\Images\\Gloss")
+    button:SetNormalTexture("Interface\\AddOns\\Gladdy\\Images\\Gloss_CDs")
 
     icon:SetTexCoord(.1, .9, .1, .9)
     icon:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)

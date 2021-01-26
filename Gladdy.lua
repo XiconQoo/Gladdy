@@ -210,6 +210,7 @@ function Gladdy:OnInitialise()
 
     self.LSM = LibStub("LibSharedMedia-3.0")
     self.LSM:Register("statusbar", "Gloss", "Interface\\AddOns\\Gladdy\\Images\\Gloss")
+    self.LSM:Register("statusbar", "Smooth", "Interface\\AddOns\\Gladdy\\Images\\Smooth")
     self.LSM:Register("statusbar", "Minimalist", "Interface\\AddOns\\Gladdy\\Images\\Minimalist")--*
 
     L = self.L
