@@ -137,7 +137,7 @@ function Diminishings:UpdateFrame(unit)
 
     drFrame:ClearAllPoints()
     if (Gladdy.db.drCooldownPos == "LEFT") then
-        if (Gladdy.db.trinketPos == "LEFT") then
+        if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
             if (Gladdy.db.castBarPos == "LEFT") then
                 drFrame:SetPoint("BOTTOMRIGHT", Gladdy.buttons[unit].trinketButton, "BOTTOMLEFT", -Gladdy.db.padding, 0)
             else
@@ -160,7 +160,7 @@ function Diminishings:UpdateFrame(unit)
         end
     end
 	if (Gladdy.db.drCooldownPos == "RIGHT") then
-        if (Gladdy.db.trinketPos == "RIGHT") then
+        if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
             if (Gladdy.db.castBarPos == "RIGHT") then
                 drFrame:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].trinketButton, "BOTTOMRIGHT", Gladdy.db.padding, 0)
             else

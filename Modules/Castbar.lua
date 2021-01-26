@@ -120,7 +120,7 @@ function Castbar:UpdateFrame(unit)
     if (Gladdy.db.castBarPos == "LEFT") then
         if (Gladdy.db.drCooldownPos == "LEFT" and Gladdy.db.drEnabled) then
             castBar:SetPoint("BOTTOMRIGHT", button.drFrame, "TOPRIGHT", 0, Gladdy.db.padding)
-        elseif (Gladdy.db.trinketPos == "LEFT") then
+        elseif (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
             castBar:SetPoint("RIGHT", button.trinketButton, "LEFT", -Gladdy.db.padding, 0)
         elseif (Gladdy.db.classIconPos == "LEFT") then
             castBar:SetPoint("RIGHT", button.classIcon, "LEFT", -Gladdy.db.padding, 0)
@@ -131,7 +131,7 @@ function Castbar:UpdateFrame(unit)
     if (Gladdy.db.castBarPos == "RIGHT") then
         if (Gladdy.db.drCooldownPos == "RIGHT" and Gladdy.db.drEnabled) then
             castBar:SetPoint("BOTTOMLEFT", button.drFrame, "TOPLEFT", castBar.icon:GetWidth() + 5, Gladdy.db.padding)
-        elseif (Gladdy.db.trinketPos == "RIGHT") then
+        elseif (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
             castBar:SetPoint("LEFT", button.trinketButton, "RIGHT", Gladdy.db.padding + castBar.icon:GetWidth() + 5, 0)
         elseif (Gladdy.db.classIconPos == "RIGHT") then
             castBar:SetPoint("LEFT", button.classIcon, "RIGHT", Gladdy.db.padding + castBar.icon:GetWidth() + 5, 0)
