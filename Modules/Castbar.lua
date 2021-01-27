@@ -8,11 +8,12 @@ local L = Gladdy.L
 local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
 local Castbar = Gladdy:NewModule("Castbar", 70, {
     castBarHeight = 20,
+    castBarWidth = 160,
     castBarTexture = "Smooth",
     castBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
     castBarFontSize = 12,
     castBarColor = { r = 1, g = 0.8, b = 0.2, a = 1 },
-    castBarBgColor = { r = 0.7, g = 0.7, b = 0.7, a = 0.7 },
+    castBarBgColor = {r = 0, g = 0, b = 0, a = 0.4},
     castBarGuesses = true,
     castBarPos = "LEFT"
 })
@@ -32,8 +33,7 @@ function Castbar:CreateFrame(unit)
     castBar:SetMinMaxValues(0, 100)
     castBar.border = CreateFrame("Frame", nil, castBar)
     castBar.border:SetBackdrop({ edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
-                                 edgeSize = 14,
-                                 insets = { left = 4, right = 4, top = 4, bottom = 4 }, })
+                                 edgeSize = 14})
     castBar.border:SetFrameStrata("HIGH")
     castBar.border:SetBackdropBorderColor(0, 0, 0, 1)
     castBar.border:Hide()
@@ -98,15 +98,15 @@ function Castbar:UpdateFrame(unit)
     castBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
     castBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
 
-    castBar.bg:SetWidth(160)
+    castBar.bg:SetWidth(Gladdy.db.castBarWidth)
     castBar.bg:SetHeight(Gladdy.db.castBarHeight)
     castBar.bg:ClearAllPoints()
     castBar.bg:SetPoint("RIGHT", castBar, "RIGHT", 2, -2)
 
-    castBar:SetWidth(160)
+    castBar:SetWidth(Gladdy.db.castBarWidth)
     castBar:SetHeight(Gladdy.db.castBarHeight)
 
-    castBar.border:SetWidth(165)
+    castBar.border:SetWidth(Gladdy.db.castBarWidth + 5)
     castBar.border:SetHeight(Gladdy.db.castBarHeight + 5)
     castBar.border:ClearAllPoints()
     castBar.border:SetPoint("RIGHT", castBar, "RIGHT", 3, 0)
@@ -264,18 +264,27 @@ function Castbar:GetOptions()
             max = 50,
             step = 1,
         }),
+        castBarWidth = option({
+            type = "range",
+            name = L["Bar width"],
+            desc = L["Width of the bars"],
+            order = 4,
+            min = 0,
+            max = 300,
+            step = 1,
+        }),
         castBarFontSize = option({
             type = "range",
             name = L["Font size"],
             desc = L["Size of the text"],
-            order = 4,
+            order = 5,
             min = 1,
             max = 20,
         }),
         castBarPos = option({
             type = "select",
             name = L["Position"],
-            order = 5,
+            order = 6,
             values = {
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],
@@ -285,7 +294,7 @@ function Castbar:GetOptions()
             type = "select",
             name = L["Bar texture"],
             desc = L["Texture of the bar"],
-            order = 6,
+            order = 7,
             dialogControl = "LSM30_Statusbar",
             values = AceGUIWidgetLSMlists.statusbar,
         }),
@@ -293,21 +302,21 @@ function Castbar:GetOptions()
             type = "color",
             name = L["Font color"],
             desc = L["Color of the text"],
-            order = 7,
+            order = 8,
             hasAlpha = true,
         }),
         castBarColor = colorOption({
             type = "color",
             name = L["Bar color"],
             desc = L["Color of the cast bar"],
-            order = 8,
+            order = 9,
             hasAlpha = true,
         }),
         castBarBgColor = colorOption({
             type = "color",
             name = L["Background color"],
             desc = L["Color of the cast bar background"],
-            order = 9,
+            order = 10,
             hasAlpha = true,
         }),
     }
