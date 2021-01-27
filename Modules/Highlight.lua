@@ -5,6 +5,7 @@ local CreateFrame = CreateFrame
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local Highlight = Gladdy:NewModule("Highlight", nil, {
+    highlightBorderSize = 3,
     targetBorderColor = {r = 1, g = 0.8, b = 0, a = 1},
     focusBorderColor = {r = 1, g = 0, b = 0, a = 1},
     leaderBorderColor = {r = 0, g = 1, b = 0, a = 1},
@@ -21,17 +22,17 @@ function Highlight:CreateFrame(unit)
     local healthBar = Gladdy.modules.Healthbar.frames[unit]
 
     local targetBorder = CreateFrame("Frame", nil, button)
-    targetBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 3})
+    targetBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = Gladdy.db.highlightBorderSize})
     targetBorder:SetFrameStrata("HIGH")
     targetBorder:Hide()
 
     local focusBorder = CreateFrame("Frame", nil, button)
-    focusBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 3})
+    focusBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = Gladdy.db.highlightBorderSize})
     focusBorder:SetFrameStrata("LOW")
     focusBorder:Hide()
 
     local leaderBorder = CreateFrame("Frame", nil, button)
-    leaderBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 3})
+    leaderBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = Gladdy.db.highlightBorderSize})
     leaderBorder:SetFrameStrata("MEDIUM")
     leaderBorder:Hide()
 
@@ -53,27 +54,30 @@ function Highlight:UpdateFrame(unit)
     local button = Gladdy.buttons[unit]
     if (not button) then return end
 
+    local borderSize = Gladdy.db.highlightBorderSize
     local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight
-    local width = Gladdy.db.barWidth + 4
-    local height = Gladdy.db.healthBarHeight + 4
-    local offset = iconSize / 2
+    local width = Gladdy.db.barWidth + borderSize*2
+    local height = iconSize + borderSize*2
 
     button.targetBorder:SetWidth(width)
     button.targetBorder:SetHeight(height)
     button.targetBorder:ClearAllPoints()
-    button.targetBorder:SetPoint("TOP", button, "TOP", offset, 2)
+    button.targetBorder:SetPoint("TOP", button.healthBar, "TOP", 0, borderSize)
+    button.targetBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = borderSize})
     button.targetBorder:SetBackdropBorderColor(Gladdy.db.targetBorderColor.r, Gladdy.db.targetBorderColor.g, Gladdy.db.targetBorderColor.b, Gladdy.db.targetBorderColor.a)
 
     button.focusBorder:SetWidth(width)
     button.focusBorder:SetHeight(height)
     button.focusBorder:ClearAllPoints()
-    button.focusBorder:SetPoint("TOP", button, "TOP", offset, 2)
+    button.focusBorder:SetPoint("TOP", button.healthBar, "TOP", 0, borderSize)
+    button.focusBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = borderSize})
     button.focusBorder:SetBackdropBorderColor(Gladdy.db.focusBorderColor.r, Gladdy.db.focusBorderColor.g, Gladdy.db.focusBorderColor.b, Gladdy.db.focusBorderColor.a)
 
     button.leaderBorder:SetWidth(width)
     button.leaderBorder:SetHeight(height)
     button.leaderBorder:ClearAllPoints()
-    button.leaderBorder:SetPoint("TOP", button, "TOP", offset, 2)
+    button.leaderBorder:SetPoint("TOP", button.healthBar, "TOP", 0, borderSize)
+    button.leaderBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = borderSize})
     button.leaderBorder:SetBackdropBorderColor(Gladdy.db.leaderBorderColor.r, Gladdy.db.leaderBorderColor.g, Gladdy.db.leaderBorderColor.b, Gladdy.db.leaderBorderColor.a)
 end
 
@@ -170,47 +174,56 @@ end
 
 function Highlight:GetOptions()
     return {
+        highlightBorderSize = {
+            type = "range",
+            name = L["Border size"],
+            desc = L["Border size"],
+            order = 2,
+            min = 1,
+            max = 10,
+            step = 1,
+        },
         targetBorderColor = colorOption({
             type = "color",
             name = L["Target border color"],
             desc = L["Color of the selected targets border"],
-            order = 2,
+            order = 3,
         }),
         focusBorderColor = colorOption({
             type = "color",
             name = L["Focus border color"],
             desc = L["Color of the focus border"],
-            order = 3,
+            order = 4,
         }),
         leaderBorderColor = colorOption({
             type = "color",
             name = L["Raid leader border color"],
             desc = L["Color of the raid leader border"],
-            order = 4,
+            order = 5,
         }),
         highlight = option({
             type = "toggle",
             name = L["Highlight target"],
             desc = L["Toggle if the selected target should be highlighted"],
-            order = 5,
+            order = 6,
         }),
         targetBorder = option({
             type = "toggle",
             name = L["Show border around target"],
             desc = L["Toggle if a border should be shown around the selected target"],
-            order = 6,
+            order = 7,
         }),
         focusBorder = option({
             type = "toggle",
             name = L["Show border around focus"],
             desc = L["Toggle of a border should be shown around the current focus"],
-            order = 7,
+            order = 9,
         }),
         leaderBorder = option({
             type = "toggle",
             name = L["Show border around raid leader"],
             desc = L["Toggle if a border should be shown around the raid leader"],
-            order = 8,
+            order = 9,
         }),
     }
 end
