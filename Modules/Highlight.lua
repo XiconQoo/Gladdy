@@ -6,9 +6,9 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local Highlight = Gladdy:NewModule("Highlight", nil, {
     highlightBorderSize = 3,
-    targetBorderColor = {r = 1, g = 0.8, b = 0, a = 1},
-    focusBorderColor = {r = 1, g = 0, b = 0, a = 1},
-    leaderBorderColor = {r = 0, g = 1, b = 0, a = 1},
+    targetBorderColor = { r = 1, g = 0.8, b = 0, a = 1 },
+    focusBorderColor = { r = 1, g = 0, b = 0, a = 1 },
+    leaderBorderColor = { r = 0, g = 1, b = 0, a = 1 },
     highlight = true,
     targetBorder = true,
     focusBorder = true,
@@ -17,22 +17,24 @@ local Highlight = Gladdy:NewModule("Highlight", nil, {
 
 function Highlight:CreateFrame(unit)
     local button = Gladdy.buttons[unit]
-    if (not button) then return end
+    if (not button) then
+        return
+    end
 
     local healthBar = Gladdy.modules.Healthbar.frames[unit]
 
     local targetBorder = CreateFrame("Frame", nil, button)
-    targetBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = Gladdy.db.highlightBorderSize})
+    targetBorder:SetBackdrop({ edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = Gladdy.db.highlightBorderSize })
     targetBorder:SetFrameStrata("HIGH")
     targetBorder:Hide()
 
     local focusBorder = CreateFrame("Frame", nil, button)
-    focusBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = Gladdy.db.highlightBorderSize})
+    focusBorder:SetBackdrop({ edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = Gladdy.db.highlightBorderSize })
     focusBorder:SetFrameStrata("LOW")
     focusBorder:Hide()
 
     local leaderBorder = CreateFrame("Frame", nil, button)
-    leaderBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = Gladdy.db.highlightBorderSize})
+    leaderBorder:SetBackdrop({ edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = Gladdy.db.highlightBorderSize })
     leaderBorder:SetFrameStrata("MEDIUM")
     leaderBorder:Hide()
 
@@ -52,38 +54,42 @@ end
 
 function Highlight:UpdateFrame(unit)
     local button = Gladdy.buttons[unit]
-    if (not button) then return end
+    if (not button) then
+        return
+    end
 
     local borderSize = Gladdy.db.highlightBorderSize
     local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight
-    local width = Gladdy.db.barWidth + borderSize*2
-    local height = iconSize + borderSize*2
+    local width = Gladdy.db.barWidth + borderSize * 2
+    local height = iconSize + borderSize * 2
 
     button.targetBorder:SetWidth(width)
     button.targetBorder:SetHeight(height)
     button.targetBorder:ClearAllPoints()
     button.targetBorder:SetPoint("TOP", button.healthBar, "TOP", 0, borderSize)
-    button.targetBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = borderSize})
+    button.targetBorder:SetBackdrop({ edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = borderSize })
     button.targetBorder:SetBackdropBorderColor(Gladdy.db.targetBorderColor.r, Gladdy.db.targetBorderColor.g, Gladdy.db.targetBorderColor.b, Gladdy.db.targetBorderColor.a)
 
     button.focusBorder:SetWidth(width)
     button.focusBorder:SetHeight(height)
     button.focusBorder:ClearAllPoints()
     button.focusBorder:SetPoint("TOP", button.healthBar, "TOP", 0, borderSize)
-    button.focusBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = borderSize})
+    button.focusBorder:SetBackdrop({ edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = borderSize })
     button.focusBorder:SetBackdropBorderColor(Gladdy.db.focusBorderColor.r, Gladdy.db.focusBorderColor.g, Gladdy.db.focusBorderColor.b, Gladdy.db.focusBorderColor.a)
 
     button.leaderBorder:SetWidth(width)
     button.leaderBorder:SetHeight(height)
     button.leaderBorder:ClearAllPoints()
     button.leaderBorder:SetPoint("TOP", button.healthBar, "TOP", 0, borderSize)
-    button.leaderBorder:SetBackdrop({edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = borderSize})
+    button.leaderBorder:SetBackdrop({ edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = borderSize })
     button.leaderBorder:SetBackdropBorderColor(Gladdy.db.leaderBorderColor.r, Gladdy.db.leaderBorderColor.g, Gladdy.db.leaderBorderColor.b, Gladdy.db.leaderBorderColor.a)
 end
 
 function Highlight:ResetUnit(unit)
     local button = Gladdy.buttons[unit]
-    if (not button) then return end
+    if (not button) then
+        return
+    end
 
     button.targetBorder:Hide()
     button.focusBorder:Hide()
@@ -103,7 +109,9 @@ end
 
 function Highlight:Toggle(unit, frame, show)
     local button = Gladdy.buttons[unit]
-    if (not button) then return end
+    if (not button) then
+        return
+    end
 
     if (frame == "target") then
         if (Gladdy.db.targetBorder and show) then
@@ -158,7 +166,7 @@ local function colorOption(params)
             local key = info.arg or info[#info]
             return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
         end,
-        set = function(info, r, g, b ,a)
+        set = function(info, r, g, b, a)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
             Gladdy:UpdateFrame()

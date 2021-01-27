@@ -235,7 +235,7 @@ function Gladdy:UpdateFrame()
                 local icon = button.spellCooldownFrame["icon" .. i]
                 icon:SetHeight(self.db.cooldownSize)
                 icon:SetWidth(self.db.cooldownSize)
-                icon.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", self.db.cooldownSize/2, "OUTLINE")
+                icon.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", self.db.cooldownSize / 2, "OUTLINE")
                 icon:ClearAllPoints()
                 if (self.db.cooldownXPos == "RIGHT") then
                     if (i == 1) then
@@ -337,7 +337,7 @@ function Gladdy:CreateButton(i)
         icon.cooldown:SetReverse(false)
         icon.cooldown.noCooldownCount = Gladdy.db.trinketDisableOmniCC
         icon.cooldownFont = icon.cooldown:CreateFontString(nil, "OVERLAY")
-        icon.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", self.db.cooldownSize/2, "OUTLINE")
+        icon.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", self.db.cooldownSize / 2, "OUTLINE")
         icon.cooldownFont:SetAllPoints(icon)
 
         spellCooldownFrame["icon" .. x] = icon

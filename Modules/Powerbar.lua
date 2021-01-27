@@ -9,8 +9,8 @@ local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
 local Powerbar = Gladdy:NewModule("Powerbar", 90, {
     powerBarHeight = 20,
     powerBarTexture = "Smooth",
-    powerBarFontColor = {r = 1, g = 1, b = 1, a = 1},
-    powerBarBgColor = { r = 0.3, g = 0.3, b = 0.3, a = 0.7},
+    powerBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
+    powerBarBgColor = { r = 0.3, g = 0.3, b = 0.3, a = 0.7 },
     powerBarFontSize = 10,
     powerActual = true,
     powerMax = true,
@@ -27,22 +27,22 @@ function Powerbar:Initialise()
 end
 
 function Powerbar:CreateFrame(unit)
-	local button = Gladdy.buttons[unit]
+    local button = Gladdy.buttons[unit]
     local powerBar = CreateFrame("StatusBar", nil, Gladdy.buttons[unit])
     powerBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
     powerBar:SetMinMaxValues(0, 100)
 
     powerBar.border = CreateFrame("Frame", nil, powerBar)
-    powerBar.border:SetBackdrop({edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
-                                 edgeSize = 13})
+    powerBar.border:SetBackdrop({ edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
+                                  edgeSize = 13 })
     powerBar.border:SetBackdropBorderColor(0, 0, 0, 1)
     powerBar.border:SetFrameStrata("HIGH")
-	
+
     powerBar.bg = powerBar:CreateTexture(nil, "BACKGROUND")
     powerBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
     powerBar.bg:ClearAllPoints()
     powerBar.bg:SetAllPoints(powerBar)
-	powerBar.bg:SetVertexColor(Gladdy.db.powerBarBgColor.r, Gladdy.db.powerBarBgColor.g, Gladdy.db.powerBarBgColor.b, Gladdy.db.powerBarBgColor.a)
+    powerBar.bg:SetVertexColor(Gladdy.db.powerBarBgColor.r, Gladdy.db.powerBarBgColor.g, Gladdy.db.powerBarBgColor.b, Gladdy.db.powerBarBgColor.a)
     powerBar.bg:SetAlpha(0.7)
 
     powerBar.raceText = powerBar:CreateFontString(nil, "LOW")
@@ -60,16 +60,18 @@ function Powerbar:CreateFrame(unit)
     powerBar.powerText:SetShadowColor(0, 0, 0, 1)
     powerBar.powerText:SetJustifyH("CENTER")
     powerBar.powerText:SetPoint("RIGHT", -5, 1)
-	
-	button.powerBar = powerBar
+
+    button.powerBar = powerBar
     self.frames[unit] = powerBar
     self:ResetUnit(unit)
 end
 
 function Powerbar:UpdateFrame(unit)
-	local button = Gladdy.buttons[unit]
+    local button = Gladdy.buttons[unit]
     local powerBar = self.frames[unit]
-    if (not powerBar) then return end
+    if (not powerBar) then
+        return
+    end
 
     local healthBar = Gladdy.modules.Healthbar.frames[unit]
 
@@ -83,11 +85,11 @@ function Powerbar:UpdateFrame(unit)
     powerBar:ClearAllPoints()
     powerBar:SetPoint("TOPLEFT", healthBar, "BOTTOMLEFT", 0, -1)
 
-    powerBar.border:SetWidth(powerBar:GetWidth()+2)
-    powerBar.border:SetHeight(powerBar:GetHeight()+2)
+    powerBar.border:SetWidth(powerBar:GetWidth() + 2)
+    powerBar.border:SetHeight(powerBar:GetHeight() + 2)
     powerBar.border:ClearAllPoints()
     powerBar.border:SetPoint("CENTER", powerBar, "CENTER", 0, 0)
-	
+
     powerBar.raceText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.powerBarFontSize)
     powerBar.raceText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)
     powerBar.powerText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.powerBarFontSize)
@@ -96,7 +98,9 @@ end
 
 function Powerbar:ResetUnit(unit)
     local powerBar = self.frames[unit]
-    if (not powerBar) then return end
+    if (not powerBar) then
+        return
+    end
 
     powerBar:SetStatusBarColor(1, 1, 1, 1)
     powerBar.raceText:SetText("")
@@ -107,7 +111,9 @@ end
 function Powerbar:Test(unit)
     local powerBar = self.frames[unit]
     local button = Gladdy.buttons[unit]
-    if (not powerBar or not button) then return end
+    if (not powerBar or not button) then
+        return
+    end
 
     self:ENEMY_SPOTTED(unit)
     self:UNIT_POWER(unit, button.power, button.powerMax, button.powerType)
@@ -116,7 +122,9 @@ end
 function Powerbar:ENEMY_SPOTTED(unit)
     local powerBar = self.frames[unit]
     local button = Gladdy.buttons[unit]
-    if (not powerBar or not button) then return end
+    if (not powerBar or not button) then
+        return
+    end
 
     local raceText = button.raceLoc
 
@@ -130,14 +138,18 @@ end
 function Powerbar:UNIT_SPEC(unit, spec)
     local powerBar = self.frames[unit]
     local button = Gladdy.buttons[unit]
-    if (not powerBar or not button) then return end
+    if (not powerBar or not button) then
+        return
+    end
 
     powerBar.raceText:SetText(spec .. " " .. button.raceLoc)
 end
 
 function Powerbar:UNIT_POWER(unit, power, powerMax, powerType)
     local powerBar = self.frames[unit]
-    if (not powerBar) then return end
+    if (not powerBar) then
+        return
+    end
 
     local powerPercentage = floor(power * 100 / powerMax)
     local powerText
@@ -177,7 +189,9 @@ end
 
 function Powerbar:UNIT_DEATH(unit)
     local powerBar = self.frames[unit]
-    if (not powerBar) then return end
+    if (not powerBar) then
+        return
+    end
 
     powerBar:SetValue(0)
     powerBar.powerText:SetText("0%")
@@ -209,7 +223,7 @@ local function colorOption(params)
             local key = info.arg or info[#info]
             return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
         end,
-        set = function(info, r, g, b ,a)
+        set = function(info, r, g, b, a)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
             Gladdy:UpdateFrame()

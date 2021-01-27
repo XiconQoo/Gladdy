@@ -53,7 +53,9 @@ end
 
 function Announcements:Test(unit)
     local button = Gladdy.buttons[unit]
-    if (not button) then return end
+    if (not button) then
+        return
+    end
 
     if (unit == "arena1") then
         self:UNIT_SPEC(unit, button.spec)
@@ -70,7 +72,9 @@ end
 
 function Announcements:CAST_START(unit, spell)
     local button = Gladdy.buttons[unit]
-    if (not button or not Gladdy.db.announcements.resurrections) then return end
+    if (not button or not Gladdy.db.announcements.resurrections) then
+        return
+    end
 
     if (self.RES_SPELLS[spell]) then
         self:Send(L["RESURRECTING: %s (%s)"]:format(button.name, button.classLoc), 3, RAID_CLASS_COLORS[button.class])
@@ -79,7 +83,9 @@ end
 
 function Announcements:ENEMY_SPOTTED(unit)
     local button = Gladdy.buttons[unit]
-    if (not button or not Gladdy.db.announcements.enemy) then return end
+    if (not button or not Gladdy.db.announcements.enemy) then
+        return
+    end
 
     if (not self.enemy[unit]) then
         self:Send(("%s (%s)"):format(button.name, button.classLoc), 3, RAID_CLASS_COLORS[button.class])
@@ -89,14 +95,18 @@ end
 
 function Announcements:UNIT_SPEC(unit, spec)
     local button = Gladdy.buttons[unit]
-    if (not button or not Gladdy.db.announcements.spec) then return end
+    if (not button or not Gladdy.db.announcements.spec) then
+        return
+    end
 
     self:Send(L["SPEC DETECTED: %s - %s (%s)"]:format(button.name, spec, button.classLoc), 3, RAID_CLASS_COLORS[button.class])
 end
 
 function Announcements:UNIT_HEALTH(unit, health, healthMax)
     local button = Gladdy.buttons[unit]
-    if (not button or not Gladdy.db.announcements.health) then return end
+    if (not button or not Gladdy.db.announcements.health) then
+        return
+    end
 
     local healthPercent = floor(health * 100 / healthMax)
     if (healthPercent < Gladdy.db.announcements.healthThreshold) then
@@ -106,21 +116,27 @@ end
 
 function Announcements:TRINKET_USED(unit)
     local button = Gladdy.buttons[unit]
-    if (not button or not Gladdy.db.announcements.trinketUsed) then return end
+    if (not button or not Gladdy.db.announcements.trinketUsed) then
+        return
+    end
 
     self:Send(L["TRINKET USED: %s (%s)"]:format(button.name, button.classLoc), 3, RAID_CLASS_COLORS[button.class])
 end
 
 function Announcements:TRINKET_READY(unit)
     local button = Gladdy.buttons[unit]
-    if (not button or not Gladdy.db.announcements.trinketReady) then return end
+    if (not button or not Gladdy.db.announcements.trinketReady) then
+        return
+    end
 
     self:Send(L["TRINKET READY: %s (%s)"]:format(button.name, button.classLoc), 3, RAID_CLASS_COLORS[button.class])
 end
 
 function Announcements:CheckDrink(unit, aura)
     local button = Gladdy.buttons[unit]
-    if (not button or not Gladdy.db.announcements.drinks) then return end
+    if (not button or not Gladdy.db.announcements.drinks) then
+        return
+    end
 
     if (aura == self.DRINK_AURA) then
         self:Send(L["DRINKING: %s (%s)"]:format(button.name, button.classLoc), 3, RAID_CLASS_COLORS[button.class])
@@ -139,7 +155,7 @@ function Announcements:Send(msg, throttle, color)
     end
 
     local dest = Gladdy.db.announcements.dest
-    color = color or {r = 0, g = 1, b = 0 }
+    color = color or { r = 0, g = 1, b = 0 }
 
     if (dest == "self") then
         Gladdy:Print(msg)

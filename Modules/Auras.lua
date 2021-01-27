@@ -7,7 +7,7 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local Auras = Gladdy:NewModule("Auras", nil, {
     auraFontSize = 20,
-    auraFontColor = {r = 1, g = 1, b = 0, a = 1}
+    auraFontColor = { r = 1, g = 1, b = 0, a = 1 }
 })
 
 function Auras:Initialise()
@@ -43,7 +43,7 @@ function Auras:CreateFrame(unit)
     auraFrame.icon:SetAllPoints(auraFrame)
     auraFrame.cooldown = CreateFrame("Cooldown", nil, auraFrame, "CooldownFrameTemplate")
     auraFrame.cooldown.noCooldownCount = true
-	
+
     auraFrame.text = auraFrame.cooldown:CreateFontString(nil, "OVERLAY")
     auraFrame.text:SetFont("Fonts\\FRIZQT__.ttf", 20, "OUTLINE")
     auraFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
@@ -58,7 +58,9 @@ end
 
 function Auras:UpdateFrame(unit)
     local auraFrame = self.frames[unit]
-    if (not auraFrame) then return end
+    if (not auraFrame) then
+        return
+    end
 
     local classIcon = Gladdy.modules.Classicon.frames[unit]
 
@@ -66,8 +68,8 @@ function Auras:UpdateFrame(unit)
     auraFrame:SetHeight(classIcon:GetHeight())
     auraFrame:SetAllPoints(classIcon)
 
-    auraFrame.cooldown:SetWidth(classIcon:GetWidth()-4)
-    auraFrame.cooldown:SetHeight(classIcon:GetHeight()-4)
+    auraFrame.cooldown:SetWidth(classIcon:GetWidth() - 4)
+    auraFrame.cooldown:SetHeight(classIcon:GetHeight() - 4)
     auraFrame.cooldown:ClearAllPoints()
     auraFrame.cooldown:SetPoint("CENTER", auraFrame, "CENTER")
 
@@ -98,38 +100,55 @@ end
 
 local rand = 0
 function TestAura()
-    if rand == 5 then rand = 0 end
+    if rand == 5 then
+        rand = 0
+    end
     local aura, _, icon = GetSpellInfo(12826)
-    if rand == 0 then Auras:AURA_GAIN("arena1", aura, icon, Auras.auras[aura].duration, Auras.auras[aura].priority) end
+    if rand == 0 then
+        Auras:AURA_GAIN("arena1", aura, icon, Auras.auras[aura].duration, Auras.auras[aura].priority)
+    end
     aura, _, icon = GetSpellInfo(6770)
-    if rand == 1 then Auras:AURA_GAIN("arena1", aura, icon, Auras.auras[aura].duration, Auras.auras[aura].priority) end
-    if rand == 2 then Auras:AURA_GAIN("arena1", aura, icon, 2, Auras.auras[aura].priority) end
+    if rand == 1 then
+        Auras:AURA_GAIN("arena1", aura, icon, Auras.auras[aura].duration, Auras.auras[aura].priority)
+    end
+    if rand == 2 then
+        Auras:AURA_GAIN("arena1", aura, icon, 2, Auras.auras[aura].priority)
+    end
     aura, _, icon = GetSpellInfo(31224)
-    if rand == 3 then Auras:AURA_GAIN("arena1", aura, icon, Auras.auras[aura].duration, Auras.auras[aura].priority) end
+    if rand == 3 then
+        Auras:AURA_GAIN("arena1", aura, icon, Auras.auras[aura].duration, Auras.auras[aura].priority)
+    end
     aura, _, icon = GetSpellInfo(33786)
-    if rand == 4 then Auras:AURA_GAIN("arena1", aura, icon, Auras.auras[aura].duration, Auras.auras[aura].priority) end
+    if rand == 4 then
+        Auras:AURA_GAIN("arena1", aura, icon, Auras.auras[aura].duration, Auras.auras[aura].priority)
+    end
     rand = rand + 1
 end
 
 function Auras:AURA_GAIN(unit, aura, icon, duration, priority)
     local auraFrame = self.frames[unit]
-    if (not auraFrame) then return end
+    if (not auraFrame) then
+        return
+    end
 
     if (auraFrame.priority and auraFrame.priority > priority) then
         return
     end
 
-    if not auraFrame.startTime or not auraFrame.active then -- was not active and new aura
+    if not auraFrame.startTime or not auraFrame.active then
+        -- was not active and new aura
         auraFrame.startTime = GetTime()
         auraFrame.endTime = GetTime() + duration
     end
 
-    if (auraFrame.name and auraFrame.name ~= aura) then -- was active but new aura
+    if (auraFrame.name and auraFrame.name ~= aura) then
+        -- was active but new aura
         auraFrame.startTime = GetTime()
         auraFrame.endTime = GetTime() + duration
     end
 
-    if (auraFrame.name and auraFrame.name == aura) then -- same aura as before, check if new endTime in margin of 100ms
+    if (auraFrame.name and auraFrame.name == aura) then
+        -- same aura as before, check if new endTime in margin of 100ms
         if GetTime() + duration - 0.1 > auraFrame.endTime or GetTime() + duration + 0.1 < auraFrame.endTime then
             auraFrame.startTime = GetTime()
             auraFrame.endTime = GetTime() + duration
@@ -146,7 +165,9 @@ end
 
 function Auras:AURA_FADE(unit)
     local auraFrame = self.frames[unit]
-    if (not auraFrame) then return end
+    if (not auraFrame) then
+        return
+    end
     if auraFrame.active then
         auraFrame.cooldown:SetCooldown(GetTime(), 0)
     end
@@ -186,7 +207,7 @@ local function colorOption(params)
             local key = info.arg or info[#info]
             return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
         end,
-        set = function(info, r, g, b ,a)
+        set = function(info, r, g, b, a)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
             Gladdy:UpdateFrame()

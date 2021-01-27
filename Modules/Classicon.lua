@@ -1,7 +1,3 @@
-local unpack = unpack
-
-local CLASS_BUTTONS = CLASS_BUTTONS
-
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local Classicon = Gladdy:NewModule("Classicon", 80, {
@@ -21,15 +17,15 @@ function Classicon:CreateFrame(unit)
     classIcon.texture = classIcon:CreateTexture(nil, "BACKGROUND")
     classIcon.texture:SetAllPoints(classIcon)
     classIcon:ClearAllPoints()
-    if( Gladdy.db.classIconPos == "RIGHT" ) then
-	    classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit].healthBar, "TOPRIGHT", 2, 2)
-	else
-		classIcon:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -2, 2)
+    if (Gladdy.db.classIconPos == "RIGHT") then
+        classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit].healthBar, "TOPRIGHT", 2, 2)
+    else
+        classIcon:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -2, 2)
     end
 
     classIcon.border = CreateFrame("Frame", nil, classIcon)
-    classIcon.border:SetBackdrop({edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-                           edgeSize = 24})
+    classIcon.border:SetBackdrop({ edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
+                                   edgeSize = 24 })
     classIcon.border:SetPoint("CENTER", classIcon, "CENTER", 0, 0)
 
     Gladdy.buttons[unit].classIcon = classIcon
@@ -38,17 +34,19 @@ end
 
 function Classicon:UpdateFrame(unit)
     local classIcon = self.frames[unit]
-    if (not classIcon) then return end
+    if (not classIcon) then
+        return
+    end
 
     local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight
 
-    classIcon:SetWidth(iconSize - iconSize*0.1)
+    classIcon:SetWidth(iconSize - iconSize * 0.1)
     classIcon:SetHeight(iconSize)
     classIcon:ClearAllPoints()
-    if( Gladdy.db.classIconPos == "LEFT" ) then
-	    classIcon:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -Gladdy.db.padding, 2)
-	else
-		classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", Gladdy.db.padding, 2)
+    if (Gladdy.db.classIconPos == "LEFT") then
+        classIcon:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -Gladdy.db.padding, 2)
+    else
+        classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", Gladdy.db.padding, 2)
     end
     classIcon:SetFrameStrata("LOW")
     classIcon:SetFrameLevel(1)
@@ -56,7 +54,7 @@ function Classicon:UpdateFrame(unit)
     classIcon.texture:ClearAllPoints()
     classIcon.texture:SetAllPoints(classIcon)
 
-    classIcon.border:SetWidth((iconSize - iconSize*0.1))
+    classIcon.border:SetWidth((iconSize - iconSize * 0.1))
     classIcon.border:SetHeight(iconSize)
     classIcon.border:SetFrameStrata("LOW")
     classIcon.border:SetFrameLevel(2)
@@ -71,7 +69,9 @@ end
 
 function Classicon:ResetUnit(unit)
     local classIcon = self.frames[unit]
-    if (not classIcon) then return end
+    if (not classIcon) then
+        return
+    end
 
     classIcon.texture:SetTexture("")
 end
@@ -98,7 +98,7 @@ end
 
 function Classicon:GetOptions()
     return {
-    	classIconPos = option({
+        classIconPos = option({
             type = "select",
             name = L["Icon position"],
             desc = L["This changes positions with trinket"],
@@ -115,29 +115,31 @@ local function getClassIcon(class)
     -- see https://wow.gamepedia.com/Class_icon
     local classIcon = "Interface\\Icons\\"
     if class == "DRUID" then
-        return classIcon.."inv_misc_monsterclaw_04"
+        return classIcon .. "inv_misc_monsterclaw_04"
     elseif class == "HUNTER" then
-        return classIcon.."inv_weapon_bow_07"
+        return classIcon .. "inv_weapon_bow_07"
     elseif class == "MAGE" then
-        return classIcon.."inv_staff_13"
+        return classIcon .. "inv_staff_13"
     elseif class == "PALADIN" then
-        return classIcon.."inv_hammer_01"
+        return classIcon .. "inv_hammer_01"
     elseif class == "PRIEST" then
-        return classIcon.."inv_staff_30"
+        return classIcon .. "inv_staff_30"
     elseif class == "ROGUE" then
-        return classIcon.."inv_throwingknife_04"
+        return classIcon .. "inv_throwingknife_04"
     elseif class == "SHAMAN" then
-        return classIcon.."inv_jewelry_talisman_04"
+        return classIcon .. "inv_jewelry_talisman_04"
     elseif class == "WARLOCK" then
-        return classIcon.."spell_nature_drowsy"
+        return classIcon .. "spell_nature_drowsy"
     elseif class == "WARRIOR" then
-        return classIcon.."inv_sword_27"
+        return classIcon .. "inv_sword_27"
     end
 end
 
 function Classicon:ENEMY_SPOTTED(unit)
     local classIcon = self.frames[unit]
-    if (not classIcon) then return end
+    if (not classIcon) then
+        return
+    end
 
     classIcon.texture:SetTexture(getClassIcon(Gladdy.buttons[unit].class))
     --classIcon.texture:SetTexCoord(unpack(CLASS_BUTTONS[Gladdy.buttons[unit].class]))

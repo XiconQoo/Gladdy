@@ -190,7 +190,7 @@ if (GetLocale() == "ruRU") then
     L["Select what action this mouse button does"] = "Выбрать действие, производимое данной кнопкой мыши"
     L["Spell name / Macro text"] = "Название заклинания / Текст макроса"
     L["Use *name* as unit's name. Like a '/rofl *name*'"] = "Используйте *name* в качестве имени игрока. Например, '/rofl *name*'"
-    
+
     -- Diminishings.lua
     L["DR Cooldown position"] = "Позиция ДР таймеров"
     L["Position of the cooldown icons"] = "Позиция ДР таймеров"
@@ -208,7 +208,7 @@ if (GetLocale() == "ruRU") then
     L["Show health percentage on the health bar"] = "Показывать здоровье в процентах на полосе жизней"
 
     -- Highlight.lua
-    L["Border size"]= "Размер границы"
+    L["Border size"] = "Размер границы"
     L["Target border color"] = "Цвет контура цели"
     L["Color of the selected targets border"] = "Цвет контура цели"
     L["Focus border color"] = "Цвет контура фокуса"

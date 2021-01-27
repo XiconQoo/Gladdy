@@ -81,8 +81,8 @@ function Trinket:CreateFrame(unit)
     trinket.cooldownFont:SetAllPoints(trinket.cooldown)
 
     trinket.border = CreateFrame("Frame", nil, trinket)
-    trinket.border:SetBackdrop({edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
-                                edgeSize = 24})
+    trinket.border:SetBackdrop({ edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
+                                 edgeSize = 24 })
     trinket.border:SetFrameStrata("HIGH")
     trinket.border:SetPoint("CENTER", trinket, "CENTER", 0, 0)
 
@@ -96,12 +96,12 @@ function Trinket:UpdateFrame(unit)
     end
 
     local classIcon = Gladdy.modules.Classicon.frames[unit]
-    local width, height = classIcon:GetWidth(),classIcon:GetHeight()
+    local width, height = classIcon:GetWidth(), classIcon:GetHeight()
 
     trinket:SetWidth(width)
     trinket:SetHeight(height)
-    trinket.cooldown:SetWidth(width-4)
-    trinket.cooldown:SetHeight(height-4)
+    trinket.cooldown:SetWidth(width - 4)
+    trinket.cooldown:SetHeight(height - 4)
 
     trinket.border:SetWidth(width)
     trinket.border:SetHeight(height)

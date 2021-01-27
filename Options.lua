@@ -17,7 +17,7 @@ Gladdy.defaults = {
         growUp = false,
         frameScale = 1,
         padding = 5,
-        frameColor = {r = 0, g = 0, b = 0, a = .4},
+        frameColor = { r = 0, g = 0, b = 0, a = .4 },
         barWidth = 180,
         bottomMargin = 10,
     },
@@ -70,9 +70,9 @@ local function getColorOpt(info)
     local key = info.arg or info[#info]
     return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
 end
-local function setColorOpt(info, r, g, b ,a)
+local function setColorOpt(info, r, g, b, a)
     local key = info.arg or info[#info]
-    Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b ,a
+    Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
     Gladdy:UpdateFrame()
 end
 
@@ -214,7 +214,7 @@ function Gladdy:SetupOptions()
         order = order + 1
     end
 
-    self.options.plugins.profiles = {profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.dbi) }
+    self.options.plugins.profiles = { profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.dbi) }
     LibStub("AceConfig-3.0"):RegisterOptionsTable("Gladdy", self.options)
     LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Gladdy", "Gladdy")
 end

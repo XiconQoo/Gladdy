@@ -1232,15 +1232,15 @@ function Gladdy:CooldownStart(button, spellId, duration)
                 if timeLeft >= 540 then
                     self.cooldownFont:SetText(ceil(timeLeft / 60) .. "m")
                     self.cooldownFont:SetTextColor(1, 1, 0)
-                    self.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", Gladdy.db.cooldownSize/3.1, "OUTLINE")
+                    self.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", Gladdy.db.cooldownSize / 3.1, "OUTLINE")
                 elseif timeLeft < 540 and timeLeft >= 60 then
                     -- more than 1 minute
                     self.cooldownFont:SetText(ceil(timeLeft / 60) .. "m")
                     self.cooldownFont:SetTextColor(1, 1, 0)
-                    self.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", Gladdy.db.cooldownSize/2.15, "OUTLINE")
+                    self.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", Gladdy.db.cooldownSize / 2.15, "OUTLINE")
                 elseif timeLeft < 60 and timeLeft > 0 then
                     -- between 60s and 21s (green)
-                    self.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", Gladdy.db.cooldownSize/2.15, "OUTLINE")
+                    self.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", Gladdy.db.cooldownSize / 2.15, "OUTLINE")
                     self.cooldownFont:SetTextColor(1, 1, 0)
                     self.cooldownFont:SetText(timeLeft)
                 else

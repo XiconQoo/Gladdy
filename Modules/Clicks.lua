@@ -12,11 +12,11 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 
 local attributes = {
-    {name = "Target", button = "1", modifier = "", action = "target", spell = ""},
-    {name = "Focus", button = "2", modifier = "", action = "focus", spell = ""},
+    { name = "Target", button = "1", modifier = "", action = "target", spell = "" },
+    { name = "Focus", button = "2", modifier = "", action = "focus", spell = "" },
 }
 for i = 3, 10 do
-    tinsert(attributes, {name = L["Action #%d"]:format(i), button = "", modifier = "", action = "disabled", spell = ""})
+    tinsert(attributes, { name = L["Action #%d"]:format(i), button = "", modifier = "", action = "disabled", spell = "" })
 end
 local Clicks = Gladdy:NewModule("Clicks", nil, {
     attributes = attributes,
@@ -60,7 +60,6 @@ BINDING_NAME_GLADDYTRINKET3 = L["Trinket Used Enemy 3"]
 BINDING_NAME_GLADDYTRINKET4 = L["Trinket Used Enemy 4"]
 BINDING_NAME_GLADDYTRINKET5 = L["Trinket Used Enemy 5"]
 
-
 function Clicks:Initialise()
     self:RegisterMessage("JOINED_ARENA")
 end
@@ -71,7 +70,9 @@ end
 
 function Clicks:ResetUnit(unit)
     local button = Gladdy.buttons[unit]
-    if (not button) then return end
+    if (not button) then
+        return
+    end
 
     for k, v in pairs(Gladdy.db.attributes) do
         button.secure:SetAttribute(v.modifier .. "macrotext" .. v.button, "")
@@ -85,9 +86,9 @@ function Clicks:JOINED_ARENA()
         local middle = GetBindingKey(("GLADDYBUTTON%d_MIDDLE"):format(v.id))
         local button4 = GetBindingKey(("GLADDYBUTTON%d_BUTTON4"):format(v.id))
         local button5 = GetBindingKey(("GLADDYBUTTON%d_BUTTON5"):format(v.id))
-		local key = GetBindingKey("GLADDYTRINKET" .. v.id)
-		
-		ClearOverrideBindings(v.trinketButton)
+        local key = GetBindingKey("GLADDYTRINKET" .. v.id)
+
+        ClearOverrideBindings(v.trinketButton)
         ClearOverrideBindings(v.secure)
 
         if (left) then
@@ -109,8 +110,8 @@ function Clicks:JOINED_ARENA()
         if (button5) then
             SetOverrideBindingClick(v.secure, false, button5, v.secure:GetName(), "Button5")
         end
-		
-		if (key) then
+
+        if (key) then
             SetOverrideBindingClick(v.trinketButton, true, key, v.trinketButton:GetName(), "LeftButton")
         end
     end
@@ -141,7 +142,9 @@ end
 
 function Clicks:SetupAttributes(unit)
     local button = Gladdy.buttons[unit]
-    if (not button) then return end
+    if (not button) then
+        return
+    end
 
     for k, v in pairs(Gladdy.db.attributes) do
         self:SetupAttribute(button, v.button, v.modifier, v.action, v.spell)
@@ -167,9 +170,9 @@ function Clicks:SetupAttribute(button, key, mod, action, spell)
     button.secure:SetAttribute(attr, text)
 end
 
-local buttons = {["1"] = L["Left button"], ["2"] = L["Right button"], ["3"] = L["Middle button"], ["4"] = L["Button 4"], ["5"] = L["Button 5"]}
-local modifiers = {[""] = L["None"], ["ctrl-"] = L["CTRL"], ["shift-"] = L["SHIFT"], ["alt-"] = L["ALT"]}
-local clickValues = {["macro"] = MACRO, ["target"] = TARGET, ["focus"] = FOCUS, ["spell"] = L["Cast Spell"], ["disabled"] = ADDON_DISABLED}
+local buttons = { ["1"] = L["Left button"], ["2"] = L["Right button"], ["3"] = L["Middle button"], ["4"] = L["Button 4"], ["5"] = L["Button 5"] }
+local modifiers = { [""] = L["None"], ["ctrl-"] = L["CTRL"], ["shift-"] = L["SHIFT"], ["alt-"] = L["ALT"] }
+local clickValues = { ["macro"] = MACRO, ["target"] = TARGET, ["focus"] = FOCUS, ["spell"] = L["Cast Spell"], ["disabled"] = ADDON_DISABLED }
 
 local function SetupAttributeOption(i)
     return {

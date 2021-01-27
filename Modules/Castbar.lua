@@ -13,7 +13,7 @@ local Castbar = Gladdy:NewModule("Castbar", 70, {
     castBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
     castBarFontSize = 12,
     castBarColor = { r = 1, g = 0.8, b = 0.2, a = 1 },
-    castBarBgColor = {r = 0, g = 0, b = 0, a = 0.4},
+    castBarBgColor = { r = 0, g = 0, b = 0, a = 0.4 },
     castBarGuesses = true,
     castBarPos = "LEFT"
 })
@@ -33,7 +33,7 @@ function Castbar:CreateFrame(unit)
     castBar:SetMinMaxValues(0, 100)
     castBar.border = CreateFrame("Frame", nil, castBar)
     castBar.border:SetBackdrop({ edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
-                                 edgeSize = 14})
+                                 edgeSize = 14 })
     castBar.border:SetFrameStrata("HIGH")
     castBar.border:SetBackdropBorderColor(0, 0, 0, 1)
     castBar.border:Hide()

@@ -11,7 +11,7 @@ local GetTime = GetTime
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local Diminishings = Gladdy:NewModule("Diminishings", nil, {
-    drFontColor = {r = 1, g = 1, b = 0, a = 1},
+    drFontColor = { r = 1, g = 1, b = 0, a = 1 },
     drFontSize = 20,
     drCooldownPos = "RIGHT",
     drIconSize = 36,
@@ -20,8 +20,8 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
 
 local function StyleActionButton(f)
     local name = f:GetName()
-    local button  = _G[name]
-    local icon  = _G[name .. "Icon"]
+    local button = _G[name]
+    local icon = _G[name .. "Icon"]
     local normalTex = _G[name .. "NormalTexture"]
 
     normalTex:SetHeight(button:GetHeight())
@@ -38,12 +38,12 @@ local function StyleActionButton(f)
 end
 
 function Diminishings:OnEvent(event, ...)
-	self[event](self, ...)
+    self[event](self, ...)
 end
 
 function Diminishings:Initialise()
     self.frames = {}
-	self.spells = {}
+    self.spells = {}
     self.icons = {}
 
     local spells = self:GetDRList()
@@ -54,22 +54,22 @@ function Diminishings:Initialise()
     end
 
     self:RegisterMessage("UNIT_DEATH", "ResetUnit")
-	self:SetScript("OnEvent", Diminishings.OnEvent)
-	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    self:SetScript("OnEvent", Diminishings.OnEvent)
+    self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 end
 
 function Diminishings:COMBAT_LOG_EVENT_UNFILTERED(...)
-	local timestamp, eventType, sourceGUID,sourceName,sourceFlags,destGUID,destName,destFlags,spellID,spellName,spellSchool,auraType = select ( 1 , ... );
+    local timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, spellID, spellName, spellSchool, auraType = select(1, ...);
     local destUnit = Gladdy.guids[destGUID]
-	if eventType == "SPELL_AURA_REMOVED" and destUnit then
-		self:Fade(destUnit, spellName)
-	end
-end	
+    if eventType == "SPELL_AURA_REMOVED" and destUnit then
+        self:Fade(destUnit, spellName)
+    end
+end
 
 function Diminishings:CreateFrame(unit)
     local drFrame = CreateFrame("Frame", nil, Gladdy.buttons[unit])
 
-	for i = 1, 16 do
+    for i = 1, 16 do
         local icon = CreateFrame("CheckButton", "GladdyDr" .. unit .. "Icon" .. i, drFrame, "ActionButtonTemplate")
         icon:SetAlpha(0)
         icon:EnableMouse(false)
@@ -91,7 +91,7 @@ function Diminishings:CreateFrame(unit)
                     Diminishings:Positionate(unit)
                 else
                     self.timeLeft = self.timeLeft - elapsed
-                    self.timeText:SetFormattedText("%d", self.timeLeft+1)
+                    self.timeText:SetFormattedText("%d", self.timeLeft + 1)
                 end
             end
         end)
@@ -125,11 +125,13 @@ end
 
 function Diminishings:UpdateFrame(unit)
     local drFrame = self.frames[unit]
-    if (not drFrame) then return end
-    
-    if( Gladdy.db.drEnabled == false ) then
-    	drFrame:Hide()
-    	return
+    if (not drFrame) then
+        return
+    end
+
+    if (Gladdy.db.drEnabled == false) then
+        drFrame:Hide()
+        return
     end
 
     local margin = max(5, Gladdy.db.padding)
@@ -159,7 +161,7 @@ function Diminishings:UpdateFrame(unit)
             end
         end
     end
-	if (Gladdy.db.drCooldownPos == "RIGHT") then
+    if (Gladdy.db.drCooldownPos == "RIGHT") then
         if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
             if (Gladdy.db.castBarPos == "RIGHT") then
                 drFrame:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].trinketButton, "BOTTOMRIGHT", Gladdy.db.padding, 0)
@@ -218,7 +220,9 @@ end
 
 function Diminishings:ResetUnit(unit)
     local drFrame = self.frames[unit]
-    if (not drFrame) then return end
+    if (not drFrame) then
+        return
+    end
 
     drFrame.tracked = {}
 
@@ -234,7 +238,7 @@ function Diminishings:ResetUnit(unit)
 end
 
 function Diminishings:Test(unit)
-    local spells = {33786, 118, 8643, 8983}
+    local spells = { 33786, 118, 8643, 8983 }
 
     for i = 1, 4 do
         local spell = GetSpellInfo(spells[i])
@@ -245,7 +249,9 @@ end
 function Diminishings:Fade(unit, spell)
     local drFrame = self.frames[unit]
     local dr = self.spells[spell]
-    if (not drFrame or not dr) then return end
+    if (not drFrame or not dr) then
+        return
+    end
 
     for i = 1, 16 do
         local icon = drFrame["icon" .. i]
@@ -263,7 +269,9 @@ end
 
 function Diminishings:Positionate(unit)
     local drFrame = self.frames[unit]
-    if (not drFrame) then return end
+    if (not drFrame) then
+        return
+    end
 
     local lastIcon
 
@@ -300,10 +308,10 @@ local function option(params)
         set = function(info, value)
             local key = info.arg or info[#info]
             -- hackfix to prevent DR/cooldown to be on the same side
-            if( key == "drCooldownPos" and value == "LEFT") then
-              Gladdy.db.cooldownPos = "RIGHT"
-            elseif ( key == "drCooldownPos" and value == "RIGHT" ) then
-              Gladdy.db.cooldownPos = "RIGHT"
+            if (key == "drCooldownPos" and value == "LEFT") then
+                Gladdy.db.cooldownPos = "RIGHT"
+            elseif (key == "drCooldownPos" and value == "RIGHT") then
+                Gladdy.db.cooldownPos = "RIGHT"
             end
             Gladdy.dbi.profile[key] = value
             Gladdy:UpdateFrame()
@@ -323,7 +331,7 @@ local function colorOption(params)
             local key = info.arg or info[#info]
             return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
         end,
-        set = function(info, r, g, b ,a)
+        set = function(info, r, g, b, a)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
             Gladdy:UpdateFrame()
@@ -339,7 +347,7 @@ end
 
 function Diminishings:GetOptions()
     return {
-    	drEnabled = option({
+        drEnabled = option({
             type = "toggle",
             name = L["Enable"],
             desc = L["Enabled DR module"],
@@ -385,54 +393,54 @@ end
 function Diminishings:GetDRList()
     return {
         -- DRUID
-        [33786] = "cycloneblind",           -- Cyclone
-        [18658] = "sleep",                  -- Hibernate
-        [26989] = "root",		    -- Entangling roots
-        [8983] = "stun",                    -- Bash
-        [9005] = "stun",                    -- Pounce
-        [22570] = "disorient",              -- Maim
+        [33786] = "cycloneblind", -- Cyclone
+        [18658] = "sleep", -- Hibernate
+        [26989] = "root", -- Entangling roots
+        [8983] = "stun", -- Bash
+        [9005] = "stun", -- Pounce
+        [22570] = "disorient", -- Maim
 
         -- HUNTER
-        [14309] = "freezingtrap",           -- Freezing Trap
-        [19386] = "sleep",                  -- Wyvern Sting
-        [19503] = "scattershot",            -- Scatter Shot
-        [19577] = "stun",                   -- Intimidation
+        [14309] = "freezingtrap", -- Freezing Trap
+        [19386] = "sleep", -- Wyvern Sting
+        [19503] = "scattershot", -- Scatter Shot
+        [19577] = "stun", -- Intimidation
 
         -- MAGE
-        [12826] = "disorient",              -- Polymorph
-        [31661] = "dragonsbreath",          -- Dragon's Breath
-        [27088] = "root",                   -- Frost Nova
-        [33395] = "root",                   -- Freeze (Water Elemental)
+        [12826] = "disorient", -- Polymorph
+        [31661] = "dragonsbreath", -- Dragon's Breath
+        [27088] = "root", -- Frost Nova
+        [33395] = "root", -- Freeze (Water Elemental)
 
         -- PALADIN
-        [10308] = "stun",                   -- Hammer of Justice
-        [20066] = "repentance",             -- Repentance
+        [10308] = "stun", -- Hammer of Justice
+        [20066] = "repentance", -- Repentance
 
         -- PRIEST
-        [8122] = "fear",                    -- Phychic Scream
-        [44047] = "root",                   -- Chastise
-        [605] = "charm",                    -- Mind Control
+        [8122] = "fear", -- Phychic Scream
+        [44047] = "root", -- Chastise
+        [605] = "charm", -- Mind Control
 
         -- ROGUE
-        [6770] = "disorient",               -- Sap
-        [2094] = "cycloneblind",            -- Blind
-        [1833] = "stun",                    -- Cheap Shot
-        [8643] = "kidneyshot",              -- Kidney Shot
-        [1776] = "disorient",               -- Gouge
+        [6770] = "disorient", -- Sap
+        [2094] = "cycloneblind", -- Blind
+        [1833] = "stun", -- Cheap Shot
+        [8643] = "kidneyshot", -- Kidney Shot
+        [1776] = "disorient", -- Gouge
 
         -- WARLOCK
-        [5782] = "fear",                    -- Fear
-        [27223] = "horror",                 -- Death Coil
-        [30283] = "stun",                   -- Shadowfury
-        [6358] = "fear",                    -- Seduction (Succubus)
-        [5484] = "fear",                    -- Howl of Terror
+        [5782] = "fear", -- Fear
+        [27223] = "horror", -- Death Coil
+        [30283] = "stun", -- Shadowfury
+        [6358] = "fear", -- Seduction (Succubus)
+        [5484] = "fear", -- Howl of Terror
 
         -- WARRIOR
-        [12809] = "stun",                   -- Concussion Blow
-        [25274] = "stun",                   -- Intercept Stun
-        [5246] = "fear",                    -- Intimidating Shout
+        [12809] = "stun", -- Concussion Blow
+        [25274] = "stun", -- Intercept Stun
+        [5246] = "fear", -- Intimidating Shout
 
         -- TAUREN
-        [20549] = "stun",                   -- War Stomp
+        [20549] = "stun", -- War Stomp
     }
 end
