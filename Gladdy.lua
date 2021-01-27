@@ -386,6 +386,7 @@ function Gladdy:ResetUnit(unit)
     button.classLoc = nil
     button.raceLoc = nil
     button.spec = nil
+    button.testSpec = nil
 
     for k1, v1 in pairs(self.BUTTON_DEFAULTS) do
         button[k1] = v1
@@ -1213,10 +1214,6 @@ function Gladdy:CooldownUsed(unit, unitClass, spellId, spellName)
     end  ]]
 end
 
-local function formatTimer(num, numDecimalPlaces)
-    return tonumber(string.format("%." .. (numDecimalPlaces or 0) .. "f", num))
-end
-
 function Gladdy:CooldownStart(button, spellId, duration)
     -- starts timer frame
     if not duration or duration == nil or type(duration) ~= "number" then
@@ -1232,29 +1229,25 @@ function Gladdy:CooldownStart(button, spellId, duration)
             frame:SetScript("OnUpdate", function(self, elapsed)
                 self.timeLeft = self.timeLeft - elapsed
                 local timeLeft = ceil(self.timeLeft)
-                local timeLeftMilliSec = formatTimer(self.timeLeft, 1)
-                if timeLeft >= 60 then
-                    -- more than 1 minute (green)
-                    self.cooldownFont:SetTextColor(0.7, 1, 0)
-                    self.cooldownFont:SetText(floor(timeLeft / 60) .. "m")
-                elseif timeLeft < 60 and timeLeft >= 21 then
-                    -- between 60s and 21s (yellow)
+                if timeLeft >= 540 then
+                    self.cooldownFont:SetText(ceil(timeLeft / 60) .. "m")
+                    self.cooldownFont:SetTextColor(1, 1, 0)
+                    self.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", Gladdy.db.cooldownSize/3.1, "OUTLINE")
+                elseif timeLeft < 540 and timeLeft >= 60 then
+                    -- more than 1 minute
+                    self.cooldownFont:SetText(ceil(timeLeft / 60) .. "m")
+                    self.cooldownFont:SetTextColor(1, 1, 0)
+                    self.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", Gladdy.db.cooldownSize/2.15, "OUTLINE")
+                elseif timeLeft < 60 and timeLeft > 0 then
+                    -- between 60s and 21s (green)
+                    self.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", Gladdy.db.cooldownSize/2.15, "OUTLINE")
                     self.cooldownFont:SetTextColor(1, 1, 0)
                     self.cooldownFont:SetText(timeLeft)
-                elseif timeLeft < 20.9 and timeLeft >= 11 then
-                    -- between 20s and 11s (yellow)
-                    self.cooldownFont:SetTextColor(1, 1, 0)
-                    self.cooldownFont:SetText(timeLeft)
-                elseif timeLeftMilliSec <= 10 and timeLeftMilliSec >= 5 then
-                    -- between 10s and 5s (orange)
-                    self.cooldownFont:SetTextColor(1, 0.7, 0)
-                    self.cooldownFont:SetFormattedText("%.1f", timeLeftMilliSec)
-                elseif timeLeftMilliSec < 5 and timeLeftMilliSec > 0 then
-                    -- between 5s and 1s (red)
-                    self.cooldownFont:SetTextColor(1, 0, 0)
-                    self.cooldownFont:SetFormattedText("%.1f", timeLeftMilliSec)
                 else
                     self.cooldownFont:SetText("")
+                end
+                if (self.timeLeft <= 0) then
+                    Gladdy:CooldownReady(button, spellId, frame)
                 end
                 if (self.timeLeft <= 0) then
                     Gladdy:CooldownReady(button, spellId, frame)
