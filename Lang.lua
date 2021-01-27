@@ -208,6 +208,7 @@ if (GetLocale() == "ruRU") then
     L["Show health percentage on the health bar"] = "Показывать здоровье в процентах на полосе жизней"
 
     -- Highlight.lua
+    L["Border size"]= "Размер границы"
     L["Target border color"] = "Цвет контура цели"
     L["Color of the selected targets border"] = "Цвет контура цели"
     L["Focus border color"] = "Цвет контура фокуса"
@@ -438,6 +439,7 @@ elseif (GetLocale() == "deDE") then
     L["Show health percentage on the health bar"] = "Zeige prozentuales Leben auf der Lebensanzeige an"
 
     -- Highlight.lua
+    L["Border size"] = "Rahmengröße"
     L["Target border color"] = "Zielrahmenfarbe"
     L["Color of the selected targets border"] = "Farbe des Rahmens des gewählten Ziels"
     L["Focus border color"] = "Focusrahmenfarbe"
