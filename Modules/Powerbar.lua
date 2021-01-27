@@ -7,9 +7,10 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
 local Powerbar = Gladdy:NewModule("Powerbar", 90, {
-    powerBarHeight = 16,
+    powerBarHeight = 20,
     powerBarTexture = "Smooth",
     powerBarFontColor = {r = 1, g = 1, b = 1, a = 1},
+    powerBarBgColor = { r = 0.3, g = 0.3, b = 0.3, a = 0.7},
     powerBarFontSize = 10,
     powerActual = true,
     powerMax = true,
@@ -33,8 +34,7 @@ function Powerbar:CreateFrame(unit)
 
     powerBar.border = CreateFrame("Frame", nil, powerBar)
     powerBar.border:SetBackdrop({edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
-	edgeSize = 13,
-	insets = {left = 4, right = 4, top = 4, bottom = 4},})
+                                 edgeSize = 13})
     powerBar.border:SetBackdropBorderColor(0, 0, 0, 1)
     powerBar.border:SetFrameStrata("HIGH")
 	
@@ -42,7 +42,7 @@ function Powerbar:CreateFrame(unit)
     powerBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
     powerBar.bg:ClearAllPoints()
     powerBar.bg:SetAllPoints(powerBar)
-	powerBar.bg:SetVertexColor(1, 1, 1, 1)
+	powerBar.bg:SetVertexColor(Gladdy.db.powerBarBgColor.r, Gladdy.db.powerBarBgColor.g, Gladdy.db.powerBarBgColor.b, Gladdy.db.powerBarBgColor.a)
     powerBar.bg:SetAlpha(0.7)
 
     powerBar.raceText = powerBar:CreateFontString(nil, "LOW")
@@ -75,6 +75,7 @@ function Powerbar:UpdateFrame(unit)
 
     powerBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
     powerBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
+    powerBar.bg:SetVertexColor(Gladdy.db.powerBarBgColor.r, Gladdy.db.powerBarBgColor.g, Gladdy.db.powerBarBgColor.b, Gladdy.db.powerBarBgColor.a)
 
     powerBar:SetWidth(healthBar:GetWidth())
     powerBar:SetHeight(Gladdy.db.powerBarHeight)
@@ -241,18 +242,25 @@ function Powerbar:GetOptions()
             dialogControl = "LSM30_Statusbar",
             values = AceGUIWidgetLSMlists.statusbar,
         }),
+        powerBarBgColor = colorOption({
+            type = "color",
+            name = L["Background color"],
+            desc = L["Color of the status bar background"],
+            order = 4,
+            hasAlpha = true,
+        }),
         powerBarFontColor = colorOption({
             type = "color",
             name = L["Font color"],
             desc = L["Color of the text"],
-            order = 4,
+            order = 5,
             hasAlpha = true,
         }),
         powerBarFontSize = option({
             type = "range",
             name = L["Font size"],
             desc = L["Size of the text"],
-            order = 5,
+            order = 6,
             min = 1,
             max = 20,
         }),
@@ -260,19 +268,19 @@ function Powerbar:GetOptions()
             type = "toggle",
             name = L["Show the actual power"],
             desc = L["Show the actual power on the power bar"],
-            order = 6,
+            order = 7,
         }),
         powerMax = option({
             type = "toggle",
             name = L["Show max power"],
             desc = L["Show max power on the power bar"],
-            order = 7,
+            order = 8,
         }),
         powerPercentage = option({
             type = "toggle",
             name = L["Show power percentage"],
             desc = L["Show power percentage on the power bar"],
-            order = 8,
+            order = 9,
         }),
     }
 end

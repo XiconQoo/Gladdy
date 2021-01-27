@@ -231,6 +231,7 @@ if (GetLocale() == "ruRU") then
     L["Show max power on the power bar"] = "Показывать максимальную ману на полосе маны"
     L["Show power percentage"] = "Показывать ману в процентах"
     L["Show power percentage on the power bar"] = "Показывать ману в процентах на полосе маны"
+    L["Color of the status bar background"] = "Цвет фона строки состояния"
 
     -- Trinket.lua
     L["No cooldown count (OmniCC)"] = "Не показывать кулдаун (OmniCC)"
@@ -462,6 +463,7 @@ elseif (GetLocale() == "deDE") then
     L["Show max power on the power bar"] = "Zeige Maximalpower in der Powerbau"
     L["Show power percentage"] = "Zeige prozentuale Power"
     L["Show power percentage on the power bar"] = "Zeige prozentuale Power in der Powerbau"
+    L["Color of the status bar background"] = "Hintergrundfarbe der Statusleiste"
 
     -- Trinket.lua
     L["No cooldown count (OmniCC)"] = "Keine Cooldownanzeige (OmniCC)"

@@ -8,9 +8,10 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
 local Healthbar = Gladdy:NewModule("Healthbar", 100, {
-    healthBarHeight = 70,
+    healthBarHeight = 60,
     healthBarTexture = "Smooth",
-    healthBarFontColor = {r = 1, g = 1, b = 1, a = 1},
+    healthBarBgColor = { r = 0, g = 0, b = 0, a = 0.4 },
+    healthBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
     healthBarFontSize = 12,
     healthActual = false,
     healthMax = true,
@@ -26,33 +27,31 @@ function Healthbar:Initialise()
 end
 
 function Healthbar:CreateFrame(unit)
-	local button = Gladdy.buttons[unit]
+    local button = Gladdy.buttons[unit]
     local healthBar = CreateFrame("StatusBar", nil, Gladdy.buttons[unit])
     healthBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.healthBarTexture))
     healthBar:SetMinMaxValues(0, 100)
 
     healthBar.border = CreateFrame("Frame", nil, healthBar)
-    healthBar.border:SetBackdrop({edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
-	edgeSize = 13,
-	insets = {left = 4, right = 4, top = 4, bottom = 4},})
+    healthBar.border:SetBackdrop({ edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
+                                   edgeSize = 13})
     healthBar.border:SetFrameStrata("HIGH")
     healthBar.border:SetBackdropBorderColor(0, 0, 0, 1)
-	
-   healthBar.bg = healthBar:CreateTexture(nil, "BACKGROUND")
+
+    healthBar.bg = healthBar:CreateTexture(nil, "BACKGROUND")
     healthBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.healthBarTexture))
     healthBar.bg:ClearAllPoints()
     healthBar.bg:SetAllPoints(healthBar)
     healthBar.bg:SetAlpha(1)
-	healthBar.bg:SetVertexColor(0.7, 0.7, 0.7, 0.7)
-	
+    healthBar.bg:SetVertexColor(Gladdy.db.healthBarBgColor.r, Gladdy.db.healthBarBgColor.g, Gladdy.db.healthBarBgColor.b, Gladdy.db.healthBarBgColor.a)
 
     healthBar.nameText = healthBar:CreateFontString(nil, "LOW")
-    if( Gladdy.db.healthBarFontSize < 1 ) then
-    	healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font"), 1)
-    	healthBar.nameText:Hide()
+    if (Gladdy.db.healthBarFontSize < 1) then
+        healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font"), 1)
+        healthBar.nameText:Hide()
     else
-    	healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.healthBarFontSize)
-    	healthBar.nameText:Show()
+        healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.healthBarFontSize)
+        healthBar.nameText:Show()
     end
     healthBar.nameText:SetTextColor(Gladdy.db.healthBarFontColor.r, Gladdy.db.healthBarFontColor.g, Gladdy.db.healthBarFontColor.b, Gladdy.db.healthBarFontColor.a)
     healthBar.nameText:SetShadowOffset(1, -1)
@@ -61,13 +60,13 @@ function Healthbar:CreateFrame(unit)
     healthBar.nameText:SetPoint("LEFT", 5, 0)
 
     healthBar.healthText = healthBar:CreateFontString(nil, "LOW")
-    if( Gladdy.db.healthBarFontSize < 1 ) then
-    	healthBar.healthText:SetFont(Gladdy.LSM:Fetch("font"), 1)
-    	healthBar.healthText:Hide()
+    if (Gladdy.db.healthBarFontSize < 1) then
+        healthBar.healthText:SetFont(Gladdy.LSM:Fetch("font"), 1)
+        healthBar.healthText:Hide()
     else
-    	healthBar.healthText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.healthBarFontSize)
-    	healthBar.healthText:Hide()
-    end	
+        healthBar.healthText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.healthBarFontSize)
+        healthBar.healthText:Hide()
+    end
     healthBar.healthText:SetTextColor(Gladdy.db.healthBarFontColor.r, Gladdy.db.healthBarFontColor.g, Gladdy.db.healthBarFontColor.b, Gladdy.db.healthBarFontColor.a)
     healthBar.healthText:SetShadowOffset(1, -1)
     healthBar.healthText:SetShadowColor(0, 0, 0, 1)
@@ -80,14 +79,17 @@ function Healthbar:CreateFrame(unit)
 end
 
 function Healthbar:UpdateFrame(unit)
-	local button = Gladdy.buttons[unit]
+    local button = Gladdy.buttons[unit]
     local healthBar = self.frames[unit]
-    if (not healthBar) then return end
+    if (not healthBar) then
+        return
+    end
 
     local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight
 
     healthBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.healthBarTexture))
     healthBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.healthBarTexture))
+    healthBar.bg:SetVertexColor(Gladdy.db.healthBarBgColor.r, Gladdy.db.healthBarBgColor.g, Gladdy.db.healthBarBgColor.b, Gladdy.db.healthBarBgColor.a)
 
     healthBar:ClearAllPoints()
     healthBar:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPLEFT", iconSize, 0)
@@ -97,17 +99,17 @@ function Healthbar:UpdateFrame(unit)
     healthBar.border:SetHeight(healthBar:GetHeight() + 4)
     healthBar.border:ClearAllPoints()
     healthBar.border:SetPoint("CENTER", healthBar, "CENTER", 0, 0)
-	
-	if(Gladdy.db.healthBarFontSize < 1) then
-		healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font"), 1)
-	    healthBar.healthText:SetFont(Gladdy.LSM:Fetch("font"), 1)
-	    healthBar.nameText:Hide()
-	    healthBar.healthText:Hide()
-	else
-	    healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.healthBarFontSize)
-	    healthBar.nameText:Show()
-	    healthBar.healthText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.healthBarFontSize)
-	    healthBar.healthText:Show()
+
+    if (Gladdy.db.healthBarFontSize < 1) then
+        healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font"), 1)
+        healthBar.healthText:SetFont(Gladdy.LSM:Fetch("font"), 1)
+        healthBar.nameText:Hide()
+        healthBar.healthText:Hide()
+    else
+        healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.healthBarFontSize)
+        healthBar.nameText:Show()
+        healthBar.healthText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.healthBarFontSize)
+        healthBar.healthText:Show()
     end
     healthBar.nameText:SetTextColor(Gladdy.db.healthBarFontColor.r, Gladdy.db.healthBarFontColor.g, Gladdy.db.healthBarFontColor.b, Gladdy.db.healthBarFontColor.a)
     healthBar.healthText:SetTextColor(Gladdy.db.healthBarFontColor.r, Gladdy.db.healthBarFontColor.g, Gladdy.db.healthBarFontColor.b, Gladdy.db.healthBarFontColor.a)
@@ -115,7 +117,9 @@ end
 
 function Healthbar:ResetUnit(unit)
     local healthBar = self.frames[unit]
-    if (not healthBar) then return end
+    if (not healthBar) then
+        return
+    end
 
     healthBar:SetStatusBarColor(1, 1, 1, 1)
     healthBar.nameText:SetText("")
@@ -126,7 +130,9 @@ end
 function Healthbar:Test(unit)
     local healthBar = self.frames[unit]
     local button = Gladdy.buttons[unit]
-    if (not healthBar or not button) then return end
+    if (not healthBar or not button) then
+        return
+    end
 
     self:ENEMY_SPOTTED(unit)
     self:UNIT_HEALTH(unit, button.health, button.healthMax)
@@ -135,7 +141,9 @@ end
 function Healthbar:ENEMY_SPOTTED(unit)
     local healthBar = self.frames[unit]
     local button = Gladdy.buttons[unit]
-    if (not healthBar or not button) then return end
+    if (not healthBar or not button) then
+        return
+    end
 
     healthBar:SetStatusBarColor(RAID_CLASS_COLORS[button.class].r, RAID_CLASS_COLORS[button.class].g, RAID_CLASS_COLORS[button.class].b, 1)
     healthBar.nameText:SetText(button.name)
@@ -143,7 +151,9 @@ end
 
 function Healthbar:UNIT_HEALTH(unit, health, healthMax)
     local healthBar = self.frames[unit]
-    if (not healthBar) then return end
+    if (not healthBar) then
+        return
+    end
 
     local healthPercentage = floor(health * 100 / healthMax)
     local healthText
@@ -175,7 +185,9 @@ end
 
 function Healthbar:UNIT_DEATH(unit)
     local healthBar = self.frames[unit]
-    if (not healthBar) then return end
+    if (not healthBar) then
+        return
+    end
 
     healthBar:SetValue(0)
     healthBar.healthText:SetText(L["DEAD"])
@@ -207,7 +219,7 @@ local function colorOption(params)
             local key = info.arg or info[#info]
             return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
         end,
-        set = function(info, r, g, b ,a)
+        set = function(info, r, g, b, a)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
             Gladdy:UpdateFrame()
@@ -239,6 +251,13 @@ function Healthbar:GetOptions()
             order = 3,
             dialogControl = "LSM30_Statusbar",
             values = AceGUIWidgetLSMlists.statusbar,
+        }),
+        healthBarBgColor = colorOption({
+            type = "color",
+            name = L["Background color"],
+            desc = L["Color of the status bar background"],
+            order = 4,
+            hasAlpha = true,
         }),
         healthBarFontColor = colorOption({
             type = "color",
