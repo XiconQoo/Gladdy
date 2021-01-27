@@ -139,8 +139,9 @@ function Gladdy:UpdateFrame()
     height = height + self.db.powerBarHeight * teamSize
     extraBarHeight = extraBarHeight + self.db.powerBarHeight
 
-    -- Castbar
-    margin = margin + self.db.cooldownSize + self.db.padding + 5 -- extra 5
+    -- Cooldown
+    local cooldownMargin = 4
+    margin = margin + self.db.cooldownSize + self.db.padding + cooldownMargin
     height = height + self.db.cooldownSize * teamSize
 
     -- Classicon
@@ -213,15 +214,15 @@ function Gladdy:UpdateFrame()
             button.spellCooldownFrame:ClearAllPoints()
             if self.db.cooldownYPos == "TOP" then
                 if self.db.cooldownXPos == "RIGHT" then
-                    button.spellCooldownFrame:SetPoint("BOTTOMRIGHT", button.healthBar, "TOPRIGHT", 0, 2) -- needs to be properly anchored after trinket
+                    button.spellCooldownFrame:SetPoint("BOTTOMRIGHT", button.healthBar, "TOPRIGHT", 0, cooldownMargin) -- needs to be properly anchored after trinket
                 else
-                    button.spellCooldownFrame:SetPoint("BOTTOMLEFT", button.healthBar, "TOPLEFT", 0, 2)
+                    button.spellCooldownFrame:SetPoint("BOTTOMLEFT", button.healthBar, "TOPLEFT", 0, cooldownMargin)
                 end
             else
-                if self.db.cooldownGrowDirection == "RIGHT" then
-                    button.spellCooldownFrame:SetPoint("TOPRIGHT", button.powerBar, "BOTTOMRIGHT", 0, -2) -- needs to be properly anchored after trinket
+                if self.db.cooldownXPos == "RIGHT" then
+                    button.spellCooldownFrame:SetPoint("TOPRIGHT", button.powerBar, "BOTTOMRIGHT", 0, -cooldownMargin) -- needs to be properly anchored after trinket
                 else
-                    button.spellCooldownFrame:SetPoint("TOPLEFT", button.powerBar, "BOTTOMLEFT", 0, -2)
+                    button.spellCooldownFrame:SetPoint("TOPLEFT", button.powerBar, "BOTTOMLEFT", 0, -cooldownMargin)
                 end
             end
             --button.spellCooldownFrame:SetHeight(self.db.healthBarHeight+extraBarHeight)
@@ -234,7 +235,7 @@ function Gladdy:UpdateFrame()
                 local icon = button.spellCooldownFrame["icon" .. i]
                 icon:SetHeight(self.db.cooldownSize)
                 icon:SetWidth(self.db.cooldownSize)
-                icon.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", self.db.cooldownSize/2.5, "OUTLINE")
+                icon.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", self.db.cooldownSize/2, "OUTLINE")
                 icon:ClearAllPoints()
                 if (self.db.cooldownXPos == "RIGHT") then
                     if (i == 1) then
@@ -336,7 +337,7 @@ function Gladdy:CreateButton(i)
         icon.cooldown:SetReverse(false)
         icon.cooldown.noCooldownCount = Gladdy.db.trinketDisableOmniCC
         icon.cooldownFont = icon.cooldown:CreateFontString(nil, "OVERLAY")
-        icon.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", 10, "OUTLINE")
+        icon.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", self.db.cooldownSize/2, "OUTLINE")
         icon.cooldownFont:SetAllPoints(icon)
 
         spellCooldownFrame["icon" .. x] = icon
