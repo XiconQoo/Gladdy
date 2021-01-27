@@ -5,7 +5,7 @@ local Cooldown = Gladdy:NewModule("Cooldown", nil, {
     cooldown = true,
     cooldownYPos = "TOP",
     cooldownXPos = "LEFT",
-    cooldownSize = 15,
+    cooldownSize = 30,
 })
 
 function Cooldown:Test(unit)
@@ -84,21 +84,22 @@ function Gladdy:UpdateTestCooldowns(i)
     local unit = "arena"..i
     local button = Gladdy.buttons[unit]
 
-    button.lastCooldownSpell = 1
-    Gladdy:UpdateCooldowns(button)
-    button.spec = ""
-    Gladdy:DetectSpec(unit, button.testSpec)
+    if (button.testSpec and button.testSpec == Gladdy.testData[unit].testSpec) then
+        button.lastCooldownSpell = 1
+        Gladdy:UpdateCooldowns(button)
+        button.spec = ""
+        Gladdy:DetectSpec(unit, button.testSpec)
 
-    -- use class spells
-    for k,v in pairs(self.cooldownSpells[button.class]) do
-        --k is spellId
-        Gladdy:CooldownUsed(unit, button.class, k, nil)
+        -- use class spells
+        for k,v in pairs(self.cooldownSpells[button.class]) do
+            --k is spellId
+            Gladdy:CooldownUsed(unit, button.class, k, nil)
+        end
+        -- use race spells
+        for k,v in pairs(self.cooldownSpells[button.race]) do
+            Gladdy:CooldownUsed(unit, button.race, k, nil)
+        end
     end
-    -- use race spells
-    for k,v in pairs(self.cooldownSpells[button.race]) do
-        Gladdy:CooldownUsed(unit, button.race, k, nil)
-    end
-
 end
 
 function Gladdy:GetCooldownList()
