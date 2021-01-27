@@ -1,8 +1,9 @@
 ## Interface: 20400
-## Title: Gladdy - Endless.gg - TotemPlatesEdited
+## Title: Gladdy - Macumba/XiCoN Edit
+## Version: 1.0-Release
 ## Notes: The most powerful arena AddOn for WoW 2.4.3
-## Author: Mikhail "miraage" Osher / Schaka
-## X-Email: miraage.wow@gmail.com / schakaqt@gmail.com
+## Author: Mikhail "miraage" Osher / Schaka / Knall / Macumba
+## X-Email: miraage.wow@gmail.com / schakaqt@gmail.com / https://discord.gg/5qVu56M
 ## SavedVariables: GladdyXZ
 
 embeds.xml
@@ -25,6 +26,7 @@ Modules\Nameplates.lua
 Modules\PlateCastbar.lua
 Modules\Powerbar.lua
 Modules\Trinket.lua
+Modules\TrinketTracker.lua
 Modules\Cooldowns.lua
 Modules\ArenaIdentify.lua
 Modules\ArenaCountDown.lua
