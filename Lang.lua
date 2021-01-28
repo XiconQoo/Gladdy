@@ -157,6 +157,7 @@ if (GetLocale() == "ruRU") then
     L["Color of the cast bar"] = "Цвет полосы применений"
     L["Background color"] = "Цвет фона полосы"
     L["Color of the cast bar background"] = "Цвет фона полосы применений"
+    L["Icon position"] "Расположение значка трансляции"
 
     -- Clicks.lua
     L["Action #%d"] = "Действие #%d"
@@ -389,6 +390,7 @@ elseif (GetLocale() == "deDE") then
     L["Color of the cast bar"] = "Farbe der Zauberleiste"
     L["Background color"] = "Hintergrundfarbe"
     L["Color of the cast bar background"] = "Hintergrundfarbe der Zauberleiste"
+    L["Icon position"] "Position des Zauberleistensymbols"
 
     -- Clicks.lua
     L["Action #%d"] = "Aktion #%d"
