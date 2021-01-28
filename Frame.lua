@@ -332,7 +332,7 @@ function Gladdy:CreateButton(i)
         icon.texture = _G[icon:GetName() .. "Icon"]
         icon.cooldown = _G[icon:GetName() .. "Cooldown"]
         icon.cooldown:SetReverse(false)
-        icon.cooldown.noCooldownCount = Gladdy.db.trinketDisableOmniCC
+        icon.cooldown.noCooldownCount = true --Gladdy.db.trinketDisableOmniCC
         icon.cooldownFont = icon.cooldown:CreateFontString(nil, "OVERLAY")
         icon.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", self.db.cooldownSize / 2, "OUTLINE")
         icon.cooldownFont:SetAllPoints(icon)

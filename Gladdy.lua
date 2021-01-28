@@ -103,10 +103,10 @@ setmetatable(Gladdy, {
 
 function Gladdy:Print(...)
     local text = "|cff33ff99Gladdy|r:"
-
     for i = 1, select("#", ...) do
         text = text .. " " .. tostring(select(i, ...))
     end
+    DEFAULT_CHAT_FRAME:AddMessage(text)
 end
 
 Gladdy.events = CreateFrame("Frame")

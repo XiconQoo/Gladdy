@@ -8,7 +8,7 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 Trinket = Gladdy:NewModule("Trinket", nil, {
     trinketEnabled = true,
-    trinketDisableOmniCC = true,
+    --trinketDisableOmniCC = true,
     trinketPos = "RIGHT"
 })
 LibStub("AceComm-3.0"):Embed(Trinket)
@@ -75,7 +75,7 @@ function Trinket:CreateFrame(unit)
     end)
 
     trinket.cooldown = CreateFrame("Cooldown", nil, trinket, "CooldownFrameTemplate")
-    trinket.cooldown.noCooldownCount = Gladdy.db.trinketDisableOmniCC
+    trinket.cooldown.noCooldownCount = true --Gladdy.db.trinketDisableOmniCC
     trinket.cooldownFont = trinket.cooldown:CreateFontString(nil, "OVERLAY")
     trinket.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", 20, "OUTLINE")
     trinket.cooldownFont:SetAllPoints(trinket.cooldown)
@@ -129,7 +129,7 @@ function Trinket:UpdateFrame(unit)
 
     trinket.cooldown:ClearAllPoints()
     trinket.cooldown:SetPoint("CENTER", trinket, "CENTER")
-    trinket.cooldown.noCooldownCount = Gladdy.db.trinketDisableOmniCC
+    trinket.cooldown.noCooldownCount = true -- Gladdy.db.trinketDisableOmniCC
 
     if (Gladdy.db.trinketEnabled == false) then
         trinket:Hide()
@@ -222,12 +222,12 @@ function Trinket:GetOptions()
             desc = L["Enable trinket icon"],
             order = 2,
         }),
-        trinketDisableOmniCC = option({
+        --[[trinketDisableOmniCC = option({
             type = "toggle",
             name = L["No OmniCC"],
             desc = L["Disable cooldown timers by addons (reload UI to take effect)"],
             order = 3,
-        }),
+        }),--]]
         trinketPos = option({
             type = "select",
             name = L["Trinket position"],

@@ -1,6 +1,6 @@
 # Gladdy - Macumba / XiCoN Edit
 
-### [v1.0-Release Download Here](https://github.com/XiconQoo/XiconPlateBuffs/releases/download/v1.6.4-Beta/XiconPlateBuffs_v1.6.4-Beta.zip)
+### [v1.0-Release Download Here](https://github.com/XiconQoo/Gladdy/releases/download/v1.0-Release/Gladdy-MX-Edit-v1.0-Release.zip)
 
 ### Recommended addons to use with Gladdy
 
@@ -26,20 +26,23 @@ Forked from https://github.com/SunstriderEmu/GladdyEndless with following change
 ### Changes
 
 v1.0-Release
+- `/gladdy test` now activates **everything** for maximum configurability
 - added black borders to all frames
-- basically all elements are arrangable LEFT or RIGHT
-  - trinket and classicon separately attachable LEFT or RIGHT
-  - DR LEFT or RIGHT
-  - castbar LEFT or RIGHT
-  - cooldowns TOP or DOWN  and LEFT or RIGHT
-- trinket / classicon width/height now rectangular
-- everything aligns to each other depending on config
-  - eg: if castbar and DR on same side, they arrange each other
-- in general-tab the padding, scaling and margin works for all movable things
-- castbar height/width is again configurable
-- increase max for healthbar-height to 100px
-- classicon/trinket scale with healthbar
-- replaced the classicons with their PNG icons for better frameborder
+- added cooldown numbers to all elements (no need to use OmniCC or similar)
+- **ALL ELEMENTS** are arrangeable LEFT or RIGHT independently
+  - trinket LEFT or RIGHT
+  - class icon LEFT or RIGHT
+  - DR frames LEFT or RIGHT
+  - cast bar and icon LEFT or RIGHT
+  - cooldowns TOP or DOWN and LEFT or RIGHT
+- everything aligns to each other responsively depending on config (eg if cast bar and DR are on same side, they will arrange each other)
+- padding, scaling and margin responsive
+- cast bar and icon height/width is configurable
+- trinket and class icon are now rectangular
+- trinket and class icon scale with health + power bar height
+- replaced the class icons with their PNG icons for better frame border
 - trinket icon is clickable again (to trigger a cooldown on that target)
-- added a config for background color of castbar/healthbar/powerbar
+- increase max height for health bar to 100px
 - added TrinketTracker again (added Endless-realms (Sunstrider/Tournament) to the exclusion list)
+- configurable highlight border size
+- background color of health-/power-/cast bar configurable

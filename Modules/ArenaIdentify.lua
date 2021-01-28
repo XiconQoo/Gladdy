@@ -33,13 +33,17 @@ local alreadyFound = {}
 local alreadySaved = {}
 
 function ArenaIdentify:GuidInParty(guid)
-    local inParty = 0
-    for i = 0, GetNumPartyMembers() do
+    for i = 1, GetNumPartyMembers() do
         if UnitGUID("party" .. i) == guid then
-            inParty = 1
+            return 1
         end
     end
-    return inParty
+    for i = 1, GetNumRaidMembers() do
+        if UnitGUID("raid" .. i) == guid then
+            return 1
+        end
+    end
+    return 0
 end
 
 function ArenaIdentify:Initialise()
