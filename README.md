@@ -1,19 +1,22 @@
 # Gladdy - Macumba / XiCoN Edit
+## The most powerful arena addon for WoW TBC 2.4.3
 
 ### [v1.0-Release Download Here](https://github.com/XiconQoo/Gladdy/releases/download/v1.0-Release/Gladdy-MX-Edit-v1.0-Release.zip)
 
+### Motivation for this edit
+
+The goal is to make Gladdy highly configurable in it's appearance. Everything can be arranged left or right independently. Also we gave Gladdy a new look with black borders.
+##### Join the [TBC addons 2.4.3 Discord](https://discord.gg/5qVu56M) by Macumba if you have any questions.
+
+
 ### Recommended addons to use with Gladdy
 
-#### - [BuffLib by Schaka](https://github.com/Schaka/BuffLib/releases/download/v1.1.1/BuffLib.zip)
-
-#### Join the [TBC addons 2.4.3 Discord](https://discord.gg/5qVu56M) by Macumba
-
-Gladdy - the most powerful arena addon for WoW 2.4.3
-
-Based on https://github.com/Schaka/gladdy
+#### [BuffLib by Schaka](https://github.com/Schaka/BuffLib/releases/download/v1.1.1/BuffLib.zip)
 
 Forked from https://github.com/SunstriderEmu/GladdyEndless with following changes
 ```
+Based on https://github.com/Schaka/gladdy
+
 - Removed TrinketTracker module that guessed when PvP trinket was used. Now using a server message to reliably show trinket usage.
 - Updates the "seconds until game starts" if the start time changes (a ready button has been clicked and the game starts earlier).
 - Added a version check (upon receiving a message from the server)
