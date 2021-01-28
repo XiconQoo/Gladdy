@@ -134,10 +134,8 @@ function Diminishings:UpdateFrame(unit)
         return
     end
 
-    local margin = max(5, Gladdy.db.padding)
-    local offset = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight
-
     drFrame:ClearAllPoints()
+    local margin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
     if (Gladdy.db.drCooldownPos == "LEFT") then
         if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
             if (Gladdy.db.castBarPos == "LEFT") then
@@ -156,7 +154,7 @@ function Diminishings:UpdateFrame(unit)
                 if (Gladdy.db.castBarPos == "LEFT") then
                     drFrame:SetPoint("BOTTOMRIGHT", Gladdy.buttons[unit].powerBar, "BOTTOMLEFT", -Gladdy.db.padding, 0)
                 else
-                    drFrame:SetPoint("RIGHT", Gladdy.buttons[unit].healthBar, "LEFT", -Gladdy.db.padding, 0)
+                    drFrame:SetPoint("RIGHT", Gladdy.buttons[unit].healthBar, "LEFT", -margin, 0)
                 end
             end
         end
@@ -179,7 +177,7 @@ function Diminishings:UpdateFrame(unit)
                 if (Gladdy.db.castBarPos == "RIGHT") then
                     drFrame:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].powerBar, "BOTTOMRIGHT", Gladdy.db.padding, 0)
                 else
-                    drFrame:SetPoint("LEFT", Gladdy.buttons[unit].healthBar, "RIGHT", Gladdy.db.padding, 0)
+                    drFrame:SetPoint("LEFT", Gladdy.buttons[unit].healthBar, "RIGHT", margin, 0)
                 end
             end
         end
