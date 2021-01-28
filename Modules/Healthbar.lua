@@ -35,7 +35,6 @@ function Healthbar:CreateFrame(unit)
     healthBar.border = CreateFrame("Frame", nil, healthBar)
     healthBar.border:SetBackdrop({ edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
                                    edgeSize = 13 })
-    healthBar.border:SetFrameStrata("HIGH")
     healthBar.border:SetBackdropBorderColor(0, 0, 0, 1)
 
     healthBar.bg = healthBar:CreateTexture(nil, "BACKGROUND")

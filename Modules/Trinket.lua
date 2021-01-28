@@ -83,7 +83,6 @@ function Trinket:CreateFrame(unit)
     trinket.border = CreateFrame("Frame", nil, trinket)
     trinket.border:SetBackdrop({ edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
                                  edgeSize = 24 })
-    trinket.border:SetFrameStrata("HIGH")
     trinket.border:SetPoint("CENTER", trinket, "CENTER", 0, 0)
 
     self.frames[unit] = trinket
@@ -110,10 +109,10 @@ function Trinket:UpdateFrame(unit)
     trinket.border:SetBackdropBorderColor(0, 0, 0, 1)
 
     trinket:ClearAllPoints()
-    local margin = 0
+    local margin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
     if (Gladdy.db.classIconPos == "LEFT") then
         if (Gladdy.db.trinketPos == "RIGHT") then
-            trinket:SetPoint("TOPLEFT", Gladdy.buttons[unit].healthBar, "TOPRIGHT", Gladdy.db.padding, 2)
+            trinket:SetPoint("TOPLEFT", Gladdy.buttons[unit].healthBar, "TOPRIGHT", margin, 2)
         else
             trinket:SetPoint("TOPRIGHT", Gladdy.buttons[unit].classIcon, "TOPLEFT", -Gladdy.db.padding, 0)
         end
@@ -122,7 +121,7 @@ function Trinket:UpdateFrame(unit)
         if (Gladdy.db.trinketPos == "RIGHT") then
             trinket:SetPoint("TOPLEFT", Gladdy.buttons[unit].classIcon, "TOPRIGHT", Gladdy.db.padding, 0)
         else
-            trinket:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -Gladdy.db.padding, 2)
+            trinket:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -margin, 2)
         end
     end
     trinket.texture:ClearAllPoints()

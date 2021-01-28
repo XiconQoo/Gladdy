@@ -16,7 +16,7 @@ Gladdy.defaults = {
         y = 0,
         growUp = false,
         frameScale = 1,
-        padding = 5,
+        padding = 3,
         frameColor = { r = 0, g = 0, b = 0, a = .4 },
         barWidth = 180,
         bottomMargin = 10,

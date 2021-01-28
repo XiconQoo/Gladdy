@@ -36,7 +36,6 @@ function Powerbar:CreateFrame(unit)
     powerBar.border:SetBackdrop({ edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
                                   edgeSize = 13 })
     powerBar.border:SetBackdropBorderColor(0, 0, 0, 1)
-    powerBar.border:SetFrameStrata("HIGH")
 
     powerBar.bg = powerBar:CreateTexture(nil, "BACKGROUND")
     powerBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
@@ -85,8 +84,8 @@ function Powerbar:UpdateFrame(unit)
     powerBar:ClearAllPoints()
     powerBar:SetPoint("TOPLEFT", healthBar, "BOTTOMLEFT", 0, -1)
 
-    powerBar.border:SetWidth(powerBar:GetWidth() + 2)
-    powerBar.border:SetHeight(powerBar:GetHeight() + 2)
+    powerBar.border:SetWidth(powerBar:GetWidth() + 4)
+    powerBar.border:SetHeight(powerBar:GetHeight() + 4)
     powerBar.border:ClearAllPoints()
     powerBar.border:SetPoint("CENTER", powerBar, "CENTER", 0, 0)
 

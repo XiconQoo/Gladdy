@@ -140,8 +140,7 @@ function Gladdy:UpdateFrame()
     extraBarHeight = extraBarHeight + self.db.powerBarHeight
 
     -- Cooldown
-    local cooldownMargin = 4
-    margin = margin + self.db.cooldownSize + self.db.padding + cooldownMargin
+    margin = margin + self.db.cooldownSize + self.db.padding + self.db.highlightBorderSize
     height = height + self.db.cooldownSize * teamSize
 
     -- Classicon
@@ -214,20 +213,18 @@ function Gladdy:UpdateFrame()
             button.spellCooldownFrame:ClearAllPoints()
             if self.db.cooldownYPos == "TOP" then
                 if self.db.cooldownXPos == "RIGHT" then
-                    button.spellCooldownFrame:SetPoint("BOTTOMRIGHT", button.healthBar, "TOPRIGHT", 0, cooldownMargin) -- needs to be properly anchored after trinket
+                    button.spellCooldownFrame:SetPoint("BOTTOMRIGHT", button.healthBar, "TOPRIGHT", 0, self.db.highlightBorderSize) -- needs to be properly anchored after trinket
                 else
-                    button.spellCooldownFrame:SetPoint("BOTTOMLEFT", button.healthBar, "TOPLEFT", 0, cooldownMargin)
+                    button.spellCooldownFrame:SetPoint("BOTTOMLEFT", button.healthBar, "TOPLEFT", 0, self.db.highlightBorderSize)
                 end
             else
                 if self.db.cooldownXPos == "RIGHT" then
-                    button.spellCooldownFrame:SetPoint("TOPRIGHT", button.powerBar, "BOTTOMRIGHT", 0, -cooldownMargin) -- needs to be properly anchored after trinket
+                    button.spellCooldownFrame:SetPoint("TOPRIGHT", button.powerBar, "BOTTOMRIGHT", 0, -self.db.highlightBorderSize) -- needs to be properly anchored after trinket
                 else
-                    button.spellCooldownFrame:SetPoint("TOPLEFT", button.powerBar, "BOTTOMLEFT", 0, -cooldownMargin)
+                    button.spellCooldownFrame:SetPoint("TOPLEFT", button.powerBar, "BOTTOMLEFT", 0, -self.db.highlightBorderSize)
                 end
             end
-            --button.spellCooldownFrame:SetHeight(self.db.healthBarHeight+extraBarHeight)
             button.spellCooldownFrame:SetHeight(self.db.cooldownSize)
-            --button.spellCooldownFrame:SetWidth(self.db.healthBarHeight+extraBarHeight)
             button.spellCooldownFrame:SetWidth(1)
             button.spellCooldownFrame:Show()
             -- Update each cooldown icon
