@@ -1,6 +1,8 @@
 # Gladdy - Macumba / XiCoN Edit
 ## The most powerful arena addon for WoW TBC 2.4.3
 
+[![paypal](../readme-media/Paypal-Donate.png =62px)](https://www.paypal.me/xiconqoo/10)
+
 ### [v1.0-Release Download Here](https://github.com/XiconQoo/Gladdy/releases/download/v1.0-Release/Gladdy-MX-Edit-v1.0-Release.zip)
 
 ### Motivation for this edit
