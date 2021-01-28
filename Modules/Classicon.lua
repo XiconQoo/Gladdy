@@ -13,7 +13,6 @@ end
 
 function Classicon:CreateFrame(unit)
     local classIcon = CreateFrame("Frame", nil, Gladdy.buttons[unit])
-    classIcon:SetFrameStrata("LOW")
     classIcon.texture = classIcon:CreateTexture(nil, "BACKGROUND")
     classIcon.texture:SetAllPoints(classIcon)
     classIcon:ClearAllPoints()
@@ -43,21 +42,18 @@ function Classicon:UpdateFrame(unit)
     classIcon:SetWidth(iconSize - iconSize * 0.1)
     classIcon:SetHeight(iconSize)
     classIcon:ClearAllPoints()
+    local margin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
     if (Gladdy.db.classIconPos == "LEFT") then
-        classIcon:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -Gladdy.db.padding, 2)
+        classIcon:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -margin, 2)
     else
-        classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", Gladdy.db.padding, 2)
+        classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", margin, 2)
     end
-    classIcon:SetFrameStrata("LOW")
-    classIcon:SetFrameLevel(1)
 
     classIcon.texture:ClearAllPoints()
     classIcon.texture:SetAllPoints(classIcon)
 
     classIcon.border:SetWidth((iconSize - iconSize * 0.1))
     classIcon.border:SetHeight(iconSize)
-    classIcon.border:SetFrameStrata("LOW")
-    classIcon.border:SetFrameLevel(2)
     classIcon.border:ClearAllPoints()
     classIcon.border:SetPoint("CENTER", classIcon, "CENTER", 0, 0)
     classIcon.border:SetBackdropBorderColor(0, 0, 0, 1)
