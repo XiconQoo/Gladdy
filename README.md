@@ -24,7 +24,7 @@ Based on https://github.com/Schaka/gladdy
 
 ## Screenshot
 
-![Screenshot](../readme-media/sample.png)
+![Screenshot](../readme-media/sample.jpg)
 
 ### Changes
 
