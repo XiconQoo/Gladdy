@@ -203,6 +203,97 @@ function Gladdy:SetupOptions()
                         max = 50,
                         step = 1,
                     },
+                    buttonBorderStyle = {
+                        type = "select",
+                        name = L["Icon border style"],
+                        desc = L["This changes the border style of all icons"],
+                        order = 8,
+                        values = Gladdy:GetIconStyles(),
+                        get = function(info)
+                            if (Gladdy.db.classIconBorderStyle == Gladdy.db.trinketBorderStyle
+                                    and Gladdy.db.classIconBorderStyle == Gladdy.db.castBarIconStyle
+                                    and Gladdy.db.classIconBorderStyle == Gladdy.db.auraBorderStyle) then
+                                return Gladdy.db.classIconBorderStyle
+                            else
+                                return ""
+                            end
+                        end,
+                        set = function(info, value)
+                            Gladdy.db.classIconBorderStyle = value
+                            Gladdy.db.trinketBorderStyle = value
+                            Gladdy.db.castBarIconStyle = value
+                            Gladdy.db.auraBorderStyle = value
+                            Gladdy:UpdateFrame()
+                        end,
+                    },
+                    buttonBorderColor = {
+                        type = "color",
+                        name = L["Icon border color"],
+                        desc = L["This changes the border color of all icons"],
+                        order = 9,
+                        hasAlpha = true,
+                        get = function(info)
+                            local a = Gladdy.db.classIconBorderColor
+                            local b = Gladdy.db.trinketBorderColor
+                            local c = Gladdy.db.castBarIconColor
+                            if (a.r == b.r and a.g == b.g and a.b == b.b and a.a == b.a and a.r == c.r and a.g == c.g and a.b == c.b and a.a == c.a) then
+                                return a
+                            else
+                                return { r = 0, g = 0, b = 0, a = 0 }
+                            end
+                        end,
+                        set = function(info, r, g, b, a)
+                            local rgb = {r = r, g = g, b = b, a = a}
+                            Gladdy.db.classIconBorderColor = rgb
+                            Gladdy.db.trinketBorderColor = rgb
+                            Gladdy.db.castBarIconColor = rgb
+                            Gladdy:UpdateFrame()
+                        end,
+                    },
+                    frameBorderStyle = {
+                        type = "select",
+                        name = L["Statusbar border style"],
+                        desc = L["This changes the border style of all statusbar frames"],
+                        order = 10,
+                        values = Gladdy:GetBorderStyles(),
+                        get = function(info)
+                            if (Gladdy.db.healthBarBorder == Gladdy.db.powerBarBorder and Gladdy.db.healthBarBorder == Gladdy.db.castBarBorderStyle) then
+                                return Gladdy.db.healthBarBorder
+                            else
+                                return ""
+                            end
+                        end,
+                        set = function(info, value)
+                            Gladdy.db.healthBarBorder = value
+                            Gladdy.db.powerBarBorder = value
+                            Gladdy.db.castBarBorderStyle = value
+                            Gladdy:UpdateFrame()
+                        end,
+                    },
+                    frameBorderColor = {
+                        type = "color",
+                        name = L["Statusbar border color"],
+                        desc = L["This changes the border color of all statusbar frames"],
+                        order = 11,
+                        hasAlpha = true,
+                        get = function(info)
+                            local a = Gladdy.db.castBarBorderColor
+                            local b = Gladdy.db.healthBarBorderColor
+                            local c = Gladdy.db.powerBarBorderColor
+                            if (a.r == b.r and a.g == b.g and a.b == b.b and a.a == b.a and a.r == c.r and a.g == c.g and a.b == c.b and a.a == c.a) then
+                                return a
+                            else
+                                return { r = 0, g = 0, b = 0, a = 0 }
+                            end
+                        end,
+                        set = function(info, r, g, b, a)
+                            local rgb = {r = r, g = g, b = b, a = a}
+                            Gladdy.db.castBarBorderColor = rgb
+                            Gladdy.db.healthBarBorderColor = rgb
+                            Gladdy.db.powerBarBorderColor = rgb
+                            Gladdy:UpdateFrame()
+                        end,
+                    },
                 },
             },
         },

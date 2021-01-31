@@ -10,11 +10,16 @@ local Castbar = Gladdy:NewModule("Castbar", 70, {
     castBarHeight = 20,
     castBarWidth = 160,
     castBarIconSize = 22,
-    castBarTexture = "Smooth",
-    castBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
+    castBarBorderSize = 8,
     castBarFontSize = 12,
+    castBarTexture = "Smooth",
+    castBarIconStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded",
+    castBarBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round",
     castBarColor = { r = 1, g = 0.8, b = 0.2, a = 1 },
     castBarBgColor = { r = 0, g = 0, b = 0, a = 0.4 },
+    castBarIconColor = { r = 0, g = 0, b = 0, a = 1 },
+    castBarBorderColor = { r = 0, g = 0, b = 0, a = 1 },
+    castBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
     castBarGuesses = true,
     castBarPos = "LEFT",
     castBarIconPos = "LEFT"
@@ -34,10 +39,9 @@ function Castbar:CreateFrame(unit)
     castBar:SetStatusBarColor(Gladdy.db.castBarColor.r, Gladdy.db.castBarColor.g, Gladdy.db.castBarColor.b, Gladdy.db.castBarColor.a)
     castBar:SetMinMaxValues(0, 100)
     castBar.border = CreateFrame("Frame", nil, castBar)
-    castBar.border:SetBackdrop({ edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
-                                 edgeSize = 14 })
-    --castBar.border:SetFrameStrata("HIGH")
-    castBar.border:SetBackdropBorderColor(0, 0, 0, 1)
+    castBar.border:SetBackdrop({ edgeFile = Gladdy.db.castBarBorderStyle,
+                                 edgeSize = Gladdy.db.castBarBorderSize })
+    castBar.border:SetBackdropBorderColor(Gladdy.db.castBarBorderColor.r, Gladdy.db.castBarBorderColor.g, Gladdy.db.castBarBorderColor.b, Gladdy.db.castBarBorderColor.a)
     castBar.border:Hide()
 
     castBar:SetScript("OnUpdate", function(self, elapsed)
@@ -65,14 +69,19 @@ function Castbar:CreateFrame(unit)
     castBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
     castBar.bg:SetVertexColor(Gladdy.db.castBarBgColor.r, Gladdy.db.castBarBgColor.g, Gladdy.db.castBarBgColor.b, Gladdy.db.castBarBgColor.a)
 
-    castBar.icon = castBar:CreateTexture(nil)
+    castBar.icon = CreateFrame("Frame", nil, castBar)
+    castBar.icon.texture = castBar.icon:CreateTexture(nil, "BACKGROUND")
+    castBar.icon.texture:SetAllPoints(castBar.icon)
+    castBar.icon.texture.overlay = castBar.icon:CreateTexture(nil, "BORDER")
+    castBar.icon.texture.overlay:SetAllPoints(castBar.icon.texture)
+    castBar.icon.texture.overlay:SetTexture(Gladdy.db.castBarIconStyle)
+
     castBar.icon:ClearAllPoints()
     if (Gladdy.db.castBarIconPos == "LEFT") then
         castBar.icon:SetPoint("RIGHT", castBar, "LEFT", -3, 0) -- Icon of castbar
     else
         castBar.icon:SetPoint("LEFT", castBar, "RIGHT", 3, 0) -- Icon of castbar
     end
-    castBar.icon:SetTexCoord(0.01, 0.99, 0.01, 0.99)
 
     castBar.spellText = castBar:CreateFontString(nil, "LOW")
     castBar.spellText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.castBarFontSize)
@@ -102,25 +111,27 @@ function Castbar:UpdateFrame(unit)
     end
 
     castBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
-    castBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
-
-    castBar.bg:SetWidth(Gladdy.db.castBarWidth)
-    castBar.bg:SetHeight(Gladdy.db.castBarHeight)
-    castBar.bg:ClearAllPoints()
-    castBar.bg:SetPoint("RIGHT", castBar, "RIGHT", 2, -2)
-    castBar.bg:SetVertexColor(Gladdy.db.castBarBgColor.r, Gladdy.db.castBarBgColor.g, Gladdy.db.castBarBgColor.b, Gladdy.db.castBarBgColor.a)
-
     castBar:SetWidth(Gladdy.db.castBarWidth)
     castBar:SetHeight(Gladdy.db.castBarHeight)
 
-    castBar.border:SetWidth(Gladdy.db.castBarWidth + 5)
-    castBar.border:SetHeight(Gladdy.db.castBarHeight + 5)
+    castBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
+    castBar.bg:ClearAllPoints()
+    castBar.bg:SetPoint("TOPLEFT", castBar, "TOPLEFT")
+    castBar.bg:SetPoint("BOTTOMRIGHT", castBar, "BOTTOMRIGHT")
+    castBar.bg:SetVertexColor(Gladdy.db.castBarBgColor.r, Gladdy.db.castBarBgColor.g, Gladdy.db.castBarBgColor.b, Gladdy.db.castBarBgColor.a)
+
+    castBar.border:SetBackdrop({ edgeFile = Gladdy.db.castBarBorderStyle,
+                                 edgeSize = Gladdy.db.castBarBorderSize })
+    castBar.border:SetBackdropBorderColor(Gladdy.db.castBarBorderColor.r, Gladdy.db.castBarBorderColor.g, Gladdy.db.castBarBorderColor.b, Gladdy.db.castBarBorderColor.a)
     castBar.border:ClearAllPoints()
-    castBar.border:SetPoint("RIGHT", castBar, "RIGHT", 3, 0)
+    castBar.border:SetPoint("TOPLEFT", castBar, "TOPLEFT")
+    castBar.border:SetPoint("BOTTOMRIGHT", castBar, "BOTTOMRIGHT")
 
     castBar.icon:SetWidth(Gladdy.db.castBarIconSize)
     castBar.icon:SetHeight(Gladdy.db.castBarIconSize)
+    castBar.icon.texture:SetAllPoints(castBar.icon)
     castBar.icon:ClearAllPoints()
+
     local rightMargin = 0
     local leftMargin = 0
     if (Gladdy.db.castBarIconPos == "LEFT") then
@@ -158,8 +169,12 @@ function Castbar:UpdateFrame(unit)
 
     castBar.spellText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.castBarFontSize)
     castBar.spellText:SetTextColor(Gladdy.db.castBarFontColor.r, Gladdy.db.castBarFontColor.g, Gladdy.db.castBarFontColor.b, Gladdy.db.castBarFontColor.a)
+
     castBar.timeText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.castBarFontSize)
     castBar.timeText:SetTextColor(Gladdy.db.castBarFontColor.r, Gladdy.db.castBarFontColor.g, Gladdy.db.castBarFontColor.b, Gladdy.db.castBarFontColor.a)
+
+    castBar.icon.texture.overlay:SetTexture(Gladdy.db.castBarIconStyle)
+    castBar.icon.texture.overlay:SetVertexColor(Gladdy.db.castBarIconColor.r, Gladdy.db.castBarIconColor.g, Gladdy.db.castBarIconColor.b, Gladdy.db.castBarIconColor.a)
 end
 
 function Castbar:ResetUnit(unit)
@@ -196,13 +211,14 @@ function Castbar:CAST_START(unit, spell, icon, value, maxValue, event)
     castBar.maxValue = maxValue
     castBar:SetMinMaxValues(0, maxValue)
     castBar:SetValue(value)
-    castBar.icon:SetTexture(icon)
+    castBar.icon.texture:SetTexture(icon)
     castBar.spellText:SetText(spell)
     castBar.timeText:SetText(maxValue)
     castBar.isCasting = event == "cast"
     castBar.isChanneling = event == "channel"
     castBar.bg:Show()
     castBar.border:Show()
+    castBar.icon:Show()
 end
 
 function Castbar:CAST_STOP(unit)
@@ -216,12 +232,13 @@ function Castbar:CAST_STOP(unit)
     castBar.isChanneling = false
     castBar.value = 0
     castBar.maxValue = 0
-    castBar.icon:SetTexture("")
+    castBar.icon.texture:SetTexture("")
     castBar.spellText:SetText("")
     castBar.timeText:SetText("")
     castBar:SetValue(0)
     castBar.bg:Hide()
     castBar.border:Hide()
+    castBar.icon:Hide()
 end
 
 local function option(params)
@@ -291,26 +308,34 @@ function Castbar:GetOptions()
             max = 300,
             step = 1,
         }),
+        castBarIconSize = option({
+            type = "range",
+            name = L["Icon size"],
+            order = 5,
+            min = 0,
+            max = 100,
+            step = 1,
+        }),
+        castBarBorderSize = option({
+            type = "range",
+            name = L["Border size"],
+            order = 6,
+            min = 0,
+            max = 100,
+            step = 1,
+        }),
         castBarFontSize = option({
             type = "range",
             name = L["Font size"],
             desc = L["Size of the text"],
-            order = 5,
+            order = 7,
             min = 1,
             max = 20,
-        }),
-        castBarIconSize = option({
-            type = "range",
-            name = L["Icon size"],
-            order = 6,
-            min = 0,
-            max = 60,
-            step = 1,
         }),
         castBarPos = option({
             type = "select",
             name = L["Position"],
-            order = 7,
+            order = 8,
             values = {
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],
@@ -319,7 +344,7 @@ function Castbar:GetOptions()
         castBarIconPos = option( {
             type = "select",
             name = L["Icon position"],
-            order = 8,
+            order = 9,
             values = {
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],
@@ -329,29 +354,53 @@ function Castbar:GetOptions()
             type = "select",
             name = L["Bar texture"],
             desc = L["Texture of the bar"],
-            order = 9,
+            order = 10,
             dialogControl = "LSM30_Statusbar",
             values = AceGUIWidgetLSMlists.statusbar,
         }),
-        castBarFontColor = colorOption({
-            type = "color",
-            name = L["Font color"],
-            desc = L["Color of the text"],
-            order = 10,
-            hasAlpha = true,
+        castBarIconStyle = option({
+            type = "select",
+            name = L["Icon style"],
+            order = 11,
+            values = Gladdy:GetIconStyles(),
+        }),
+        castBarBorderStyle = option({
+            type = "select",
+            name = L["Border style"],
+            order = 12,
+            values = Gladdy:GetBorderStyles()
         }),
         castBarColor = colorOption({
             type = "color",
             name = L["Bar color"],
             desc = L["Color of the cast bar"],
-            order = 11,
+            order = 13,
             hasAlpha = true,
         }),
         castBarBgColor = colorOption({
             type = "color",
             name = L["Background color"],
             desc = L["Color of the cast bar background"],
-            order = 12,
+            order = 14,
+            hasAlpha = true,
+        }),
+        castBarIconColor = colorOption({
+            type = "color",
+            name = L["Icon border color"],
+            order = 15,
+            hasAlpha = true,
+        }),
+        castBarBorderColor = colorOption({
+            type = "color",
+            name = L["Status Bar border color"],
+            order = 16,
+            hasAlpha = true,
+        }),
+        castBarFontColor = colorOption({
+            type = "color",
+            name = L["Font color"],
+            desc = L["Color of the text"],
+            order = 17,
             hasAlpha = true,
         }),
     }

@@ -6,6 +6,8 @@ local Cooldown = Gladdy:NewModule("Cooldown", nil, {
     cooldownYPos = "TOP",
     cooldownXPos = "LEFT",
     cooldownSize = 30,
+    cooldownBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_Gloss",
+    cooldownBorderColor = { r = 1, g = 1, b = 1, a = 1 },
 })
 
 function Cooldown:Test(unit)
@@ -30,6 +32,26 @@ local function option(params)
             end--]]
             --Gladdy.db.cooldownPos = value
             Gladdy.dbi.profile[key] = value
+            Gladdy:UpdateFrame()
+        end,
+    }
+
+    for k, v in pairs(params) do
+        defaults[k] = v
+    end
+
+    return defaults
+end
+
+local function colorOption(params)
+    local defaults = {
+        get = function(info)
+            local key = info.arg or info[#info]
+            return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
+        end,
+        set = function(info, r, g, b, a)
+            local key = info.arg or info[#info]
+            Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
             Gladdy:UpdateFrame()
         end,
     }
@@ -76,6 +98,19 @@ function Cooldown:GetOptions()
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],
             },
+        }),
+        cooldownBorderStyle = option({
+            type = "select",
+            name = L["Border style"],
+            order = 8,
+            values = Gladdy:GetIconStyles()
+        }),
+        cooldownBorderColor = colorOption({
+            type = "color",
+            name = L["Border color"],
+            desc = L["Color of the border"],
+            order = 9,
+            hasAlpha = true,
         }),
     }
 end

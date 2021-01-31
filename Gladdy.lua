@@ -109,6 +109,23 @@ function Gladdy:Print(...)
     DEFAULT_CHAT_FRAME:AddMessage(text)
 end
 
+function Gladdy:GetBorderStyles()
+    return
+    {
+        ["Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round"] = L["Statusbar rounded"],
+        ["Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_square"] = L["Statusbar squared"],
+    }
+end
+
+function Gladdy:GetIconStyles()
+    return
+    {
+        ["Interface\\AddOns\\Gladdy\\Images\\Border_rounded"] = L["Border rounded"],
+        ["Interface\\AddOns\\Gladdy\\Images\\Border_squared"] = L["Border squared"],
+        ["Interface\\AddOns\\Gladdy\\Images\\Border_Gloss"] = L["Gloss (black border)"],
+    }
+end
+
 Gladdy.events = CreateFrame("Frame")
 Gladdy.events.registered = {}
 Gladdy.events:RegisterEvent("PLAYER_LOGIN")

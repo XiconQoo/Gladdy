@@ -15,7 +15,10 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drFontSize = 20,
     drCooldownPos = "RIGHT",
     drIconSize = 36,
-    drEnabled = true
+    drEnabled = true,
+    drEnableCooldown = true,
+    drBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_Gloss",
+    drBorderColor = { r = 1, g = 1, b = 1, a = 1 },
 })
 
 local function StyleActionButton(f)
@@ -28,13 +31,12 @@ local function StyleActionButton(f)
     normalTex:SetWidth(button:GetWidth())
     normalTex:SetPoint("CENTER")
 
-    button:SetNormalTexture("Interface\\AddOns\\Gladdy\\Images\\Gloss_CDs")
+    button:SetNormalTexture(Gladdy.db.drBorderStyle)
+    normalTex:SetVertexColor(Gladdy.db.drBorderColor.r, Gladdy.db.drBorderColor.g, Gladdy.db.drBorderColor.b, Gladdy.db.drBorderColor.a)
 
     icon:SetTexCoord(.1, .9, .1, .9)
     icon:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
     icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
-
-    normalTex:SetVertexColor(1, 1, 1, 1)
 end
 
 function Diminishings:OnEvent(event, ...)
@@ -384,6 +386,19 @@ function Diminishings:GetOptions()
             min = 5,
             max = 100,
             step = 1,
+        }),
+        drBorderStyle = option({
+            type = "select",
+            name = L["Border style"],
+            order = 7,
+            values = Gladdy:GetIconStyles()
+        }),
+        drBorderColor = colorOption({
+            type = "color",
+            name = L["Border color"],
+            desc = L["Color of the border"],
+            order = 8,
+            hasAlpha = true,
         }),
     }
 end

@@ -114,13 +114,12 @@ local function StyleActionButton(f)
     normalTex:SetWidth(button:GetWidth())
     normalTex:SetPoint("CENTER")
 
-    button:SetNormalTexture("Interface\\AddOns\\Gladdy\\Images\\Gloss_CDs")
+    button:SetNormalTexture(Gladdy.db.cooldownBorderStyle)
+    normalTex:SetVertexColor(Gladdy.db.cooldownBorderColor.r, Gladdy.db.cooldownBorderColor.g, Gladdy.db.cooldownBorderColor.b, Gladdy.db.cooldownBorderColor.a)
 
     icon:SetTexCoord(.1, .9, .1, .9)
     icon:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
     icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
-
-    normalTex:SetVertexColor(1, 1, 1, 1)
 end
 
 function Gladdy:UpdateFrame()

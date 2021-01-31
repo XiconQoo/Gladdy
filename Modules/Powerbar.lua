@@ -9,6 +9,9 @@ local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
 local Powerbar = Gladdy:NewModule("Powerbar", 90, {
     powerBarHeight = 20,
     powerBarTexture = "Smooth",
+    powerBarBorder = "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round",
+    powerBarBorderSize = 10,
+    powerBarBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     powerBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
     powerBarBgColor = { r = 0.3, g = 0.3, b = 0.3, a = 0.7 },
     powerBarFontSize = 10,
@@ -33,16 +36,15 @@ function Powerbar:CreateFrame(unit)
     powerBar:SetMinMaxValues(0, 100)
 
     powerBar.border = CreateFrame("Frame", nil, powerBar)
-    powerBar.border:SetBackdrop({ edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
-                                  edgeSize = 13 })
-    powerBar.border:SetBackdropBorderColor(0, 0, 0, 1)
+    powerBar.border:SetBackdrop({ edgeFile = Gladdy.db.powerBarBorder,
+                                  edgeSize = Gladdy.db.powerBarBorderSize })
+    powerBar.border:SetBackdropBorderColor(Gladdy.db.powerBarBorderColor.r, Gladdy.db.powerBarBorderColor.g, Gladdy.db.powerBarBorderColor.b, Gladdy.db.powerBarBorderColor.a)
 
     powerBar.bg = powerBar:CreateTexture(nil, "BACKGROUND")
     powerBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
     powerBar.bg:ClearAllPoints()
     powerBar.bg:SetAllPoints(powerBar)
     powerBar.bg:SetVertexColor(Gladdy.db.powerBarBgColor.r, Gladdy.db.powerBarBgColor.g, Gladdy.db.powerBarBgColor.b, Gladdy.db.powerBarBgColor.a)
-    powerBar.bg:SetAlpha(0.7)
 
     powerBar.raceText = powerBar:CreateFontString(nil, "LOW")
     powerBar.raceText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.powerBarFontSize)
@@ -66,7 +68,6 @@ function Powerbar:CreateFrame(unit)
 end
 
 function Powerbar:UpdateFrame(unit)
-    local button = Gladdy.buttons[unit]
     local powerBar = self.frames[unit]
     if (not powerBar) then
         return
@@ -84,10 +85,12 @@ function Powerbar:UpdateFrame(unit)
     powerBar:ClearAllPoints()
     powerBar:SetPoint("TOPLEFT", healthBar, "BOTTOMLEFT", 0, -1)
 
-    powerBar.border:SetWidth(powerBar:GetWidth() + 4)
-    powerBar.border:SetHeight(powerBar:GetHeight() + 4)
+    powerBar.border:SetBackdrop({ edgeFile = Gladdy.db.powerBarBorder,
+                                  edgeSize = Gladdy.db.powerBarBorderSize })
+    powerBar.border:SetBackdropBorderColor(Gladdy.db.powerBarBorderColor.r, Gladdy.db.powerBarBorderColor.g, Gladdy.db.powerBarBorderColor.b, Gladdy.db.powerBarBorderColor.a)
     powerBar.border:ClearAllPoints()
-    powerBar.border:SetPoint("CENTER", powerBar, "CENTER", 0, 0)
+    powerBar.border:SetPoint("TOPLEFT", powerBar, "TOPLEFT")
+    powerBar.border:SetPoint("BOTTOMRIGHT", powerBar, "BOTTOMRIGHT")
 
     powerBar.raceText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.powerBarFontSize)
     powerBar.raceText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)
@@ -277,23 +280,45 @@ function Powerbar:GetOptions()
             min = 1,
             max = 20,
         }),
+        powerBarBorder= option({
+            type = "select",
+            name = L["Border style"],
+            order = 7,
+            values = Gladdy:GetBorderStyles()
+        }),
+        powerBarBorderSize = option({
+            type = "range",
+            name = L["Border size"],
+            desc = L["Size of the border"],
+            order = 8,
+            min = 1,
+            max = 16,
+            step = 1,
+        }),
+        powerBarBorderColor = colorOption({
+            type = "color",
+            name = L["Border color"],
+            desc = L["Color of the border"],
+            order = 9,
+            hasAlpha = true,
+        }),
         powerActual = option({
             type = "toggle",
             name = L["Show the actual power"],
             desc = L["Show the actual power on the power bar"],
-            order = 7,
+            order = 10,
         }),
         powerMax = option({
             type = "toggle",
             name = L["Show max power"],
             desc = L["Show max power on the power bar"],
-            order = 8,
+            order = 11,
         }),
         powerPercentage = option({
             type = "toggle",
             name = L["Show power percentage"],
             desc = L["Show power percentage on the power bar"],
-            order = 9,
+            order = 12,
         }),
     }
 end

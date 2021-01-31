@@ -10,6 +10,9 @@ local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
 local Healthbar = Gladdy:NewModule("Healthbar", 100, {
     healthBarHeight = 60,
     healthBarTexture = "Smooth",
+    healthBarBorder = "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round",
+    healthBarBorderSize = 10,
+    healthBarBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     healthBarBgColor = { r = 0, g = 0, b = 0, a = 0.4 },
     healthBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
     healthBarFontSize = 12,
@@ -33,9 +36,9 @@ function Healthbar:CreateFrame(unit)
     healthBar:SetMinMaxValues(0, 100)
 
     healthBar.border = CreateFrame("Frame", nil, healthBar)
-    healthBar.border:SetBackdrop({ edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
-                                   edgeSize = 13 })
-    healthBar.border:SetBackdropBorderColor(0, 0, 0, 1)
+    healthBar.border:SetBackdrop({ edgeFile = Gladdy.db.healthBarBorder,
+                                   edgeSize = Gladdy.db.healthBarBorderSize })
+    healthBar.border:SetBackdropBorderColor(Gladdy.db.healthBarBorderColor.r, Gladdy.db.healthBarBorderColor.g, Gladdy.db.healthBarBorderColor.b, Gladdy.db.healthBarBorderColor.a)
 
     healthBar.bg = healthBar:CreateTexture(nil, "BACKGROUND")
     healthBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.healthBarTexture))
@@ -78,7 +81,6 @@ function Healthbar:CreateFrame(unit)
 end
 
 function Healthbar:UpdateFrame(unit)
-    local button = Gladdy.buttons[unit]
     local healthBar = self.frames[unit]
     if (not healthBar) then
         return
@@ -94,10 +96,12 @@ function Healthbar:UpdateFrame(unit)
     healthBar:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPLEFT", iconSize, 0)
     healthBar:SetPoint("BOTTOMRIGHT", Gladdy.buttons[unit], "BOTTOMRIGHT")
 
-    healthBar.border:SetWidth(healthBar:GetWidth() + 4)
-    healthBar.border:SetHeight(healthBar:GetHeight() + 4)
+    healthBar.border:SetBackdrop({ edgeFile = Gladdy.db.healthBarBorder,
+                                   edgeSize = Gladdy.db.healthBarBorderSize })
+    healthBar.border:SetBackdropBorderColor(Gladdy.db.healthBarBorderColor.r, Gladdy.db.healthBarBorderColor.g, Gladdy.db.healthBarBorderColor.b, Gladdy.db.healthBarBorderColor.a)
     healthBar.border:ClearAllPoints()
-    healthBar.border:SetPoint("CENTER", healthBar, "CENTER", 0, 0)
+    healthBar.border:SetPoint("TOPLEFT", healthBar, "TOPLEFT")
+    healthBar.border:SetPoint("BOTTOMRIGHT", healthBar, "BOTTOMRIGHT")
 
     if (Gladdy.db.healthBarFontSize < 1) then
         healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font"), 1)
@@ -273,23 +277,45 @@ function Healthbar:GetOptions()
             min = 0,
             max = 20,
         }),
+        healthBarBorder= option({
+            type = "select",
+            name = L["Border style"],
+            order = 6,
+            values = Gladdy:GetBorderStyles()
+        }),
+        healthBarBorderSize = option({
+            type = "range",
+            name = L["Border size"],
+            desc = L["Size of the border"],
+            order = 7,
+            min = 1,
+            max = 16,
+            step = 1,
+        }),
+        healthBarBorderColor = colorOption({
+            type = "color",
+            name = L["Border color"],
+            desc = L["Color of the border"],
+            order = 8,
+            hasAlpha = true,
+        }),
         healthActual = option({
             type = "toggle",
             name = L["Show the actual health"],
             desc = L["Show the actual health on the health bar"],
-            order = 6,
+            order = 9,
         }),
         healthMax = option({
             type = "toggle",
             name = L["Show max health"],
             desc = L["Show max health on the health bar"],
-            order = 7,
+            order = 10,
         }),
         healthPercentage = option({
             type = "toggle",
             name = L["Show health percentage"],
             desc = L["Show health percentage on the health bar"],
-            order = 8,
+            order = 11,
         }),
     }
 end
