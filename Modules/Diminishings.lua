@@ -267,6 +267,10 @@ function Diminishings:Fade(unit, spell)
     end
 end
 
+function Positionate()
+    Diminishings:Positionate("arena1")
+end
+
 function Diminishings:Positionate(unit)
     local drFrame = self.frames[unit]
     if (not drFrame) then
@@ -284,7 +288,7 @@ function Diminishings:Positionate(unit)
                 if (not lastIcon) then
                     icon:SetPoint("TOPRIGHT")
                 else
-                    icon:SetPoint("LEFT", lastIcon, "RIGHT")
+                    icon:SetPoint("RIGHT", lastIcon, "LEFT")
                 end
             else
                 if (not lastIcon) then
