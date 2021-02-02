@@ -10,11 +10,11 @@ local Castbar = Gladdy:NewModule("Castbar", 70, {
     castBarHeight = 20,
     castBarWidth = 160,
     castBarIconSize = 22,
-    castBarBorderSize = 8,
+    castBarBorderSize = 7,
     castBarFontSize = 12,
     castBarTexture = "Smooth",
-    castBarIconStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded",
-    castBarBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round",
+    castBarIconStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
+    castBarBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade",
     castBarColor = { r = 1, g = 0.8, b = 0.2, a = 1 },
     castBarBgColor = { r = 0, g = 0, b = 0, a = 0.4 },
     castBarIconColor = { r = 0, g = 0, b = 0, a = 1 },
@@ -250,6 +250,10 @@ local function option(params)
         set = function(info, value)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key] = value
+            Gladdy.options.args.Castbar.args.castBarBorderSize.max = Gladdy.db.castBarHeight/2
+            if Gladdy.db.castBarBorderSize > Gladdy.db.castBarHeight/2 then
+                Gladdy.db.castBarBorderSize = Gladdy.db.castBarHeight/2
+            end
             Gladdy:UpdateFrame()
         end,
     }
@@ -321,7 +325,7 @@ function Castbar:GetOptions()
             name = L["Border size"],
             order = 6,
             min = 0,
-            max = 100,
+            max = Gladdy.db.castBarHeight/2,
             step = 1,
         }),
         castBarFontSize = option({

@@ -9,8 +9,8 @@ local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
 local Powerbar = Gladdy:NewModule("Powerbar", 90, {
     powerBarHeight = 20,
     powerBarTexture = "Smooth",
-    powerBarBorder = "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round",
-    powerBarBorderSize = 10,
+    powerBarBorder = "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade",
+    powerBarBorderSize = 9,
     powerBarBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     powerBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
     powerBarBgColor = { r = 0.3, g = 0.3, b = 0.3, a = 0.7 },
@@ -208,6 +208,10 @@ local function option(params)
         set = function(info, value)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key] = value
+            Gladdy.options.args.Powerbar.args.powerBarBorderSize.max = Gladdy.db.powerBarHeight/2
+            if Gladdy.db.powerBarBorderSize > Gladdy.db.powerBarHeight/2 then
+                Gladdy.db.powerBarBorderSize = Gladdy.db.powerBarHeight/2
+            end
             Gladdy:UpdateFrame()
         end,
     }
@@ -292,7 +296,7 @@ function Powerbar:GetOptions()
             desc = L["Size of the border"],
             order = 8,
             min = 1,
-            max = 16,
+            max = Gladdy.db.powerBarHeight/2,
             step = 1,
         }),
         powerBarBorderColor = colorOption({

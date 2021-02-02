@@ -112,16 +112,16 @@ end
 function Gladdy:GetBorderStyles()
     return
     {
-        ["Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round"] = L["Statusbar rounded"],
-        ["Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_square"] = L["Statusbar squared"],
+        ["Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade"] = L["Statusbar round"],
+        ["Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_square_selfmade"] = L["Statusbar square"],
     }
 end
 
 function Gladdy:GetIconStyles()
     return
     {
-        ["Interface\\AddOns\\Gladdy\\Images\\Border_rounded"] = L["Border rounded"],
-        ["Interface\\AddOns\\Gladdy\\Images\\Border_squared"] = L["Border squared"],
+        ["Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp"] = L["Border round"],
+        ["Interface\\AddOns\\Gladdy\\Images\\Border_squared_blp"] = L["Border square"],
         ["Interface\\AddOns\\Gladdy\\Images\\Border_Gloss"] = L["Gloss (black border)"],
     }
 end

@@ -388,7 +388,7 @@ function Diminishings:GetOptions()
             desc = L["Size of the DR Icons"],
             order = 6,
             min = 5,
-            max = 100,
+            max = 50,
             step = 1,
         }),
         drBorderStyle = option({

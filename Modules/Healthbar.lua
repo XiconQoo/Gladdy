@@ -10,8 +10,8 @@ local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
 local Healthbar = Gladdy:NewModule("Healthbar", 100, {
     healthBarHeight = 60,
     healthBarTexture = "Smooth",
-    healthBarBorder = "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round",
-    healthBarBorderSize = 10,
+    healthBarBorder = "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade",
+    healthBarBorderSize = 9,
     healthBarBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     healthBarBgColor = { r = 0, g = 0, b = 0, a = 0.4 },
     healthBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
@@ -206,6 +206,10 @@ local function option(params)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key] = value
             Gladdy:UpdateFrame()
+            Gladdy.options.args.Healthbar.args.healthBarBorderSize.max = Gladdy.db.healthBarHeight/2
+            if Gladdy.db.healthBarBorderSize > Gladdy.db.healthBarHeight/2 then
+                Gladdy.db.healthBarBorderSize = Gladdy.db.healthBarHeight/2
+            end
         end,
     }
 
@@ -289,7 +293,7 @@ function Healthbar:GetOptions()
             desc = L["Size of the border"],
             order = 7,
             min = 1,
-            max = 16,
+            max = Gladdy.db.healthBarHeight/2,
             step = 1,
         }),
         healthBarBorderColor = colorOption({

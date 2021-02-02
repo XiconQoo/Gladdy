@@ -237,7 +237,7 @@ function Gladdy:SetupOptions()
                             local b = Gladdy.db.trinketBorderColor
                             local c = Gladdy.db.castBarIconColor
                             if (a.r == b.r and a.g == b.g and a.b == b.b and a.a == b.a and a.r == c.r and a.g == c.g and a.b == c.b and a.a == c.a) then
-                                return a
+                                return a.r, a.g, a.b, a.a
                             else
                                 return { r = 0, g = 0, b = 0, a = 0 }
                             end
@@ -281,7 +281,7 @@ function Gladdy:SetupOptions()
                             local b = Gladdy.db.healthBarBorderColor
                             local c = Gladdy.db.powerBarBorderColor
                             if (a.r == b.r and a.g == b.g and a.b == b.b and a.a == b.a and a.r == c.r and a.g == c.g and a.b == c.b and a.a == c.a) then
-                                return a
+                                return a.r, a.g, a.b, a.a
                             else
                                 return { r = 0, g = 0, b = 0, a = 0 }
                             end

@@ -10,7 +10,7 @@ Trinket = Gladdy:NewModule("Trinket", nil, {
     trinketEnabled = true,
     --trinketDisableOmniCC = true,
     trinketPos = "RIGHT",
-    trinketBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded",
+    trinketBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     trinketBorderColor = { r = 0, g = 0, b = 0, a = 1 },
 })
 LibStub("AceComm-3.0"):Embed(Trinket)

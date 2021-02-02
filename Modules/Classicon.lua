@@ -2,7 +2,7 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local Classicon = Gladdy:NewModule("Classicon", 80, {
     classIconPos = "LEFT",
-    classIconBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded",
+    classIconBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     classIconBorderColor = { r = 0, g = 0, b = 0, a = 1 },
 })
 
