@@ -8,6 +8,7 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
 local Healthbar = Gladdy:NewModule("Healthbar", 100, {
+    healthBarFont = "DorisPP",
     healthBarHeight = 60,
     healthBarTexture = "Smooth",
     healthBarBorder = "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade",
@@ -49,10 +50,10 @@ function Healthbar:CreateFrame(unit)
 
     healthBar.nameText = healthBar:CreateFontString(nil, "LOW")
     if (Gladdy.db.healthBarFontSize < 1) then
-        healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font"), 1)
+        healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.healthBarFont), 1)
         healthBar.nameText:Hide()
     else
-        healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.healthBarFontSize)
+        healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.healthBarFont), Gladdy.db.healthBarFontSize) --Gladdy.LSM:Fetch("font", Gladdy.db.npCastbarsFont)
         healthBar.nameText:Show()
     end
     healthBar.nameText:SetTextColor(Gladdy.db.healthBarFontColor.r, Gladdy.db.healthBarFontColor.g, Gladdy.db.healthBarFontColor.b, Gladdy.db.healthBarFontColor.a)
@@ -63,10 +64,10 @@ function Healthbar:CreateFrame(unit)
 
     healthBar.healthText = healthBar:CreateFontString(nil, "LOW")
     if (Gladdy.db.healthBarFontSize < 1) then
-        healthBar.healthText:SetFont(Gladdy.LSM:Fetch("font"), 1)
+        healthBar.healthText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.healthBarFont), 1)
         healthBar.healthText:Hide()
     else
-        healthBar.healthText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.healthBarFontSize)
+        healthBar.healthText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.healthBarFont), Gladdy.db.healthBarFontSize)
         healthBar.healthText:Hide()
     end
     healthBar.healthText:SetTextColor(Gladdy.db.healthBarFontColor.r, Gladdy.db.healthBarFontColor.g, Gladdy.db.healthBarFontColor.b, Gladdy.db.healthBarFontColor.a)
@@ -104,14 +105,14 @@ function Healthbar:UpdateFrame(unit)
     healthBar.border:SetPoint("BOTTOMRIGHT", healthBar, "BOTTOMRIGHT")
 
     if (Gladdy.db.healthBarFontSize < 1) then
-        healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font"), 1)
-        healthBar.healthText:SetFont(Gladdy.LSM:Fetch("font"), 1)
+        healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.healthBarFont), 1)
+        healthBar.healthText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.healthBarFont), 1)
         healthBar.nameText:Hide()
         healthBar.healthText:Hide()
     else
-        healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.healthBarFontSize)
+        healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.healthBarFont), Gladdy.db.healthBarFontSize)
         healthBar.nameText:Show()
-        healthBar.healthText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.healthBarFontSize)
+        healthBar.healthText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.healthBarFont), Gladdy.db.healthBarFontSize)
         healthBar.healthText:Show()
     end
     healthBar.nameText:SetTextColor(Gladdy.db.healthBarFontColor.r, Gladdy.db.healthBarFontColor.g, Gladdy.db.healthBarFontColor.b, Gladdy.db.healthBarFontColor.a)
@@ -205,30 +206,10 @@ local function option(params)
         set = function(info, value)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key] = value
-            Gladdy:UpdateFrame()
             Gladdy.options.args.Healthbar.args.healthBarBorderSize.max = Gladdy.db.healthBarHeight/2
             if Gladdy.db.healthBarBorderSize > Gladdy.db.healthBarHeight/2 then
                 Gladdy.db.healthBarBorderSize = Gladdy.db.healthBarHeight/2
             end
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
-local function colorOption(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
-        end,
-        set = function(info, r, g, b, a)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
             Gladdy:UpdateFrame()
         end,
     }
@@ -259,67 +240,75 @@ function Healthbar:GetOptions()
             dialogControl = "LSM30_Statusbar",
             values = AceGUIWidgetLSMlists.statusbar,
         }),
-        healthBarBgColor = colorOption({
+        healthBarBgColor = Gladdy:colorOption({
             type = "color",
             name = L["Background color"],
             desc = L["Color of the status bar background"],
             order = 4,
             hasAlpha = true,
         }),
-        healthBarFontColor = colorOption({
+        healthBarFont = option({
+            type = "select",
+            name = L["Font"],
+            desc = L["Font of the bar"],
+            order = 5,
+            dialogControl = "LSM30_Font",
+            values = AceGUIWidgetLSMlists.font,
+        }),
+        healthBarFontColor = Gladdy:colorOption({
             type = "color",
             name = L["Font color"],
             desc = L["Color of the text"],
-            order = 4,
+            order = 7,
             hasAlpha = true,
         }),
         healthBarFontSize = option({
             type = "range",
             name = L["Font size"],
             desc = L["Size of the text"],
-            order = 5,
+            order = 6,
             min = 0,
             max = 20,
         }),
         healthBarBorder= option({
             type = "select",
             name = L["Border style"],
-            order = 6,
+            order = 8,
             values = Gladdy:GetBorderStyles()
         }),
         healthBarBorderSize = option({
             type = "range",
             name = L["Border size"],
             desc = L["Size of the border"],
-            order = 7,
+            order = 9,
             min = 1,
             max = Gladdy.db.healthBarHeight/2,
             step = 1,
         }),
-        healthBarBorderColor = colorOption({
+        healthBarBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Border color"],
             desc = L["Color of the border"],
-            order = 8,
+            order = 10,
             hasAlpha = true,
         }),
         healthActual = option({
             type = "toggle",
             name = L["Show the actual health"],
             desc = L["Show the actual health on the health bar"],
-            order = 9,
+            order = 11,
         }),
         healthMax = option({
             type = "toggle",
             name = L["Show max health"],
             desc = L["Show max health on the health bar"],
-            order = 10,
+            order = 12,
         }),
         healthPercentage = option({
             type = "toggle",
             name = L["Show health percentage"],
             desc = L["Show health percentage on the health bar"],
-            order = 11,
+            order = 13,
         }),
     }
 end

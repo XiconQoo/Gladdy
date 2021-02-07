@@ -6,11 +6,13 @@ local CreateFrame = CreateFrame
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local Auras = Gladdy:NewModule("Auras", nil, {
+    auraFont = "DorisPP",
     auraFontSize = 20,
     auraFontColor = { r = 1, g = 1, b = 0, a = 1 },
-    auraBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded",
+    auraBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     auraBuffBorderColor = { r = 1, g = 0, b = 0, a = 1 },
     auraDebuffBorderColor = { r = 0, g = 1, b = 0, a = 1 },
+    auraDisableCircle = false,
 })
 
 function Auras:Initialise()
@@ -33,10 +35,17 @@ function Auras:CreateFrame(unit)
     auraFrame.cooldown:SetFrameStrata("MEDIUM")
     auraFrame.cooldown:SetFrameLevel(4)
 
+    auraFrame.cooldownFrame = CreateFrame("Frame", nil, auraFrame)
+    auraFrame.cooldownFrame:ClearAllPoints()
+    auraFrame.cooldownFrame:SetPoint("TOPLEFT", auraFrame, "TOPLEFT")
+    auraFrame.cooldownFrame:SetPoint("BOTTOMRIGHT", auraFrame, "BOTTOMRIGHT")
+    auraFrame.cooldownFrame:SetFrameStrata("MEDIUM")
+    auraFrame.cooldownFrame:SetFrameLevel(5)
+
     auraFrame.icon = auraFrame:CreateTexture(nil, "BACKGROUND")
     auraFrame.icon:SetAllPoints(auraFrame)
 
-    auraFrame.icon.overlay = auraFrame.cooldown:CreateTexture(nil, "OVERLAY")
+    auraFrame.icon.overlay = auraFrame.cooldownFrame:CreateTexture(nil, "OVERLAY")
     auraFrame.icon.overlay:SetAllPoints(auraFrame)
     auraFrame.icon.overlay:SetTexture(Gladdy.db.buttonBorderStyle)
 
@@ -54,8 +63,9 @@ function Auras:CreateFrame(unit)
         end
     end)
 
-    auraFrame.text = auraFrame.cooldown:CreateFontString(nil, "OVERLAY")
-    auraFrame.text:SetFont("Fonts\\FRIZQT__.ttf", 20, "OUTLINE")
+
+    auraFrame.text = auraFrame.cooldownFrame:CreateFontString(nil, "OVERLAY")
+    auraFrame.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.auraFont), 20, "OUTLINE")
     auraFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
     auraFrame.text:SetShadowOffset(1, -1)
     auraFrame.text:SetShadowColor(0, 0, 0, 1)
@@ -83,7 +93,7 @@ function Auras:UpdateFrame(unit)
     auraFrame.cooldown:ClearAllPoints()
     auraFrame.cooldown:SetPoint("CENTER", auraFrame, "CENTER")
 
-    auraFrame.text:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.auraFontSize)
+    auraFrame.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.auraFont), Gladdy.db.auraFontSize)
     auraFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
 
     auraFrame.icon.overlay:SetTexture(Gladdy.db.auraBorderStyle)
@@ -181,6 +191,7 @@ function Auras:AURA_GAIN(unit, aura, icon, duration, priority)
     auraFrame.track = self.auras[aura].track
     auraFrame.active = true
     auraFrame.icon.overlay:SetTexture(Gladdy.db.auraBorderStyle)
+    auraFrame.cooldownFrame:Show()
     if auraFrame.track and auraFrame.track == "debuff" then
         auraFrame.icon.overlay:SetVertexColor(Gladdy.db.auraDebuffBorderColor.r, Gladdy.db.auraDebuffBorderColor.g, Gladdy.db.auraDebuffBorderColor.b, Gladdy.db.auraDebuffBorderColor.a)
     elseif auraFrame.track and auraFrame.track == "buff" then
@@ -188,7 +199,7 @@ function Auras:AURA_GAIN(unit, aura, icon, duration, priority)
     else
         auraFrame.icon.overlay:SetVertexColor(Gladdy.db.frameBorderColor.r, Gladdy.db.frameBorderColor.g, Gladdy.db.frameBorderColor.b, Gladdy.db.frameBorderColor.a)
     end
-    auraFrame.cooldown:SetCooldown(auraFrame.startTime, auraFrame.endTime - auraFrame.startTime)
+    if not Gladdy.db.auraDisableCircle then auraFrame.cooldown:SetCooldown(auraFrame.startTime, auraFrame.endTime - auraFrame.startTime) end
 end
 
 function Auras:AURA_FADE(unit)
@@ -208,79 +219,53 @@ function Auras:AURA_FADE(unit)
     auraFrame.icon:SetTexture("")
     auraFrame.text:SetText("")
     auraFrame.icon.overlay:SetTexture("")
-end
-
-local function option(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key]
-        end,
-        set = function(info, value)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key] = value
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
-local function colorOption(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
-        end,
-        set = function(info, r, g, b, a)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
+    auraFrame.cooldownFrame:Hide()
 end
 
 function Auras:GetOptions()
     return {
-        auraFontColor = colorOption({
-            type = "color",
-            name = L["Font color"],
-            desc = L["Color of the text"],
-            order = 4,
-            hasAlpha = true,
+        auraDisableCircle = Gladdy:option({
+            type = "toggle",
+            name = L["Disable Cooldown Circle"],
+            order = 2,
         }),
-        auraFontSize = option({
+        auraFont = Gladdy:option({
+            type = "select",
+            name = L["Font"],
+            desc = L["Font of the cooldown"],
+            order = 3,
+            dialogControl = "LSM30_Font",
+            values = AceGUIWidgetLSMlists.font,
+        }),
+        auraFontSize = Gladdy:option({
             type = "range",
             name = L["Font size"],
             desc = L["Size of the text"],
-            order = 5,
+            order = 4,
             min = 1,
             max = 20,
         }),
-        auraBorderStyle = option({
+        auraFontColor = Gladdy:colorOption({
+            type = "color",
+            name = L["Font color"],
+            desc = L["Color of the text"],
+            order = 5,
+            hasAlpha = true,
+        }),
+        auraBorderStyle = Gladdy:option({
             type = "select",
             name = L["Border style"],
             order = 6,
             values = Gladdy:GetIconStyles()
         }),
-        auraBuffBorderColor = colorOption({
+        auraBuffBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Buff color"],
             desc = L["Color of the text"],
             order = 7,
             hasAlpha = true,
         }),
-        auraDebuffBorderColor = colorOption({
+        auraDebuffBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Debuff color"],
             desc = L["Color of the text"],

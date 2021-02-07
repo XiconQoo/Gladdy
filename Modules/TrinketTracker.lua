@@ -391,41 +391,21 @@ function TrinketTracker:Initialise()
     end
 end
 
-local function option(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key]
-        end,
-        set = function(info, value)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key] = value
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
 function TrinketTracker:GetOptions()
     return {
-        ttActive = option({
+        ttActive = Gladdy:option({
             type = "toggle",
             name = L["Enable TrinketTracker (required /reload)"],
             desc = L["Enable/disable TrinketTracker - server side messages will still work"],
             order = 2,
         }),
-        ttDebug = option({
+        ttDebug = Gladdy:option({
             type = "toggle",
             name = L["Debug logs for what broke CC"],
             desc = L["Enable/disable chat logging showing what broke a specific CC."],
             order = 3,
         }),
-        timeOutBuffer = option({
+        timeOutBuffer = Gladdy:option({
             type = "range",
             name = L["Minimum CC duration for TrinketTracker to work"],
             desc = L["Below this duration left on the CC, it will assume that the player didn't trinket because duration guesses were incorrect."],
@@ -434,7 +414,7 @@ function TrinketTracker:GetOptions()
             max = 1,
             step = 0.1,
         }),
-        bigDamageValue = option({
+        bigDamageValue = Gladdy:option({
             type = "range",
             name = L["Minimum damage done for fear/roots to break from"],
             desc = L["Set the minimum damage done to a player before the addon will assume that damage broke CC like fear or roots."],

@@ -80,49 +80,9 @@ function Classicon:ResetUnit(unit)
     classIcon.texture:SetTexture("")
 end
 
-local function option(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key]
-        end,
-        set = function(info, value)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key] = value
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
-local function colorOption(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
-        end,
-        set = function(info, r, g, b, a)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
 function Classicon:GetOptions()
     return {
-        classIconPos = option({
+        classIconPos = Gladdy:option({
             type = "select",
             name = L["Icon position"],
             desc = L["This changes positions with trinket"],
@@ -132,13 +92,13 @@ function Classicon:GetOptions()
                 ["RIGHT"] = L["Right"],
             },
         }),
-        classIconBorderStyle = option({
+        classIconBorderStyle = Gladdy:option({
             type = "select",
             name = L["Border style"],
             order = 3,
             values = Gladdy:GetIconStyles()
         }),
-        classIconBorderColor = colorOption({
+        classIconBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Border color"],
             desc = L["Color of the border"],

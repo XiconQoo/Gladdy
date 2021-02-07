@@ -7,6 +7,7 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
 local Powerbar = Gladdy:NewModule("Powerbar", 90, {
+    powerBarFont = "DorisPP",
     powerBarHeight = 20,
     powerBarTexture = "Smooth",
     powerBarBorder = "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade",
@@ -47,7 +48,7 @@ function Powerbar:CreateFrame(unit)
     powerBar.bg:SetVertexColor(Gladdy.db.powerBarBgColor.r, Gladdy.db.powerBarBgColor.g, Gladdy.db.powerBarBgColor.b, Gladdy.db.powerBarBgColor.a)
 
     powerBar.raceText = powerBar:CreateFontString(nil, "LOW")
-    powerBar.raceText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.powerBarFontSize)
+    powerBar.raceText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.powerBarFont), Gladdy.db.powerBarFontSize)
     powerBar.raceText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)
     powerBar.raceText:SetShadowOffset(1, -1)
     powerBar.raceText:SetShadowColor(0, 0, 0, 1)
@@ -55,7 +56,7 @@ function Powerbar:CreateFrame(unit)
     powerBar.raceText:SetPoint("LEFT", 5, 1)
 
     powerBar.powerText = powerBar:CreateFontString(nil, "LOW")
-    powerBar.powerText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.powerBarFontSize)
+    powerBar.powerText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.powerBarFont), Gladdy.db.powerBarFontSize)
     powerBar.powerText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)
     powerBar.powerText:SetShadowOffset(1, -1)
     powerBar.powerText:SetShadowColor(0, 0, 0, 1)
@@ -92,9 +93,9 @@ function Powerbar:UpdateFrame(unit)
     powerBar.border:SetPoint("TOPLEFT", powerBar, "TOPLEFT")
     powerBar.border:SetPoint("BOTTOMRIGHT", powerBar, "BOTTOMRIGHT")
 
-    powerBar.raceText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.powerBarFontSize)
+    powerBar.raceText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.powerBarFont), Gladdy.db.powerBarFontSize)
     powerBar.raceText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)
-    powerBar.powerText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.powerBarFontSize)
+    powerBar.powerText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.powerBarFont), Gladdy.db.powerBarFontSize)
     powerBar.powerText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)
 end
 
@@ -223,26 +224,6 @@ local function option(params)
     return defaults
 end
 
-local function colorOption(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
-        end,
-        set = function(info, r, g, b, a)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
 function Powerbar:GetOptions()
     return {
         powerBarHeight = option({
@@ -262,18 +243,26 @@ function Powerbar:GetOptions()
             dialogControl = "LSM30_Statusbar",
             values = AceGUIWidgetLSMlists.statusbar,
         }),
-        powerBarBgColor = colorOption({
+        powerBarBgColor = Gladdy:colorOption({
             type = "color",
             name = L["Background color"],
             desc = L["Color of the status bar background"],
             order = 4,
             hasAlpha = true,
         }),
-        powerBarFontColor = colorOption({
+        powerBarFont = option({
+            type = "select",
+            name = L["Font"],
+            desc = L["Font of the bar"],
+            order = 5,
+            dialogControl = "LSM30_Font",
+            values = AceGUIWidgetLSMlists.font,
+        }),
+        powerBarFontColor = Gladdy:colorOption({
             type = "color",
             name = L["Font color"],
             desc = L["Color of the text"],
-            order = 5,
+            order = 7,
             hasAlpha = true,
         }),
         powerBarFontSize = option({
@@ -287,42 +276,42 @@ function Powerbar:GetOptions()
         powerBarBorder= option({
             type = "select",
             name = L["Border style"],
-            order = 7,
+            order = 8,
             values = Gladdy:GetBorderStyles()
         }),
         powerBarBorderSize = option({
             type = "range",
             name = L["Border size"],
             desc = L["Size of the border"],
-            order = 8,
+            order = 9,
             min = 1,
             max = Gladdy.db.powerBarHeight/2,
             step = 1,
         }),
-        powerBarBorderColor = colorOption({
+        powerBarBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Border color"],
             desc = L["Color of the border"],
-            order = 9,
+            order = 10,
             hasAlpha = true,
         }),
         powerActual = option({
             type = "toggle",
             name = L["Show the actual power"],
             desc = L["Show the actual power on the power bar"],
-            order = 10,
+            order = 11,
         }),
         powerMax = option({
             type = "toggle",
             name = L["Show max power"],
             desc = L["Show max power on the power bar"],
-            order = 11,
+            order = 12,
         }),
         powerPercentage = option({
             type = "toggle",
             name = L["Show power percentage"],
             desc = L["Show power percentage on the power bar"],
-            order = 12,
+            order = 13,
         }),
     }
 end

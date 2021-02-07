@@ -114,29 +114,9 @@ function ACDFrame:CHAT_MSG_BG_SYSTEM_NEUTRAL(arg1)
     end
 end
 
-local function option(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key]
-        end,
-        set = function(info, value)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key] = value
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
 function ACDFrame:GetOptions()
     return {
-        countdown = option({
+        countdown = Gladdy:option({
             type = "toggle",
             name = L["Turn on/off"],
             desc = L["Turns countdown before the start of an arena match on/off."],

@@ -11,6 +11,7 @@ local GetTime = GetTime
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local Diminishings = Gladdy:NewModule("Diminishings", nil, {
+    drFont = "DorisPP",
     drFontColor = { r = 1, g = 1, b = 0, a = 1 },
     drFontSize = 20,
     drCooldownPos = "RIGHT",
@@ -19,6 +20,7 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drEnableCooldown = true,
     drBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_Gloss",
     drBorderColor = { r = 1, g = 1, b = 1, a = 1 },
+    drDisableCircle = false
 })
 
 local function StyleActionButton(f)
@@ -98,18 +100,26 @@ function Diminishings:CreateFrame(unit)
             end
         end)
 
-        icon.text = icon:CreateFontString(nil, "OVERLAY")
+        icon.cooldown = CreateFrame("Cooldown", nil, icon, "CooldownFrameTemplate")
+        icon.cooldown.noCooldownCount = true --Gladdy.db.trinketDisableOmniCC
+
+        icon.cooldownFrame = CreateFrame("Frame", nil, icon)
+        icon.cooldownFrame:ClearAllPoints()
+        icon.cooldownFrame:SetPoint("TOPLEFT", icon, "TOPLEFT")
+        icon.cooldownFrame:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT")
+
+        icon.text = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
         icon.text:SetDrawLayer("OVERLAY")
-        icon.text:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.drFontSize, "OUTLINE")
+        icon.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), Gladdy.db.drFontSize, "OUTLINE")
         icon.text:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
         icon.text:SetShadowOffset(1, -1)
         icon.text:SetShadowColor(0, 0, 0, 1)
         icon.text:SetJustifyH("CENTER")
         icon.text:SetPoint("CENTER")
 
-        icon.timeText = icon:CreateFontString(nil, "OVERLAY")
+        icon.timeText = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
         icon.timeText:SetDrawLayer("OVERLAY")
-        icon.timeText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.drFontSize - 2, "OUTLINE")
+        icon.timeText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), Gladdy.db.drFontSize - 2, "OUTLINE")
         icon.timeText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
         icon.timeText:SetShadowOffset(1, -1)
         icon.timeText:SetShadowColor(0, 0, 0, 1)
@@ -194,9 +204,9 @@ function Diminishings:UpdateFrame(unit)
         icon:SetWidth(Gladdy.db.drIconSize)
         icon:SetHeight(Gladdy.db.drIconSize)
 
-        icon.text:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.drFontSize, "OUTLINE")
+        icon.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), Gladdy.db.drFontSize, "OUTLINE")
         icon.text:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
-        icon.timeText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.drFontSize - 2, "OUTLINE")
+        icon.timeText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), Gladdy.db.drFontSize - 2, "OUTLINE")
         icon.timeText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
 
         icon:ClearAllPoints()
@@ -258,6 +268,7 @@ function Diminishings:Fade(unit, spell)
         if (not icon.active or (icon.dr and icon.dr == dr)) then
             icon.dr = dr
             icon.timeLeft = drDuration
+            if not Gladdy.db.drDisableCircle then icon.cooldown:SetCooldown(GetTime(), drDuration) end
             icon.texture:SetTexture(self.icons[spell])
             icon.active = true
             self:Positionate(unit)
@@ -303,105 +314,72 @@ function Diminishings:Positionate(unit)
     end
 end
 
-local function option(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key]
-        end,
-        set = function(info, value)
-            local key = info.arg or info[#info]
-            -- hackfix to prevent DR/cooldown to be on the same side
-            if (key == "drCooldownPos" and value == "LEFT") then
-                Gladdy.db.cooldownPos = "RIGHT"
-            elseif (key == "drCooldownPos" and value == "RIGHT") then
-                Gladdy.db.cooldownPos = "RIGHT"
-            end
-            Gladdy.dbi.profile[key] = value
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
-local function colorOption(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
-        end,
-        set = function(info, r, g, b, a)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
 function Diminishings:GetOptions()
     return {
-        drEnabled = option({
+        drEnabled = Gladdy:option({
             type = "toggle",
             name = L["Enable"],
             desc = L["Enabled DR module"],
             order = 2,
         }),
-        drFontColor = colorOption({
+        drDisableCircle = Gladdy:option({
+            type = "toggle",
+            name = L["Disable Cooldown Circle"],
+            order = 3,
+        }),
+        drFont = Gladdy:option({
+            type = "select",
+            name = L["Font"],
+            desc = L["Font of the cooldown"],
+            order = 4,
+            dialogControl = "LSM30_Font",
+            values = AceGUIWidgetLSMlists.font,
+        }),
+        drFontColor = Gladdy:colorOption({
             type = "color",
             name = L["Font color"],
             desc = L["Color of the text"],
-            order = 3,
+            order = 5,
             hasAlpha = true,
         }),
-        drFontSize = option({
+        drFontSize = Gladdy:option({
             type = "range",
             name = L["Font size"],
             desc = L["Size of the text"],
-            order = 4,
+            order = 6,
             min = 1,
             max = 20,
         }),
-        drCooldownPos = option({
+        drCooldownPos = Gladdy:option({
             type = "select",
             name = L["DR Cooldown position"],
             desc = L["Position of the cooldown icons"],
-            order = 5,
+            order = 7,
             values = {
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],
             },
         }),
-        drIconSize = option({
+        drIconSize = Gladdy:option({
             type = "range",
             name = L["Icon Size"],
             desc = L["Size of the DR Icons"],
-            order = 6,
+            order = 8,
             min = 5,
             max = 50,
             step = 1,
         }),
-        drBorderStyle = option({
+        drBorderStyle = Gladdy:option({
             type = "select",
             name = L["Border style"],
-            order = 7,
+            order = 9,
             values = Gladdy:GetIconStyles()
         }),
-        drBorderColor = colorOption({
+        drBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Border color"],
             desc = L["Color of the border"],
-            order = 8,
+            order = 10,
             hasAlpha = true,
         }),
     }

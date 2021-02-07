@@ -152,7 +152,7 @@ function Gladdy:UpdateFrame()
     self.frame:SetScale(self.db.frameScale)
     self.frame:SetWidth(width)
     self.frame:SetHeight(height)
-    self.frame:SetBackdropColor(self.db.frameColor.r, self.db.frameColor.g, self.db.frameColor.b, self.db.frameColor.a)
+    --self.frame:SetBackdropColor(self.db.frameColor.r, self.db.frameColor.g, self.db.frameColor.b, self.db.frameColor.a)
     self.frame:ClearAllPoints()
     if (self.db.x == 0 and self.db.y == 0) then
         self.frame:SetPoint("CENTER")
@@ -231,7 +231,7 @@ function Gladdy:UpdateFrame()
                 local icon = button.spellCooldownFrame["icon" .. i]
                 icon:SetHeight(self.db.cooldownSize)
                 icon:SetWidth(self.db.cooldownSize)
-                icon.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", self.db.cooldownSize / 2, "OUTLINE")
+                icon.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), self.db.cooldownSize / 2, "OUTLINE")
                 icon:ClearAllPoints()
                 if (self.db.cooldownXPos == "RIGHT") then
                     if (i == 1) then
@@ -274,6 +274,7 @@ function Gladdy:UpdateFrame()
         end
         Gladdy:UpdateTestCooldowns(i)
     end
+    Gladdy:PlateCastBarUpdate()
 end
 
 function Gladdy:HideFrame()
@@ -332,8 +333,12 @@ function Gladdy:CreateButton(i)
         icon.cooldown = _G[icon:GetName() .. "Cooldown"]
         icon.cooldown:SetReverse(false)
         icon.cooldown.noCooldownCount = true --Gladdy.db.trinketDisableOmniCC
-        icon.cooldownFont = icon.cooldown:CreateFontString(nil, "OVERLAY")
-        icon.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", self.db.cooldownSize / 2, "OUTLINE")
+        icon.cooldownFrame = CreateFrame("Frame", nil, icon)
+        icon.cooldownFrame:ClearAllPoints()
+        icon.cooldownFrame:SetPoint("TOPLEFT", icon, "TOPLEFT")
+        icon.cooldownFrame:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT")
+        icon.cooldownFont = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
+        icon.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), self.db.cooldownSize / 2, "OUTLINE")
         icon.cooldownFont:SetAllPoints(icon)
 
         spellCooldownFrame["icon" .. x] = icon

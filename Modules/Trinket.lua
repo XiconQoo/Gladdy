@@ -7,11 +7,13 @@ local GetTime = GetTime
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 Trinket = Gladdy:NewModule("Trinket", nil, {
+    trinketFont = "DorisPP",
     trinketEnabled = true,
     --trinketDisableOmniCC = true,
     trinketPos = "RIGHT",
     trinketBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     trinketBorderColor = { r = 0, g = 0, b = 0, a = 1 },
+    trinketDisableCircle = false,
 })
 LibStub("AceComm-3.0"):Embed(Trinket)
 
@@ -29,8 +31,14 @@ function Trinket:CreateFrame(unit)
 
     trinket.cooldown = CreateFrame("Cooldown", nil, trinket, "CooldownFrameTemplate")
     trinket.cooldown.noCooldownCount = true --Gladdy.db.trinketDisableOmniCC
-    trinket.cooldownFont = trinket.cooldown:CreateFontString(nil, "OVERLAY")
-    trinket.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", 20, "OUTLINE")
+
+    trinket.cooldownFrame = CreateFrame("Frame", nil, trinket)
+    trinket.cooldownFrame:ClearAllPoints()
+    trinket.cooldownFrame:SetPoint("TOPLEFT", trinket, "TOPLEFT")
+    trinket.cooldownFrame:SetPoint("BOTTOMRIGHT", trinket, "BOTTOMRIGHT")
+
+    trinket.cooldownFont = trinket.cooldownFrame:CreateFontString(nil, "OVERLAY")
+    trinket.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), 20, "OUTLINE")
     trinket.cooldownFont:SetAllPoints(trinket.cooldown)
 
     trinket.borderFrame = CreateFrame("Frame", nil, trinket)
@@ -59,27 +67,27 @@ function Trinket:CreateFrame(unit)
                 -- more than 1 minute
                 self.cooldownFont:SetTextColor(1, 1, 0)
                 self.cooldownFont:SetText(floor(timeLeft / 60) .. ":" .. string.format("%02.f", floor(timeLeft - floor(timeLeft / 60) * 60)))
-                self.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", 20, "OUTLINE")
+                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), 20, "OUTLINE")
             elseif timeLeft < 60 and timeLeft >= 21 then
                 -- between 60s and 21s (green)
                 self.cooldownFont:SetTextColor(0.7, 1, 0)
                 self.cooldownFont:SetText(timeLeft)
-                self.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", 30, "OUTLINE")
+                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), 30, "OUTLINE")
             elseif timeLeft < 20.9 and timeLeft >= 11 then
                 -- between 20s and 11s (green)
                 self.cooldownFont:SetTextColor(0, 1, 0)
                 self.cooldownFont:SetText(timeLeft)
-                self.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", 30, "OUTLINE")
+                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), 30, "OUTLINE")
             elseif timeLeftMilliSec <= 10 and timeLeftMilliSec >= 5 then
                 -- between 10s and 5s (orange)
                 self.cooldownFont:SetTextColor(1, 0.7, 0)
                 self.cooldownFont:SetFormattedText("%.1f", timeLeftMilliSec)
-                self.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", 30, "OUTLINE")
+                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), 30, "OUTLINE")
             elseif timeLeftMilliSec < 5 and timeLeftMilliSec > 0 then
                 -- between 5s and 1s (red)
                 self.cooldownFont:SetTextColor(1, 0, 0)
                 self.cooldownFont:SetFormattedText("%.1f", timeLeftMilliSec)
-                self.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", 30, "OUTLINE")
+                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), 30, "OUTLINE")
             else
                 self.cooldownFont:SetText("")
             end
@@ -188,84 +196,57 @@ function Trinket:Used(unit)
 
     trinket.timeLeft = 120
     trinket.active = true
-    trinket.cooldown:SetCooldown(GetTime(), 120)
-end
-
-local function option(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key]
-        end,
-        set = function(info, value)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key] = value
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
-local function colorOption(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
-        end,
-        set = function(info, r, g, b, a)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
+    if not Gladdy.db.trinketDisableCircle then trinket.cooldown:SetCooldown(GetTime(), 120) end
 end
 
 function Trinket:GetOptions()
     return {
-        trinketEnabled = option({
+        trinketEnabled = Gladdy:option({
             type = "toggle",
             name = L["Enabled"],
             desc = L["Enable trinket icon"],
             order = 2,
         }),
-        --[[trinketDisableOmniCC = option({
+        trinketDisableCircle = Gladdy:option({
+            type = "toggle",
+            name = L["Disable Cooldown Circle"],
+            order = 3,
+        }),
+        trinketFont = Gladdy:option({
+            type = "select",
+            name = L["Font"],
+            desc = L["Font of the cooldown"],
+            order = 4,
+            dialogControl = "LSM30_Font",
+            values = AceGUIWidgetLSMlists.font,
+        }),
+        --[[trinketDisableOmniCC = Gladdy:option({
             type = "toggle",
             name = L["No OmniCC"],
             desc = L["Disable cooldown timers by addons (reload UI to take effect)"],
             order = 3,
         }),--]]
-        trinketPos = option({
+        trinketPos = Gladdy:option({
             type = "select",
             name = L["Trinket position"],
             desc = L["This changes positions of the trinket"],
-            order = 4,
+            order = 5,
             values = {
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],
             },
         }),
-        trinketBorderStyle = option({
+        trinketBorderStyle = Gladdy:option({
             type = "select",
             name = L["Border style"],
-            order = 4,
+            order = 6,
             values = Gladdy:GetIconStyles()
         }),
-        trinketBorderColor = colorOption({
+        trinketBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Border color"],
             desc = L["Color of the border"],
-            order = 5,
+            order = 7,
             hasAlpha = true,
         }),
     }

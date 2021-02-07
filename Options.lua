@@ -17,7 +17,6 @@ Gladdy.defaults = {
         growUp = false,
         frameScale = 1,
         padding = 3,
-        frameColor = { r = 0, g = 0, b = 0, a = .4 },
         barWidth = 180,
         bottomMargin = 10,
     },
@@ -55,6 +54,46 @@ SlashCmdList["GLADDY"] = function(msg)
         Gladdy:Print("/gladdy hide")
         Gladdy:Print("/gladdy reset")
     end
+end
+
+function Gladdy:option(params)
+    local defaults = {
+        get = function(info)
+            local key = info.arg or info[#info]
+            return Gladdy.dbi.profile[key]
+        end,
+        set = function(info, value)
+            local key = info.arg or info[#info]
+            Gladdy.dbi.profile[key] = value
+            Gladdy:UpdateFrame()
+        end,
+    }
+
+    for k, v in pairs(params) do
+        defaults[k] = v
+    end
+
+    return defaults
+end
+
+function Gladdy:colorOption(params)
+    local defaults = {
+        get = function(info)
+            local key = info.arg or info[#info]
+            return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
+        end,
+        set = function(info, r, g, b, a)
+            local key = info.arg or info[#info]
+            Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
+            Gladdy:UpdateFrame()
+        end,
+    }
+
+    for k, v in pairs(params) do
+        defaults[k] = v
+    end
+
+    return defaults
 end
 
 local function getOpt(info)
@@ -176,15 +215,6 @@ function Gladdy:SetupOptions()
                         max = 20,
                         step = 1,
                     },
-                    frameColor = {
-                        type = "color",
-                        name = L["Frame color"],
-                        desc = L["Color of the frame"],
-                        order = 5,
-                        hasAlpha = true,
-                        get = getColorOpt,
-                        set = setColorOpt,
-                    },
                     barWidth = {
                         type = "range",
                         name = L["Bar width"],
@@ -203,16 +233,100 @@ function Gladdy:SetupOptions()
                         max = 50,
                         step = 1,
                     },
+                    disableCooldownCircle = {
+                        type = "toggle",
+                        name = L["No Cooldown Circle"],
+                        order = 8,
+                        get = function(info)
+                            local a = Gladdy.db.auraDisableCircle
+                            local b = Gladdy.db.cooldownDisableCircle
+                            local c = Gladdy.db.trinketDisableCircle
+                            local d = Gladdy.db.drDisableCircle
+                            if (a == b and a == c and a == d) then
+                                return a
+                            else
+                                return ""
+                            end
+                        end,
+                        set = function(info, value)
+                            Gladdy.db.auraDisableCircle = value
+                            Gladdy.db.cooldownDisableCircle = value
+                            Gladdy.db.trinketDisableCircle = value
+                            Gladdy.db.drDisableCircle = value
+                            Gladdy:UpdateFrame()
+                        end,
+                    },
+                    font = {
+                        type = "select",
+                        name = L["Font"],
+                        desc = L["General Font"],
+                        order = 9,
+                        dialogControl = "LSM30_Font",
+                        values = AceGUIWidgetLSMlists.font,
+                        get = function(info)
+                            local a = Gladdy.db.castBarFont
+                            local b = Gladdy.db.healthBarFont
+                            local c = Gladdy.db.powerBarFont
+                            local d = Gladdy.db.npCastbarsFont
+                            local e = Gladdy.db.cooldownFont
+                            local f = Gladdy.db.drFont
+                            local g = Gladdy.db.auraFont
+                            if (a == b and a == c and a == d and a == e and a == f and a == g) then
+                                return a
+                            else
+                                return ""
+                            end
+                        end,
+                        set = function(info, value)
+                            Gladdy.db.castBarFont = value
+                            Gladdy.db.healthBarFont = value
+                            Gladdy.db.powerBarFont = value
+                            Gladdy.db.npCastbarsFont = value
+                            Gladdy.db.cooldownFont = value
+                            Gladdy.db.drFont = value
+                            Gladdy.db.auraFont = value
+                            Gladdy:UpdateFrame()
+                        end,
+                    },
+                    fontColor = {
+                        type = "color",
+                        name = L["Text font color"],
+                        desc = L["Color of the text"],
+                        order = 10,
+                        hasAlpha = true,
+                        get = function(info)
+                            local a = Gladdy.db.healthBarFontColor
+                            local b = Gladdy.db.powerBarFontColor
+                            local c = Gladdy.db.castBarFontColor
+                            local d = Gladdy.db.npCastbarsFontColor
+                            if (a.r == b.r and a.g == b.g and a.b == b.b and a.a == b.a
+                                    and a.r == c.r and a.g == c.g and a.b == c.b and a.a == c.a
+                                    and a.r == d.r and a.g == d.g and a.b == d.b and a.a == d.a) then
+                                return a.r, a.g, a.b, a.a
+                            else
+                                return { r = 0, g = 0, b = 0, a = 0 }
+                            end
+                        end,
+                        set = function(info, r, g, b, a)
+                            local rgb = {r = r, g = g, b = b, a = a}
+                            Gladdy.db.healthBarFontColor = rgb
+                            Gladdy.db.powerBarFontColor = rgb
+                            Gladdy.db.castBarFontColor = rgb
+                            Gladdy.db.npCastbarsFontColor = rgb
+                            Gladdy:UpdateFrame()
+                        end,
+                    },
                     buttonBorderStyle = {
                         type = "select",
                         name = L["Icon border style"],
                         desc = L["This changes the border style of all icons"],
-                        order = 8,
+                        order = 11,
                         values = Gladdy:GetIconStyles(),
                         get = function(info)
                             if (Gladdy.db.classIconBorderStyle == Gladdy.db.trinketBorderStyle
                                     and Gladdy.db.classIconBorderStyle == Gladdy.db.castBarIconStyle
-                                    and Gladdy.db.classIconBorderStyle == Gladdy.db.auraBorderStyle) then
+                                    and Gladdy.db.classIconBorderStyle == Gladdy.db.auraBorderStyle
+                                    and Gladdy.db.classIconBorderStyle == Gladdy.db.npTotemPlatesBorderStyle) then
                                 return Gladdy.db.classIconBorderStyle
                             else
                                 return ""
@@ -223,6 +337,7 @@ function Gladdy:SetupOptions()
                             Gladdy.db.trinketBorderStyle = value
                             Gladdy.db.castBarIconStyle = value
                             Gladdy.db.auraBorderStyle = value
+                            Gladdy.db.npTotemPlatesBorderStyle = value
                             Gladdy:UpdateFrame()
                         end,
                     },
@@ -230,13 +345,16 @@ function Gladdy:SetupOptions()
                         type = "color",
                         name = L["Icon border color"],
                         desc = L["This changes the border color of all icons"],
-                        order = 9,
+                        order = 12,
                         hasAlpha = true,
                         get = function(info)
                             local a = Gladdy.db.classIconBorderColor
                             local b = Gladdy.db.trinketBorderColor
                             local c = Gladdy.db.castBarIconColor
-                            if (a.r == b.r and a.g == b.g and a.b == b.b and a.a == b.a and a.r == c.r and a.g == c.g and a.b == c.b and a.a == c.a) then
+                            local d = Gladdy.db.npTotemPlatesBorderColor
+                            if (a.r == b.r and a.g == b.g and a.b == b.b and a.a == b.a
+                                    and a.r == c.r and a.g == c.g and a.b == c.b and a.a == c.a
+                                    and a.r == d.r and a.g == d.g and a.b == d.b and a.a == d.a) then
                                 return a.r, a.g, a.b, a.a
                             else
                                 return { r = 0, g = 0, b = 0, a = 0 }
@@ -247,6 +365,7 @@ function Gladdy:SetupOptions()
                             Gladdy.db.classIconBorderColor = rgb
                             Gladdy.db.trinketBorderColor = rgb
                             Gladdy.db.castBarIconColor = rgb
+                            Gladdy.db.npTotemPlatesBorderColor = rgb
                             Gladdy:UpdateFrame()
                         end,
                     },
@@ -254,7 +373,7 @@ function Gladdy:SetupOptions()
                         type = "select",
                         name = L["Statusbar border style"],
                         desc = L["This changes the border style of all statusbar frames"],
-                        order = 10,
+                        order = 13,
                         values = Gladdy:GetBorderStyles(),
                         get = function(info)
                             if (Gladdy.db.healthBarBorder == Gladdy.db.powerBarBorder and Gladdy.db.healthBarBorder == Gladdy.db.castBarBorderStyle) then
@@ -274,7 +393,7 @@ function Gladdy:SetupOptions()
                         type = "color",
                         name = L["Statusbar border color"],
                         desc = L["This changes the border color of all statusbar frames"],
-                        order = 11,
+                        order = 14,
                         hasAlpha = true,
                         get = function(info)
                             local a = Gladdy.db.castBarBorderColor

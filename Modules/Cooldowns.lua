@@ -2,12 +2,14 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 
 local Cooldown = Gladdy:NewModule("Cooldown", nil, {
+    cooldownFont = "DorisPP",
     cooldown = true,
     cooldownYPos = "TOP",
     cooldownXPos = "LEFT",
     cooldownSize = 30,
     cooldownBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_Gloss",
     cooldownBorderColor = { r = 1, g = 1, b = 1, a = 1 },
+    cooldownDisableCircle = false,
 })
 
 function Cooldown:Test(unit)
@@ -16,62 +18,28 @@ function Cooldown:Test(unit)
     button.lastCooldownSpell = 1
 end
 
-local function option(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key]
-        end,
-        set = function(info, value)
-            local key = info.arg or info[#info]
-            -- hackfix to prevent DR/cooldown to be on the same side
-            --[[if( key == "cooldownPos" and value == "LEFT" ) then
-              Gladdy.db.drCooldownPos = "RIGHT"
-            elseif ( key == "cooldownPos" and value == "RIGHT" ) then
-              Gladdy.db.drCooldownPos = "RIGHT"
-            end--]]
-            --Gladdy.db.cooldownPos = value
-            Gladdy.dbi.profile[key] = value
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
-local function colorOption(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
-        end,
-        set = function(info, r, g, b, a)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
 function Cooldown:GetOptions()
     return {
-        cooldown = option({
+        cooldown = Gladdy:option({
             type = "toggle",
             name = L["Enable"],
             desc = L["Enabled cooldown module"],
-            order = 4,
+            order = 2,
         }),
-        cooldownSize = option({
+        cooldownDisableCircle = Gladdy:option({
+            type = "toggle",
+            name = L["Disable Cooldown Circle"],
+            order = 3,
+        }),
+        cooldownFont = Gladdy:option({
+            type = "select",
+            name = L["Font"],
+            desc = L["Font of the cooldown"],
+            order = 4,
+            dialogControl = "LSM30_Font",
+            values = AceGUIWidgetLSMlists.font,
+        }),
+        cooldownSize = Gladdy:option({
             type = "range",
             name = L["Cooldown size"],
             desc = L["Size of each cd icon"],
@@ -79,7 +47,7 @@ function Cooldown:GetOptions()
             min = 5,
             max = (Gladdy.db.healthBarHeight + Gladdy.db.castBarHeight + Gladdy.db.powerBarHeight + Gladdy.db.bottomMargin) / 2,
         }),
-        cooldownYPos = option({
+        cooldownYPos = Gladdy:option({
             type = "select",
             name = L["Position"],
             desc = L["Position of the cooldown icons"],
@@ -89,7 +57,7 @@ function Cooldown:GetOptions()
                 ["BOTTOM"] = L["Bottom"],
             },
         }),
-        cooldownXPos = option({
+        cooldownXPos = Gladdy:option({
             type = "select",
             name = L["Position"],
             desc = L["Position of the cooldown icons"],
@@ -99,13 +67,13 @@ function Cooldown:GetOptions()
                 ["RIGHT"] = L["Right"],
             },
         }),
-        cooldownBorderStyle = option({
+        cooldownBorderStyle = Gladdy:option({
             type = "select",
             name = L["Border style"],
             order = 8,
             values = Gladdy:GetIconStyles()
         }),
-        cooldownBorderColor = colorOption({
+        cooldownBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Border color"],
             desc = L["Color of the border"],
