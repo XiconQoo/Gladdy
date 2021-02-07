@@ -57,9 +57,9 @@ local function GetTotemColorOptions()
             args = {
                 desc = {
                     order = 1,
-                    name = indexedList[i].name,
+                    name = format("|T%s:20|t %s", indexedList[i].texture, indexedList[i].name),
                     type = "toggle",
-                    image = indexedList[i].texture,
+                    --image = indexedList[i].texture,
                     width = "1",
                     get = function(info) return Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].enabled end,
                     set = function(info, value)
@@ -112,7 +112,6 @@ local Nameplates = Gladdy:NewModule("Nameplates", nil, {
     npCastbarsFontColor = {r = 1, g = 1, b = 1, a = 1},
     npCastBarTexture = "Smooth",
     npTotemPlatesBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
-    npTotemPlatesBorderColor = {r = 0, g = 0, b = 0, a = 1},
     npTotemPlatesSize = 40,
     npTotemPlatesAlpha = 0.9,
     npTotemColors = select(1, GetTotemColorOptions())
@@ -351,7 +350,6 @@ local function UpdateTotems(healthBar)
             nameplate.totem:SetHeight(Gladdy.db.npTotemPlatesSize)
             nameplate.totem.border:SetTexture(Gladdy.db.npTotemPlatesBorderStyle)
             nameplate.totem.border:SetVertexColor(Gladdy.db.npTotemColors["totem" .. improvedTotemShit[totemName].id].color.r, Gladdy.db.npTotemColors["totem" .. improvedTotemShit[totemName].id].color.g, Gladdy.db.npTotemColors["totem" .. improvedTotemShit[totemName].id].color.b, Gladdy.db.npTotemColors["totem" .. improvedTotemShit[totemName].id].color.a)
-            --nameplate.totem.border:SetVertexColor(Gladdy.db["totem" .. improvedTotemShit[totemName].id].r, Gladdy.db.npTotemPlatesBorderColor.g, Gladdy.db.npTotemPlatesBorderColor.b, Gladdy.db.npTotemPlatesBorderColor.a)
             nameplate.totem.border:ClearAllPoints()
             nameplate.totem.border:SetPoint("TOPLEFT", nameplate.totem, "TOPLEFT")
             nameplate.totem.border:SetPoint("BOTTOMRIGHT", nameplate.totem, "BOTTOMRIGHT")

@@ -122,10 +122,6 @@ local typedkeys={
 	},
 	toggle={
 		tristate=optbool,
-		image=optstringfunc,
-		imageCoords=optmethodtable,
-		imageHeight=optnumber,
-		imageWidth=optnumber,
 	},
 	tristate={
 	},
