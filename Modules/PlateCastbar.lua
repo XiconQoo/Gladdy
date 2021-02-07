@@ -30,10 +30,7 @@ local Table = {
         },
     },
 }
-local Textures = {
-    Font = "Interface\\AddOns\\Gladdy\\Images\\DorisPP.ttf",
-    CastBar = "Interface\\AddOns\\Gladdy\\Images\\LiteStep.tga",
-}
+
 _G[AddOn .. "_SavedVariables"] = {
     ["CastBar"] = {
         ["Width"] = 105,
@@ -125,6 +122,25 @@ local function Frame_RegisterEvents()
     Frame:RegisterEvent("PLAYER_FOCUS_CHANGED")
 end
 
+local function UnitCastBar_Update(unit)
+    local Texture = _G[AddOn .. "_Texture_" .. unit .. "CastBar_CastBar"]
+    if Texture then
+        Texture:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.npCastBarTexture))
+    end
+
+    local SpellName = _G[AddOn .. "_FontString_" .. unit .. "CastBar_SpellName"]
+    if SpellName then
+        SpellName:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npCastbarsFont), 9, "OUTLINE")
+        SpellName:SetTextColor(Gladdy.db.npCastbarsFontColor.r, Gladdy.db.npCastbarsFontColor.g, Gladdy.db.npCastbarsFontColor.b, Gladdy.db.npCastbarsFontColor.a)
+    end
+
+    local CastTime = _G[AddOn .. "_FontString_" .. unit .. "CastBar_CastTime"]
+    if CastTime then
+        CastTime:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npCastbarsFont), 9, "OUTLINE")
+        CastTime:SetTextColor(Gladdy.db.npCastbarsFontColor.r, Gladdy.db.npCastbarsFontColor.g, Gladdy.db.npCastbarsFontColor.b, Gladdy.db.npCastbarsFontColor.a)
+    end
+end
+
 local function UnitCastBar_Create(unit)
     _G[AddOn .. "_Frame_" .. unit .. "CastBar"] = CreateFrame("Frame", nil);
     local CastBar = _G[AddOn .. "_Frame_" .. unit .. "CastBar"]
@@ -137,7 +153,7 @@ local function UnitCastBar_Create(unit)
     _G[AddOn .. "_Texture_" .. unit .. "CastBar_CastBar"] = CastBar:CreateTexture(nil, "ARTWORK");
     local Texture = _G[AddOn .. "_Texture_" .. unit .. "CastBar_CastBar"]
     Texture:SetHeight(11);
-    Texture:SetTexture(Textures.CastBar);
+    Texture:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.npCastBarTexture));
     Texture:SetPoint("CENTER", AddOn .. "_Frame_" .. unit .. "CastBar", "CENTER");
 
     _G[AddOn .. "_Texture_" .. unit .. "CastBar_Icon"] = CastBar:CreateTexture(nil, "ARTWORK");
@@ -166,7 +182,7 @@ local function UnitCastBar_Create(unit)
 
     _G[AddOn .. "_FontString_" .. unit .. "CastBar_SpellName"] = CastBar:CreateFontString(nil)
     local SpellName = _G[AddOn .. "_FontString_" .. unit .. "CastBar_SpellName"]
-    SpellName:SetFont(Textures.Font, 9, "OUTLINE")
+    SpellName:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npCastbarsFont), 9, "OUTLINE")
     SpellName:SetPoint(_G[AddOn .. "_SavedVariables"]["Spell"]["Anchor"],
             AddOn .. "_Frame_" .. unit .. "CastBar", "CENTER",
             _G[AddOn .. "_SavedVariables"]["Spell"]["PointX"],
@@ -179,7 +195,7 @@ local function UnitCastBar_Create(unit)
 
     _G[AddOn .. "_FontString_" .. unit .. "CastBar_CastTime"] = CastBar:CreateFontString(nil)
     local CastTime = _G[AddOn .. "_FontString_" .. unit .. "CastBar_CastTime"]
-    CastTime:SetFont(Textures.Font, 9, "OUTLINE")
+    CastTime:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npCastbarsFont), 9, "OUTLINE")
     CastTime:SetPoint(_G[AddOn .. "_SavedVariables"]["Timer"]["Anchor"],
             AddOn .. "_Frame_" .. unit .. "CastBar", "CENTER",
             _G[AddOn .. "_SavedVariables"]["Timer"]["PointX"],
@@ -204,6 +220,12 @@ end
 local function CastBars_Create()
     for k, v in pairs(unitsToCheck) do
         UnitCastBar_Create(k)
+    end
+end
+
+function Gladdy:PlateCastBarUpdate()
+    for k, v in pairs(unitsToCheck) do
+        UnitCastBar_Update(k)
     end
 end
 
@@ -276,11 +298,13 @@ local function getName(namePlate)
     local _, _, _, _, eman, _, _ = namePlate:GetRegions()
     if namePlate.aloftData then
         name = namePlate.aloftData.name
-    elseif ElvUI then
-        name = namePlate.UnitFrame.oldName:GetText()
     elseif sohighPlates then
         --name = namePlate.name:GetText()
         name = namePlate.oldname:GetText()
+    elseif ElvUI then
+        if namePlate.UnitFrame then
+            name = namePlate.UnitFrame.oldName:GetText()
+        end
     elseif strmatch(eman:GetText(), "%d") then
         local _, _, _, _, _, nameRegion = namePlate:GetRegions()
         name = nameRegion:GetText()
@@ -294,7 +318,7 @@ local function createCastbars(elapsed)
     -- decide whether castbar should be showing or not
 
     for frame, _ in pairs(Table["Nameplates"]) do
-        if frame:IsVisible() then
+        if frame:IsVisible() and not sohighPlates then
             local hpborder, cbborder, cbicon, overlay, oldname, level, bossicon, raidicon = frame:GetRegions()
 
             for k, v in pairs(unitsToCheck) do
