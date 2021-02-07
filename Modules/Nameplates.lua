@@ -296,21 +296,26 @@ local function UpdateNameplate(healthBar)
                 nameplate.totem:Show()
                 nameplate.totem.border:Show()
             end
-            if (nameplate.UnitFrame and nameplate.UnitFrame:GetAlpha() < 0.90) -- ElvUI
-                    or (nameplate.nameplate and nameplate.nameplate:GetAlpha() < 0.90) -- ShaguPlates
-                    or nameplate:GetAlpha() < 0.90 then -- Blizz, SoHigh, Aloft
+
+            -- set alpha
+            if (UnitExists("target") and nameplate:GetAlpha() < 1) then
                 nameplate:SetAlpha(Gladdy.db.npTotemPlatesAlpha)
                 nameplate.totem:SetAlpha(Gladdy.db.npTotemPlatesAlpha)
                 nameplate.totem.border:SetAlpha(Gladdy.db.npTotemPlatesAlpha)
             else
+                nameplate:SetAlpha(1)
                 nameplate.totem:SetAlpha(1)
                 nameplate.totem.border:SetAlpha(1)
             end
+
             nameplate.totem:SetTexture(totemTexture.texture)
             nameplate.totem:SetWidth(Gladdy.db.npTotemPlatesSize)
             nameplate.totem:SetHeight(Gladdy.db.npTotemPlatesSize)
             nameplate.totem.border:SetTexture(Gladdy.db.npTotemPlatesBorderStyle)
-            nameplate.totem.border:SetVertexColor(Gladdy.db.npTotemColors["totem" .. totemData[totemName].id].color.r, Gladdy.db.npTotemColors["totem" .. totemData[totemName].id].color.g, Gladdy.db.npTotemColors["totem" .. totemData[totemName].id].color.b, Gladdy.db.npTotemColors["totem" .. totemData[totemName].id].color.a)
+            nameplate.totem.border:SetVertexColor(Gladdy.db.npTotemColors["totem" .. totemData[totemName].id].color.r,
+                    Gladdy.db.npTotemColors["totem" .. totemData[totemName].id].color.g,
+                    Gladdy.db.npTotemColors["totem" .. totemData[totemName].id].color.b,
+                    Gladdy.db.npTotemColors["totem" .. totemData[totemName].id].color.a)
             nameplate.totem.border:ClearAllPoints()
             nameplate.totem.border:SetPoint("TOPLEFT", nameplate.totem, "TOPLEFT")
             nameplate.totem.border:SetPoint("BOTTOMRIGHT", nameplate.totem, "BOTTOMRIGHT")
@@ -341,7 +346,10 @@ function Nameplates:HookTotems(...)
     for index = 1, select('#', ...) do
         local plate = select(index, ...)
         local regions = plate:GetRegions()
-        if (not totems["Nameplates"][plate] and not plate:GetName() and regions and regions:GetObjectType() == "Texture" and regions:GetTexture() == "Interface\\Tooltips\\Nameplate-Border") then
+        if (not totems["Nameplates"][plate]
+                and not plate:GetName()
+                and regions and regions:GetObjectType() == "Texture"
+                and regions:GetTexture() == "Interface\\Tooltips\\Nameplate-Border") then
             self:SkinTotems(plate)
             plate.region = regions
         end
