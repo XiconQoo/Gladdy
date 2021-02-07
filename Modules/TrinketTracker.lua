@@ -490,7 +490,6 @@ end
 function TrinketTracker:PLAYER_ENTERING_WORLD(...)
     -- safe init all
     TrinketTracker:PLAYER_LOGIN()
-    print("TrinketTracker:PLAYER_ENTERING_WORLD")
     -- clear frames, just to be sure
     if type(self.guids) == "table" then
         for k, v in pairs(self.guids) do

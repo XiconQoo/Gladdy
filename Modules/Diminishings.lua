@@ -324,7 +324,7 @@ function Diminishings:GetOptions()
         }),
         drDisableCircle = Gladdy:option({
             type = "toggle",
-            name = L["Disable Cooldown Circle"],
+            name = L["No Cooldown Circle"],
             order = 3,
         }),
         drFont = Gladdy:option({

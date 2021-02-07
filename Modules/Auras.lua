@@ -226,7 +226,7 @@ function Auras:GetOptions()
     return {
         auraDisableCircle = Gladdy:option({
             type = "toggle",
-            name = L["Disable Cooldown Circle"],
+            name = L["No Cooldown Circle"],
             order = 2,
         }),
         auraFont = Gladdy:option({

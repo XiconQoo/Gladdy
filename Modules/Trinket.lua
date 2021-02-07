@@ -209,7 +209,7 @@ function Trinket:GetOptions()
         }),
         trinketDisableCircle = Gladdy:option({
             type = "toggle",
-            name = L["Disable Cooldown Circle"],
+            name = L["No Cooldown Circle"],
             order = 3,
         }),
         trinketFont = Gladdy:option({
