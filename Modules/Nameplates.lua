@@ -37,7 +37,7 @@ local improvedTotemShit = {
     [select(1, GetSpellInfo(25908))] = {id = 25908,texture = "Interface\\Icons\\INV_Staff_07", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Tranquil Air Totem
 }
 
-local function GetTotemColorOptions()
+local function GetTotemColorDefaultOptions()
     local defaultDB = {}
     local options = {}
     local indexedList = {}
@@ -96,8 +96,17 @@ local function GetTotemColorOptions()
     return defaultDB, options, indexedList
 end
 
+local function GetTotemColorOptions()
+    local indexedList = select(3, GetTotemColorDefaultOptions())
+    local colorList = {}
+    for i=1, #indexedList do
+        tinsert(colorList, Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].color)
+    end
+    return colorList
+end
+
 function Gladdy:GetTotemColors()
-    return GetTotemColorOptions()
+    return GetTotemColorDefaultOptions()
 end
 
 local totems = {
@@ -114,7 +123,7 @@ local Nameplates = Gladdy:NewModule("Nameplates", nil, {
     npTotemPlatesBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     npTotemPlatesSize = 40,
     npTotemPlatesAlpha = 0.9,
-    npTotemColors = select(1, GetTotemColorOptions())
+    npTotemColors = select(1, GetTotemColorDefaultOptions())
 })
 LibStub("AceHook-3.0"):Embed(Nameplates)
 LibStub("AceTimer-3.0"):Embed(Nameplates)
@@ -188,11 +197,36 @@ function Nameplates:GetOptions()
             desc = L["Alpha of totem icons"],
             order = 11,
             min = 0.1,
-            max = 1,
+            max = 0.9,
             step = 0.01,
         }),
-        npTotemColors = {
+        npAllTotemColors = {
+            type = "color",
+            name = L["All totem border color"],
             order = 12,
+            hasAlpha = true,
+            get = function(info)
+                local colors = GetTotemColorOptions()
+                local color = colors[1]
+                for i=2, #colors do
+                    if colors[i].r ~= color.r or colors[i].r ~= color.r or colors[i].r ~= color.r or colors[i].r ~= color.r then
+                        return 0, 0, 0, 0
+                    end
+                end
+                return color.r, color.g, color.b, color.a
+            end,
+            set = function(info, r, g, b, a)
+                local colors = GetTotemColorOptions()
+                for i=1, #colors do
+                    colors[i].r = r
+                    colors[i].g = g
+                    colors[i].b = b
+                    colors[i].a = a
+                end
+            end,
+        },
+        npTotemColors = {
+            order = 13,
             name = "Customize Totems",
             type = "group",
             childGroups = "simple",
@@ -279,7 +313,7 @@ local function UpdateTotems(healthBar)
     local totemTexture = improvedTotemShit[totemName]
     local hpborder, cbborder, cbicon, overlay, oldname, level, bossicon, raidicon = nameplate:GetRegions()
 
-    if (addon == BLIZZ or addon == ALOFT or addon == ELVUI or addon == SOHIGHPLATES and GetCVar('_sNpTotem') ~= '1' or addon == SHAGUPLATES and ShaguPlates_config.nameplates.totemicons ~= "1") then
+    if (addon == BLIZZ or addon == ALOFT or addon == ELVUI or addon == SOHIGHPLATES and GetCVar('_sNpTotem') ~= '1' or addon == SHAGUPLATES and ShaguPlates_config.nameplates.totemicons ~= "1") and Gladdy.db.npTotems then
         if (totemTexture and Gladdy.db.npTotemColors["totem" .. improvedTotemShit[totemName].id].enabled) then
             if (addon == BLIZZ) then
                 overlay:SetAlpha(0)
@@ -339,6 +373,7 @@ local function UpdateTotems(healthBar)
             if (nameplate.UnitFrame and nameplate.UnitFrame:GetAlpha() < 0.90) -- ElvUI
                     or (nameplate.nameplate and nameplate.nameplate:GetAlpha() < 0.90) -- ShaguPlates
                     or nameplate:GetAlpha() < 0.90 then -- Blizz, SoHigh, Aloft
+                nameplate:SetAlpha(Gladdy.db.npTotemPlatesAlpha)
                 nameplate.totem:SetAlpha(Gladdy.db.npTotemPlatesAlpha)
                 nameplate.totem.border:SetAlpha(Gladdy.db.npTotemPlatesAlpha)
             else
