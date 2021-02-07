@@ -123,7 +123,11 @@ local function StyleActionButton(f)
 end
 
 function Gladdy:UpdateFrame()
-    local teamSize = self.curBracket or 5
+
+    if (not self.frame) then
+        self:CreateFrame()
+    end
+    local teamSize = self.curBracket or 0
 
     local iconSize = self.db.healthBarHeight
     local margin = 0
