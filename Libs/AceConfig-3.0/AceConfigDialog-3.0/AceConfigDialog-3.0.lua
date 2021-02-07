@@ -1091,6 +1091,31 @@ local function FeedOptions(appName, options,container,rootframe,path,group,inlin
 					control = gui:Create("CheckBox")
 					control:SetLabel(name)
 					control:SetTriState(v.tristate)
+
+					local imageCoords = GetOptionsMemberValue("imageCoords",v, options, path, appName)
+					local image, width, height = GetOptionsMemberValue("image",v, options, path, appName)
+					if type(image) == 'string' then
+						if not width then
+							width = GetOptionsMemberValue("imageWidth",v, options, path, appName)
+						end
+						if not height then
+							height = GetOptionsMemberValue("imageHeight",v, options, path, appName)
+						end
+						if type(imageCoords) == 'table' then
+							control:SetImage(image, unpack(imageCoords))
+						else
+							control:SetImage(image)
+						end
+						if type(width) ~= "number" then
+							width = 32
+						end
+						if type(height) ~= "number" then
+							height = 32
+						end
+						control:SetImageSize(width, height)
+					end
+
+
 					local value = GetOptionsMemberValue("get",v, options, path, appName)
 					control:SetValue(value)
 					control:SetCallback("OnValueChanged",ActivateControl)

@@ -154,6 +154,47 @@ do
 	local function SetLabel(self, label)
 		self.text:SetText(label)
 	end
+
+	local function UpdateImageAnchor(self)
+		local image = self.image
+		local check = self.check
+		local text = self.text
+
+		image:ClearAllPoints()
+		text:ClearAllPoints()
+
+		if self.imageshown then
+			image:SetWidth(17)
+			image:SetHeight(17)
+			image:SetPoint("LEFT", check, "RIGHT", 2, 0)
+			text:SetPoint("LEFT", image, "RIGHT", 2, 0)
+		else
+			--no image shown
+			text:SetPoint("LEFT",check,"RIGHT")
+		end
+	end
+
+	local function SetImage(self, path, ...)
+		local image = self.image
+		image:SetTexture(path)
+
+		if image:GetTexture() then
+			self.imageshown = true
+			local n = select('#', ...)
+			if n == 4 or n == 8 then
+				image:SetTexCoord(...)
+			end
+		else
+			self.imageshown = nil
+		end
+		UpdateImageAnchor(self)
+	end
+
+	local function SetImageSize(self, width, height)
+		self.image:SetWidth(width)
+		self.image:SetHeight(height)
+		UpdateImageAnchor(self)
+	end
 	
 	local function Constructor()
 		local frame = CreateFrame("Button",nil,UIParent)
@@ -170,6 +211,8 @@ do
 		self.ToggleChecked = ToggleChecked
 		self.SetLabel = SetLabel
 		self.SetTriState = SetTriState
+		self.SetImage = SetImage
+		self.SetImageSize = SetImageSize
 		
 		self.frame = frame
 		frame.obj = self
@@ -208,6 +251,9 @@ do
 		text:SetHeight(18)
 		text:SetPoint("LEFT",check,"RIGHT",0,0)
 		text:SetPoint("RIGHT",frame,"RIGHT",0,0)
+
+		local image = frame:CreateTexture(nil,"BACKGROUND")
+		self.image = image
 
 		AceGUI:RegisterAsWidget(self)
 		return self
