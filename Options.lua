@@ -351,10 +351,8 @@ function Gladdy:SetupOptions()
                             local a = Gladdy.db.classIconBorderColor
                             local b = Gladdy.db.trinketBorderColor
                             local c = Gladdy.db.castBarIconColor
-                            local d = Gladdy.db.npTotemPlatesBorderColor
                             if (a.r == b.r and a.g == b.g and a.b == b.b and a.a == b.a
-                                    and a.r == c.r and a.g == c.g and a.b == c.b and a.a == c.a
-                                    and a.r == d.r and a.g == d.g and a.b == d.b and a.a == d.a) then
+                                    and a.r == c.r and a.g == c.g and a.b == c.b and a.a == c.a) then
                                 return a.r, a.g, a.b, a.a
                             else
                                 return { r = 0, g = 0, b = 0, a = 0 }
