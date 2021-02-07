@@ -28,7 +28,7 @@ local improvedTotemShit = {
     [select(1, GetSpellInfo(15107))] = {id = 15107,texture = select(3, GetSpellInfo(15107)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Windwall Totem
     [select(1, GetSpellInfo(3738))] = {id = 3738,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_SlowingTotem_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Wrath of Air Totem
     -- Restoration
-    [select(1, GetSpellInfo(8143))] = {id = 8143,texture = select(3, GetSpellInfo(8143)), color = {r = 0, g = 1, b = 0, a = 1}, enabled = true}, -- Tremor Totem
+    [select(1, GetSpellInfo(8143))] = {id = 8143,texture = select(3, GetSpellInfo(8143)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Tremor Totem
     [select(1, GetSpellInfo(5394))] = {id = 5394,texture = select(3, GetSpellInfo(5394)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Healing Stream Totem
     [select(1, GetSpellInfo(8166))] = {id = 8166,texture = select(3, GetSpellInfo(8166)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Poison Cleansing Totem
     [select(1, GetSpellInfo(5675))] = {id = 5675,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_ManaRegenTotem_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Mana Spring Totem
