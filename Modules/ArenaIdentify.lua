@@ -15,7 +15,9 @@ TO DO:
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local ArenaIdentify = Gladdy:NewModule("ArenaIdentify", nil, {
-    scanTable = {},
+    scanTable = {
+        [GetRealmName()] = {}
+    },
     guidsByName = {},
     arenaIdentifyEnabled = true,
 })
