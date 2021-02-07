@@ -4,7 +4,19 @@ local WorldFrame = WorldFrame
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 
-local improvedTotemShit = {
+---------------------------------------------------
+
+-- Constants
+
+---------------------------------------------------
+
+local totemPattern = "(.+)%s[I,II,III,IV,V,VI,VII,VIII]"
+local BLIZZ = "BLIZZ"
+local ALOFT = "ALOFT"
+local SOHIGHPLATES = "SOHIGHPLATES"
+local ELVUI = "ELVUI"
+local SHAGUPLATES = "SHAGUPLATES"
+local totemData = {
     -- Elemental
     [select(1, GetSpellInfo(3599))] = {id = 3599,texture = select(3, GetSpellInfo(3599)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Searing Totem
     [select(1, GetSpellInfo(8227))] = {id = 8227,texture = select(3, GetSpellInfo(8227)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Flametongue Totem
@@ -41,7 +53,7 @@ local function GetTotemColorDefaultOptions()
     local defaultDB = {}
     local options = {}
     local indexedList = {}
-    for k,v in pairs(improvedTotemShit) do
+    for k,v in pairs(totemData) do
         tinsert(indexedList, {name = k, id = v.id, color = v.color, texture = v.texture, enabled = v.enabled})
     end
     table.sort(indexedList, function (a, b)
@@ -113,6 +125,12 @@ local totems = {
     ["Nameplates"] = {}
 }
 
+---------------------------------------------------
+
+-- Core
+
+---------------------------------------------------
+
 local Nameplates = Gladdy:NewModule("Nameplates", nil, {
     npTotems = true,
     npCastbars = true,
@@ -125,13 +143,216 @@ local Nameplates = Gladdy:NewModule("Nameplates", nil, {
     npTotemPlatesAlpha = 0.9,
     npTotemColors = select(1, GetTotemColorDefaultOptions())
 })
+
 LibStub("AceHook-3.0"):Embed(Nameplates)
 LibStub("AceTimer-3.0"):Embed(Nameplates)
 
 function Nameplates:Initialise()
     self.numChildren = 0
     self:SetScript("OnUpdate", self.Update)
+    Nameplates.Aloft = IsAddOnLoaded("Aloft")
+    Nameplates.SoHighPlates = IsAddOnLoaded("SoHighPlates")
+    Nameplates.ElvUI = IsAddOnLoaded("ElvUI")
+    Nameplates.ShaguPlates = IsAddOnLoaded("ShaguPlates-tbc") or IsAddOnLoaded("ShaguPlates")
 end
+
+function Nameplates:Reset()
+    self:CancelAllTimers()
+    self:UnhookAll()
+    self.numChildren = 0
+end
+
+---------------------------------------------------
+
+-- Nameplate functions
+
+---------------------------------------------------
+
+local function getName(namePlate)
+    local name
+    local addon
+    local _, _, _, _, nameRegion1, _, nameRegion2 = namePlate:GetRegions()
+    if Nameplates.Aloft then
+        if namePlate.aloftData then
+            name = namePlate.aloftData.name
+            addon = ALOFT
+        end
+    elseif Nameplates.SoHighPlates then
+        if namePlate.oldname or namePlate.name then
+            name = (namePlate.oldname and namePlate.oldname:GetText()) or (namePlate.name and namePlate.name:GetText())
+            addon = SOHIGHPLATES
+        end
+    else
+        if Nameplates.ElvUI then
+            if namePlate.UnitFrame then
+                name = namePlate.UnitFrame.oldName:GetText()
+                addon = ELVUI
+            end
+        end
+        if not name then
+            if strmatch(nameRegion1:GetText(), "%d") then
+                name = nameRegion2:GetText()
+            else
+                name = nameRegion1:GetText()
+            end
+            addon = BLIZZ
+        end
+    end
+    if Nameplates.ShaguPlates then
+        addon = SHAGUPLATES
+    end
+    return name, addon
+end
+
+local updateInterval, lastUpdate, num, frame, region, name, totemName, addon = .001, 0
+function Nameplates:Update(elapsed)
+    lastUpdate = lastUpdate + elapsed
+    if lastUpdate > updateInterval then
+        if NAMEPLATES_ON then
+            num = WorldFrame:GetNumChildren()
+            for i = 1, num do
+                frame = select(i, WorldFrame:GetChildren())
+                region = frame:GetRegions()
+                if (frame:GetNumRegions() > 2 and frame:GetNumChildren() >= 1) then
+                    if frame:IsVisible() then
+                        name, addon = getName(frame)
+                        if name then
+                            totemName = select(1, string.match(name, totemPattern)) or name
+                            if totemName then
+                                totems["Nameplates"][frame] = true
+                                self:SkinTotems(frame)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+------------ ADDON specific functions -----------------
+local function nameplateSetAlpha(nameplate, alpha, addonName)
+    if (addonName == BLIZZ) then
+        local hpborder, cbborder, cbicon, overlay, oldname, level, bossicon, raidicon = nameplate:GetRegions()
+        local healthBar = nameplate:GetChildren()
+        overlay:SetAlpha(alpha)
+        hpborder:SetAlpha(alpha)
+        oldname:SetAlpha(alpha)
+        level:SetAlpha(alpha)
+        healthBar:SetAlpha(alpha)
+    elseif (addonName == ALOFT) then
+        nameplate:SetFrameStrata(alpha == 1 and "LOW" or "BACKGROUND")
+        local aloftData = nameplate.aloftData
+        aloftData.healthBar:SetAlpha(alpha)
+        if aloftData.healthTextRegion then aloftData.healthTextRegion:SetAlpha(alpha) end
+        aloftData.backdropFrame:SetAlpha(alpha)
+        aloftData.highlightRegion:SetAlpha(alpha)
+        aloftData.nameTextRegion:SetAlpha(alpha)
+        aloftData.levelTextRegion:SetAlpha(alpha)
+        aloftData.bossIconRegion:SetAlpha(alpha)
+    elseif (addonName == SOHIGHPLATES) then
+        nameplate.background:SetAlpha(alpha)
+        nameplate.container:SetAlpha(alpha)
+        nameplate.health:SetAlpha(alpha)
+        nameplate.health.percent:SetAlpha(alpha)
+        nameplate.level:SetAlpha(alpha)
+        nameplate.name:SetAlpha(alpha)
+    elseif (addonName == ELVUI) then
+        if alpha == 1 then
+            nameplate.UnitFrame:Show()
+        else
+            nameplate.UnitFrame:Hide()
+        end
+    elseif (addonName == SHAGUPLATES) then
+        local _,_,shaguPlate = nameplate:GetChildren()
+        if shaguPlate and shaguPlate.original then
+            shaguPlate.health:SetAlpha(alpha)
+            shaguPlate.name:SetAlpha(alpha)
+            shaguPlate.glow:SetAlpha(alpha)
+            shaguPlate.level:SetAlpha(alpha)
+        end
+    end
+end
+
+local function UpdateNameplate(healthBar)
+    local nameplate = healthBar:GetParent()
+    local totemTexture = totemData[totemName]
+
+    if (addon == BLIZZ
+            or addon == ALOFT
+            or addon == ELVUI
+            or addon == SOHIGHPLATES and GetCVar('_sNpTotem') ~= '1'
+            or addon == SHAGUPLATES and ShaguPlates_config.nameplates.totemicons ~= "1")
+            and Gladdy.db.npTotems then
+        if (totemTexture and Gladdy.db.npTotemColors["totem" .. totemData[totemName].id].enabled) then
+            nameplateSetAlpha(nameplate, 0.01, addon)
+
+            if not nameplate.totem then
+                nameplate.totem = nameplate:CreateTexture(nil, "BACKGROUND")
+                nameplate.totem:ClearAllPoints()
+                nameplate.totem:SetPoint("CENTER", nameplate, "CENTER", 0, 0)
+                nameplate.totem.border = nameplate:CreateTexture(nil, "BORDER")
+            else
+                nameplate.totem:Show()
+                nameplate.totem.border:Show()
+            end
+            if (nameplate.UnitFrame and nameplate.UnitFrame:GetAlpha() < 0.90) -- ElvUI
+                    or (nameplate.nameplate and nameplate.nameplate:GetAlpha() < 0.90) -- ShaguPlates
+                    or nameplate:GetAlpha() < 0.90 then -- Blizz, SoHigh, Aloft
+                nameplate:SetAlpha(Gladdy.db.npTotemPlatesAlpha)
+                nameplate.totem:SetAlpha(Gladdy.db.npTotemPlatesAlpha)
+                nameplate.totem.border:SetAlpha(Gladdy.db.npTotemPlatesAlpha)
+            else
+                nameplate.totem:SetAlpha(1)
+                nameplate.totem.border:SetAlpha(1)
+            end
+            nameplate.totem:SetTexture(totemTexture.texture)
+            nameplate.totem:SetWidth(Gladdy.db.npTotemPlatesSize)
+            nameplate.totem:SetHeight(Gladdy.db.npTotemPlatesSize)
+            nameplate.totem.border:SetTexture(Gladdy.db.npTotemPlatesBorderStyle)
+            nameplate.totem.border:SetVertexColor(Gladdy.db.npTotemColors["totem" .. totemData[totemName].id].color.r, Gladdy.db.npTotemColors["totem" .. totemData[totemName].id].color.g, Gladdy.db.npTotemColors["totem" .. totemData[totemName].id].color.b, Gladdy.db.npTotemColors["totem" .. totemData[totemName].id].color.a)
+            nameplate.totem.border:ClearAllPoints()
+            nameplate.totem.border:SetPoint("TOPLEFT", nameplate.totem, "TOPLEFT")
+            nameplate.totem.border:SetPoint("BOTTOMRIGHT", nameplate.totem, "BOTTOMRIGHT")
+        else
+            nameplateSetAlpha(nameplate, 1, addon)
+            if nameplate.totem then
+                nameplate.totem:Hide()
+                nameplate.totem.border:Hide()
+            end
+        end
+    else
+        if nameplate.totem then
+            nameplate.totem:Hide()
+            nameplate.totem.border:Hide()
+        end
+    end
+end
+
+function Nameplates:SkinTotems(plate)
+    local HealthBar = plate:GetChildren()
+    HealthBar:SetScript("OnShow", UpdateNameplate)
+    HealthBar:SetScript("OnSizeChanged", UpdateNameplate)
+    UpdateNameplate(HealthBar)
+    totems["Nameplates"][plate] = true
+end
+
+function Nameplates:HookTotems(...)
+    for index = 1, select('#', ...) do
+        local plate = select(index, ...)
+        local regions = plate:GetRegions()
+        if (not totems["Nameplates"][plate] and not plate:GetName() and regions and regions:GetObjectType() == "Texture" and regions:GetTexture() == "Interface\\Tooltips\\Nameplate-Border") then
+            self:SkinTotems(plate)
+            plate.region = regions
+        end
+    end
+end
+
+---------------------------------------------------
+
+-- Interface options
+
+---------------------------------------------------
 
 function Nameplates:GetOptions()
     return {
@@ -233,216 +454,4 @@ function Nameplates:GetOptions()
             args = select(2, Gladdy:GetTotemColors())
         },
     }
-end
-
-function Nameplates:Reset()
-    self:CancelAllTimers()
-    self:UnhookAll()
-    self.numChildren = 0
-end
-
-local BLIZZ = 0
-local ALOFT = 1
-local SOHIGHPLATES = 2
-local ELVUI = 3
-local SHAGUPLATES = 4
-
-local function getName(namePlate)
-    local name
-    local addon
-    local _, _, _, _, nameRegion1, _, nameRegion2 = namePlate:GetRegions()
-    if namePlate.aloftData then
-        name = namePlate.aloftData.name
-        addon = ALOFT
-    elseif sohighPlates then
-        --name = namePlate.name:GetText()
-        name = (namePlate.oldname and namePlate.oldname:GetText()) or (namePlate.name and namePlate.name:GetText())
-        addon = SOHIGHPLATES
-    else
-        if ElvUI then
-            if namePlate.UnitFrame then
-                name = namePlate.UnitFrame.oldName:GetText()
-                addon = ELVUI
-            end
-        end
-        if not name then
-            if strmatch(nameRegion1:GetText(), "%d") then
-                name = nameRegion2:GetText()
-            else
-                name = nameRegion1:GetText()
-            end
-            addon = BLIZZ
-        end
-    end
-    if ShaguPlates then
-        addon = SHAGUPLATES
-    end
-    return name, addon
-end
-
-local pattern = "(.+)%s[I,II,III,IV,V,VI,VII,VIII]"
-local updateInterval, lastUpdate, num, frame, region, name, totemName, addon = .001, 0
-function Nameplates:Update(elapsed)
-    lastUpdate = lastUpdate + elapsed
-    if lastUpdate > updateInterval then
-        if NAMEPLATES_ON then
-            num = WorldFrame:GetNumChildren()
-            for i = 1, num do
-                frame = select(i, WorldFrame:GetChildren())
-                region = frame:GetRegions()
-                if (frame:GetNumRegions() > 2 and frame:GetNumChildren() >= 1) then
-                    if frame:IsVisible() then
-                        name, addon = getName(frame)
-                        if name then
-                            totemName = select(1, string.match(name, pattern)) or name
-                            if totemName then
-                                totems["Nameplates"][frame] = true
-                                self:SkinTotems(frame)
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
-
-local function UpdateTotems(healthBar)
-    local nameplate = healthBar:GetParent()
-    --local healthBar = nameplate:GetChildren()
-    local totemTexture = improvedTotemShit[totemName]
-    local hpborder, cbborder, cbicon, overlay, oldname, level, bossicon, raidicon = nameplate:GetRegions()
-
-    if (addon == BLIZZ or addon == ALOFT or addon == ELVUI or addon == SOHIGHPLATES and GetCVar('_sNpTotem') ~= '1' or addon == SHAGUPLATES and ShaguPlates_config.nameplates.totemicons ~= "1") and Gladdy.db.npTotems then
-        if (totemTexture and Gladdy.db.npTotemColors["totem" .. improvedTotemShit[totemName].id].enabled) then
-            if (addon == BLIZZ) then
-                overlay:SetAlpha(0)
-                hpborder:Hide()
-                oldname:Hide()
-                level:Hide()
-                healthBar:SetAlpha(0)
-                raidicon:Hide()
-            elseif (addon == ALOFT) then
-                local aloftData = nameplate.aloftData
-                aloftData.healthBar:Hide()
-                if aloftData.healthTextRegion then aloftData.healthTextRegion:Hide() end
-                --aloftData.healthTextRegion:Hide()
-                aloftData.backdropFrame:Hide()
-                --aloftData.overlayRegion:Hide()
-                aloftData.highlightRegion:Hide()
-                aloftData.nameTextRegion:Hide()
-                aloftData.levelTextRegion:Hide()
-                aloftData.bossIconRegion:Hide()
-                --aloftData.raidIconRegion:Hide()
-            elseif (addon == SOHIGHPLATES) then
-                nameplate.background:Hide()
-                nameplate.castbar.cbackground:SetTexture(nil)
-                nameplate.container:Hide()
-                nameplate.health:Hide()
-                nameplate.health.percent:Show()
-                nameplate.level:Hide()
-                nameplate.name:Hide()
-                if nameplate.totemIcon then
-                    nameplate.totemIcon:Hide()
-                    nameplate.totemBorder:SetBackdrop(nil)
-                end
-                nameplate.name:Hide()
-            elseif (addon == ELVUI) then
-                nameplate.UnitFrame:Hide()
-            elseif (addon == SHAGUPLATES) then
-                local _,_,shaguPlate = nameplate:GetChildren()
-                if shaguPlate and shaguPlate.original then
-                    shaguPlate.health:SetAlpha(0)
-                    shaguPlate.name:SetAlpha(0)
-                    shaguPlate.glow:SetAlpha(0)
-                    shaguPlate.level:SetAlpha(0)
-                    shaguPlate.raidicon:SetAlpha(0)
-                    shaguPlate.raidicon:SetAlpha(0)
-                end
-            end
-
-            if not nameplate.totem then
-                nameplate.totem = nameplate:CreateTexture(nil, "BACKGROUND")
-                nameplate.totem:ClearAllPoints()
-                nameplate.totem:SetPoint("CENTER", nameplate, "CENTER", 0, 0)
-                nameplate.totem.border = nameplate:CreateTexture(nil, "BORDER")
-            else
-                nameplate.totem:Show()
-                nameplate.totem.border:Show()
-            end
-            if (nameplate.UnitFrame and nameplate.UnitFrame:GetAlpha() < 0.90) -- ElvUI
-                    or (nameplate.nameplate and nameplate.nameplate:GetAlpha() < 0.90) -- ShaguPlates
-                    or nameplate:GetAlpha() < 0.90 then -- Blizz, SoHigh, Aloft
-                nameplate:SetAlpha(Gladdy.db.npTotemPlatesAlpha)
-                nameplate.totem:SetAlpha(Gladdy.db.npTotemPlatesAlpha)
-                nameplate.totem.border:SetAlpha(Gladdy.db.npTotemPlatesAlpha)
-            else
-                nameplate.totem:SetAlpha(1)
-                nameplate.totem.border:SetAlpha(1)
-            end
-            nameplate.totem:SetTexture(totemTexture.texture)
-            nameplate.totem:SetWidth(Gladdy.db.npTotemPlatesSize)
-            nameplate.totem:SetHeight(Gladdy.db.npTotemPlatesSize)
-            nameplate.totem.border:SetTexture(Gladdy.db.npTotemPlatesBorderStyle)
-            nameplate.totem.border:SetVertexColor(Gladdy.db.npTotemColors["totem" .. improvedTotemShit[totemName].id].color.r, Gladdy.db.npTotemColors["totem" .. improvedTotemShit[totemName].id].color.g, Gladdy.db.npTotemColors["totem" .. improvedTotemShit[totemName].id].color.b, Gladdy.db.npTotemColors["totem" .. improvedTotemShit[totemName].id].color.a)
-            nameplate.totem.border:ClearAllPoints()
-            nameplate.totem.border:SetPoint("TOPLEFT", nameplate.totem, "TOPLEFT")
-            nameplate.totem.border:SetPoint("BOTTOMRIGHT", nameplate.totem, "BOTTOMRIGHT")
-        else
-            if (addon == BLIZZ) then
-                overlay:SetAlpha(1)
-                hpborder:Show()
-                oldname:Show()
-                level:Show()
-                healthBar:SetAlpha(1)
-            elseif (addon == ALOFT) then
-                nameplate:SetFrameStrata("LOW")
-                local aloftData = nameplate.aloftData
-                aloftData.healthBar:Show()
-                if aloftData.healthTextRegion then aloftData.healthTextRegion:Show() end
-                aloftData.backdropFrame:Show()
-                aloftData.highlightRegion:Show()
-                aloftData.nameTextRegion:Show()
-                aloftData.levelTextRegion:Show()
-                aloftData.bossIconRegion:Show()
-            elseif (addon == SOHIGHPLATES) then
-                nameplate.container:Show()
-                nameplate.health:Show()
-                nameplate.level:Show()
-                __sNpCore:ConfigSetValue(nameplate)
-            elseif (addon == ELVUI) then
-            elseif (addon == SHAGUPLATES) then
-            end
-            if nameplate.totem then
-                nameplate.totem:Hide()
-                nameplate.totem.border:Hide()
-            end
-        end
-    else
-        if nameplate.totem then
-            nameplate.totem:Hide()
-            nameplate.totem.border:Hide()
-        end
-    end
-end
-
-function Nameplates:SkinTotems(plate)
-    local HealthBar, CastBar = plate:GetChildren()
-    --local threat, hpborder, cbshield, cbborder, cbicon, overlay, oldname, level, bossicon, raidicon, elite = frame:GetRegions()
-    local overlayRegion, castBarOverlayRegion, spellIconRegion, highlightRegion, nameTextRegion, bossIconRegion, levelTextRegion, raidIconRegion = plate:GetRegions()
-    HealthBar:SetScript("OnShow", UpdateTotems)
-    HealthBar:SetScript("OnSizeChanged", UpdateTotems)
-    UpdateTotems(HealthBar)
-    totems["Nameplates"][plate] = true
-end
-
-function Nameplates:HookTotems(...)
-    for index = 1, select('#', ...) do
-        local plate = select(index, ...)
-        local regions = plate:GetRegions()
-        if (not totems["Nameplates"][plate] and not plate:GetName() and regions and regions:GetObjectType() == "Texture" and regions:GetTexture() == "Interface\\Tooltips\\Nameplate-Border") then
-            self:SkinTotems(plate)
-            plate.region = regions
-        end
-    end
 end
