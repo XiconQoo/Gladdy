@@ -191,17 +191,22 @@ function Gladdy:SetupOptions()
                         desc = L["Toggle if frame can be moved"],
                         order = 1,
                     },
+                    headerFrame = {
+                        type = "header",
+                        name = L["Frame General"],
+                        order = 2,
+                    },
                     growUp = {
                         type = "toggle",
                         name = L["Grow frame upwards"],
                         desc = L["If enabled the frame will grow upwards instead of downwards"],
-                        order = 2,
+                        order = 3,
                     },
                     frameScale = {
                         type = "range",
                         name = L["Frame scale"],
                         desc = L["Scale of the frame"],
-                        order = 3,
+                        order = 4,
                         min = .1,
                         max = 2,
                         step = .1,
@@ -210,14 +215,14 @@ function Gladdy:SetupOptions()
                         type = "range",
                         name = L["Frame padding"],
                         desc = L["Padding of the frame"],
-                        order = 4,
+                        order = 5,
                         min = 0,
                         max = 20,
                         step = 1,
                     },
                     barWidth = {
                         type = "range",
-                        name = L["Bar width"],
+                        name = L["Frame width"],
                         desc = L["Width of the bars"],
                         order = 6,
                         min = 10,
@@ -233,10 +238,15 @@ function Gladdy:SetupOptions()
                         max = 50,
                         step = 1,
                     },
+                    headerCooldown = {
+                        type = "header",
+                        name = L["Cooldown General"],
+                        order = 8,
+                    },
                     disableCooldownCircle = {
                         type = "toggle",
                         name = L["No Cooldown Circle"],
-                        order = 8,
+                        order = 9,
                         get = function(info)
                             local a = Gladdy.db.auraDisableCircle
                             local b = Gladdy.db.cooldownDisableCircle
@@ -256,11 +266,16 @@ function Gladdy:SetupOptions()
                             Gladdy:UpdateFrame()
                         end,
                     },
+                    headerFont = {
+                        type = "header",
+                        name = L["Font General"],
+                        order = 10,
+                    },
                     font = {
                         type = "select",
                         name = L["Font"],
                         desc = L["General Font"],
-                        order = 9,
+                        order = 11,
                         dialogControl = "LSM30_Font",
                         values = AceGUIWidgetLSMlists.font,
                         get = function(info)
@@ -290,9 +305,9 @@ function Gladdy:SetupOptions()
                     },
                     fontColor = {
                         type = "color",
-                        name = L["Text font color"],
+                        name = L["Font color"],
                         desc = L["Color of the text"],
-                        order = 10,
+                        order = 12,
                         hasAlpha = true,
                         get = function(info)
                             local a = Gladdy.db.healthBarFontColor
@@ -316,11 +331,16 @@ function Gladdy:SetupOptions()
                             Gladdy:UpdateFrame()
                         end,
                     },
+                    headerIcon = {
+                        type = "header",
+                        name = L["Icons General"],
+                        order = 13,
+                    },
                     buttonBorderStyle = {
                         type = "select",
                         name = L["Icon border style"],
                         desc = L["This changes the border style of all icons"],
-                        order = 11,
+                        order = 14,
                         values = Gladdy:GetIconStyles(),
                         get = function(info)
                             if (Gladdy.db.classIconBorderStyle == Gladdy.db.trinketBorderStyle
@@ -345,7 +365,7 @@ function Gladdy:SetupOptions()
                         type = "color",
                         name = L["Icon border color"],
                         desc = L["This changes the border color of all icons"],
-                        order = 12,
+                        order = 15,
                         hasAlpha = true,
                         get = function(info)
                             local a = Gladdy.db.classIconBorderColor
@@ -367,11 +387,37 @@ function Gladdy:SetupOptions()
                             Gladdy:UpdateFrame()
                         end,
                     },
-                    frameBorderStyle = {
+                    headerStatusbar = {
+                        type = "header",
+                        name = L["Statusbar General"],
+                        order = 47,
+                    },
+                    statusbarTexture = {
+                        type = "select",
+                        name = L["Statusbar texture"],
+                        desc = L["This changes the texture of all statusbar frames"],
+                        order = 48,
+                        dialogControl = "LSM30_Statusbar",
+                        values = AceGUIWidgetLSMlists.statusbar,
+                        get = function(info)
+                            if (Gladdy.db.healthBarTexture == Gladdy.db.powerBarTexture and Gladdy.db.healthBarTexture == Gladdy.db.npCastBarTexture) then
+                                return Gladdy.db.healthBarTexture
+                            else
+                                return ""
+                            end
+                        end,
+                        set = function(info, value)
+                            Gladdy.db.healthBarTexture = value
+                            Gladdy.db.powerBarTexture = value
+                            Gladdy.db.npCastBarTexture = value
+                            Gladdy:UpdateFrame()
+                        end,
+                    },
+                    statusbarBorderStyle = {
                         type = "select",
                         name = L["Statusbar border style"],
                         desc = L["This changes the border style of all statusbar frames"],
-                        order = 13,
+                        order = 49,
                         values = Gladdy:GetBorderStyles(),
                         get = function(info)
                             if (Gladdy.db.healthBarBorder == Gladdy.db.powerBarBorder and Gladdy.db.healthBarBorder == Gladdy.db.castBarBorderStyle) then
@@ -387,11 +433,11 @@ function Gladdy:SetupOptions()
                             Gladdy:UpdateFrame()
                         end,
                     },
-                    frameBorderColor = {
+                    statusbarBorderColor = {
                         type = "color",
                         name = L["Statusbar border color"],
                         desc = L["This changes the border color of all statusbar frames"],
-                        order = 14,
+                        order = 50,
                         hasAlpha = true,
                         get = function(info)
                             local a = Gladdy.db.castBarBorderColor
