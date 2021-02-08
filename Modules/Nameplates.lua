@@ -51,7 +51,13 @@ local totemData = {
 
 local function GetTotemColorDefaultOptions()
     local defaultDB = {}
-    local options = {}
+    local options = {
+        headerTotemConfig = {
+            type = "header",
+            name = L["Totem Config"],
+            order = 1,
+        },
+    }
     local indexedList = {}
     for k,v in pairs(totemData) do
         tinsert(indexedList, {name = k, id = v.id, color = v.color, texture = v.texture, enabled = v.enabled})
@@ -62,7 +68,7 @@ local function GetTotemColorDefaultOptions()
     for i=1,#indexedList do
         defaultDB["totem" .. indexedList[i].id] = {color = indexedList[i].color, enabled = indexedList[i].enabled}
         options["totem" .. indexedList[i].id] = {
-            order = i,
+            order = i+1,
             name = "",
             inline = true,
             type = "group",
@@ -349,12 +355,11 @@ end
 
 function Nameplates:GetOptions()
     return {
-        npTotems = Gladdy:option({
-            type = "toggle",
-            name = L["Totem icons on/off"],
-            desc = L["Turns totem icons instead of nameplates on or off. (Requires reload)"],
+        headerCastbar = {
+            type = "header",
+            name = L["Castbar"],
             order = 2,
-        }),
+        },
         npCastbars = Gladdy:option({
             type = "toggle",
             name = L["Castbars on/off"],
@@ -390,20 +395,25 @@ function Nameplates:GetOptions()
             order = 7,
             hasAlpha = true,
         }),
+        headerTotem = {
+            type = "header",
+            name = L["Totem General"],
+            order = 8,
+        },
+        npTotems = Gladdy:option({
+            type = "toggle",
+            name = L["Totem icons on/off"],
+            desc = L["Turns totem icons instead of nameplates on or off. (Requires reload)"],
+            order = 9,
+        }),
         npTotemPlatesSize = Gladdy:option({
             type = "range",
             name = L["Totem size"],
             desc = L["Size of totem icons"],
-            order = 8,
+            order = 10,
             min = 20,
             max = 100,
             step = 1,
-        }),
-        npTotemPlatesBorderStyle = Gladdy:option({
-            type = "select",
-            name = L["Totem icon border style"],
-            order = 9,
-            values = Gladdy:GetIconStyles()
         }),
         npTotemPlatesAlpha = Gladdy:option({
             type = "range",
@@ -414,10 +424,16 @@ function Nameplates:GetOptions()
             max = 0.9,
             step = 0.01,
         }),
+        npTotemPlatesBorderStyle = Gladdy:option({
+            type = "select",
+            name = L["Totem icon border style"],
+            order = 12,
+            values = Gladdy:GetIconStyles()
+        }),
         npAllTotemColors = {
             type = "color",
             name = L["All totem border color"],
-            order = 12,
+            order = 13,
             hasAlpha = true,
             get = function(info)
                 local colors = GetTotemColorOptions()
@@ -440,7 +456,7 @@ function Nameplates:GetOptions()
             end,
         },
         npTotemColors = {
-            order = 13,
+            order = 14,
             name = "Customize Totems",
             type = "group",
             childGroups = "simple",
