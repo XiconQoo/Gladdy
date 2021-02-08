@@ -90,7 +90,7 @@ function Castbar:CreateFrame(unit)
     castBar.spellText:SetShadowOffset(1, -1)
     castBar.spellText:SetShadowColor(0, 0, 0, 1)
     castBar.spellText:SetJustifyH("CENTER")
-    castBar.spellText:SetPoint("LEFT", 7, 1) -- Text of the spell
+    castBar.spellText:SetPoint("LEFT", 7, 0) -- Text of the spell
 
     castBar.timeText = castBar:CreateFontString(nil, "LOW")
     castBar.timeText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.auraFont), Gladdy.db.castBarFontSize)
@@ -98,7 +98,7 @@ function Castbar:CreateFrame(unit)
     castBar.timeText:SetShadowOffset(1, -1)
     castBar.timeText:SetShadowColor(0, 0, 0, 1)
     castBar.timeText:SetJustifyH("CENTER")
-    castBar.timeText:SetPoint("RIGHT", -4, 2) -- text of cast timer
+    castBar.timeText:SetPoint("RIGHT", -4, 0) -- text of cast timer
 
     self.frames[unit] = castBar
     self:ResetUnit(unit)
