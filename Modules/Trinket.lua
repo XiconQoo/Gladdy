@@ -156,6 +156,7 @@ function Trinket:ResetUnit(unit)
     trinket.timeLeft = nil
     trinket.active = false
     trinket.cooldown:SetCooldown(GetTime(), 0)
+    trinket.cooldownFont:SetText("")
 end
 
 function Trinket:Test(unit)
