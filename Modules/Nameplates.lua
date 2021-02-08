@@ -20,7 +20,7 @@ local totemData = {
     -- Elemental
     [select(1, GetSpellInfo(3599))] = {id = 3599,texture = select(3, GetSpellInfo(3599)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Searing Totem
     [select(1, GetSpellInfo(8227))] = {id = 8227,texture = select(3, GetSpellInfo(8227)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Flametongue Totem
-    [select(1, GetSpellInfo(2484))] = {id = 2484,texture = select(3, GetSpellInfo(2484)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Earthbind Totem
+    [select(1, GetSpellInfo(2484))] = {id = 2484,texture = select(3, GetSpellInfo(2484)), color = {r = 0.5, g = 0.5, b = 0.5, a = 1}, enabled = true}, -- Earthbind Totem
     [select(1, GetSpellInfo(5730))] = {id = 5730,texture = select(3, GetSpellInfo(5730)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Stoneclaw Totem
     [select(1, GetSpellInfo(1535))] = {id = 1535,texture = select(3, GetSpellInfo(1535)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Fire Nova Totem
     [select(1, GetSpellInfo(8190))] = {id = 8190,texture = select(3, GetSpellInfo(8190)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Magma Totem
@@ -32,20 +32,20 @@ local totemData = {
     [select(1, GetSpellInfo(8075))] = {id = 8075,texture = select(3, GetSpellInfo(8075)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Strength of Earth Totem
     [select(1, GetSpellInfo(8181))] = {id = 8181,texture = select(3, GetSpellInfo(8181)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Frost Resistance Totem
     [select(1, GetSpellInfo(8184))] = {id = 8184,texture = select(3, GetSpellInfo(8184)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Fire Resistance Totem
-    [select(1, GetSpellInfo(8177))] = {id = 8177,texture = select(3, GetSpellInfo(8177)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Grounding Totem
+    [select(1, GetSpellInfo(8177))] = {id = 8177,texture = select(3, GetSpellInfo(8177)), color = {r = 0, g = 0.53, b = 0.92, a = 1}, enabled = true}, -- Grounding Totem
     [select(1, GetSpellInfo(8835))] = {id = 8835,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_InvisibilityTotem_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Grace of Air Totem
-    [select(1, GetSpellInfo(10595))] = {id = 10595,texture = select(3, GetSpellInfo(10595)), color = {r = 0, g = 0, b = 0, a = 1}}, -- Nature Resistance Totem
-    [select(1, GetSpellInfo(8512))] = {id = 8512,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_Windfury_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Windfury Totem
+    [select(1, GetSpellInfo(10595))] = {id = 10595,texture = select(3, GetSpellInfo(10595)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Nature Resistance Totem
+    [select(1, GetSpellInfo(8512))] = {id = 8512,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_Windfury_edit", color = {r = 0.96, g = 0, b = 0.07, a = 1}, enabled = true}, -- Windfury Totem
     [select(1, GetSpellInfo(6495))] = {id = 6495, texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_RemoveCurse_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Sentry Totem
     [select(1, GetSpellInfo(15107))] = {id = 15107,texture = select(3, GetSpellInfo(15107)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Windwall Totem
     [select(1, GetSpellInfo(3738))] = {id = 3738,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_SlowingTotem_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Wrath of Air Totem
     -- Restoration
-    [select(1, GetSpellInfo(8143))] = {id = 8143,texture = select(3, GetSpellInfo(8143)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Tremor Totem
+    [select(1, GetSpellInfo(8143))] = {id = 8143,texture = select(3, GetSpellInfo(8143)), color = {r = 1, g = 0.9, b = 0.1, a = 1}, enabled = true}, -- Tremor Totem
     [select(1, GetSpellInfo(5394))] = {id = 5394,texture = select(3, GetSpellInfo(5394)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Healing Stream Totem
     [select(1, GetSpellInfo(8166))] = {id = 8166,texture = select(3, GetSpellInfo(8166)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Poison Cleansing Totem
     [select(1, GetSpellInfo(5675))] = {id = 5675,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_ManaRegenTotem_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Mana Spring Totem
     [select(1, GetSpellInfo(8170))] = {id = 8170,texture = select(3, GetSpellInfo(8170)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Disease Cleansing Totem
-    [select(1, GetSpellInfo(16190))] = {id = 16190,texture = select(3, GetSpellInfo(16190)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Mana Tide Totem
+    [select(1, GetSpellInfo(16190))] = {id = 16190,texture = select(3, GetSpellInfo(16190)), color = {r = 0.078, g = 0.9, b = 0.16, a = 1}, enabled = true}, -- Mana Tide Totem
     [select(1, GetSpellInfo(25908))] = {id = 25908,texture = "Interface\\Icons\\INV_Staff_07", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true}, -- Tranquil Air Totem
 }
 
@@ -336,24 +336,9 @@ end
 
 function Nameplates:SkinTotems(plate)
     local HealthBar = plate:GetChildren()
-    HealthBar:SetScript("OnShow", UpdateNameplate)
-    HealthBar:SetScript("OnSizeChanged", UpdateNameplate)
+    --HealthBar:SetScript("OnShow", UpdateNameplate)
+    --HealthBar:SetScript("OnSizeChanged", UpdateNameplate)
     UpdateNameplate(HealthBar)
-    totems["Nameplates"][plate] = true
-end
-
-function Nameplates:HookTotems(...)
-    for index = 1, select('#', ...) do
-        local plate = select(index, ...)
-        local regions = plate:GetRegions()
-        if (not totems["Nameplates"][plate]
-                and not plate:GetName()
-                and regions and regions:GetObjectType() == "Texture"
-                and regions:GetTexture() == "Interface\\Tooltips\\Nameplate-Border") then
-            self:SkinTotems(plate)
-            plate.region = regions
-        end
-    end
 end
 
 ---------------------------------------------------
