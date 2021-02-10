@@ -1,7 +1,8 @@
---[[ $Id: AceComm-3.0.lua 66660 2008-03-28 10:40:54Z nevcairiel $ ]]
+--[[ $Id: AceComm-3.0.lua 618 2008-03-28 10:35:31Z nevcairiel $ ]]
 
 --[[ AceComm-3.0
 
+TODO: Time out old data rotting around from dead senders? Not a HUGE deal since the number of possible sender names is somewhat limited.
 
 ]]
 

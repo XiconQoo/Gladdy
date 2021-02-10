@@ -77,7 +77,7 @@ do
 	
 	do
 		local widgetType = "LSM30_Font_Item_Select"
-		local widgetVersion = 1
+		local widgetVersion = 11
 
 		local function SetText(self, text)
 			if text and text ~= '' then
@@ -99,7 +99,7 @@ do
 
 	do
 		local widgetType = "LSM30_Statusbar_Item_Select"
-		local widgetVersion = 1
+		local widgetVersion = 11
 
 		local function SetText(self, text)
 			if text and text ~= '' then
@@ -126,7 +126,7 @@ do
 
 	do
 		local widgetType = "LSM30_Background_Item_Select"
-		local widgetVersion = 1
+		local widgetVersion = 11
 			
 		local function Frame_OnEnter(this)
 			local self = this.obj
@@ -185,7 +185,7 @@ do
 	
 	do
 		local widgetType = "LSM30_Sound_Item_Select"
-		local widgetVersion = 1
+		local widgetVersion = 11
 			
 		local function Frame_OnEnter(this)
 			local self = this.obj
@@ -398,7 +398,7 @@ do
 	
 	do
 		local widgetType = "LSM30_Border_Item_Select"
-		local widgetVersion = 1
+		local widgetVersion = 11
 			
 		local function Frame_OnEnter(this)
 			local self = this.obj
@@ -458,7 +458,7 @@ do
 	
 	do 
 		local widgetType = "LSM30_Font"
-		local widgetVersion = 1
+		local widgetVersion = 11
 		
 		local function SetText(self, text)		
 			if text and text ~= '' then
@@ -481,7 +481,7 @@ do
 		
 		local function AddListItem(self, value, text)
 			local item = AceGUI:Create("LSM30_Font_Item_Select")
-			item:SetText(text)
+			item:SetText(value)
 			item.userdata.obj = self
 			item.userdata.value = value
 			item:SetCallback("OnValueChanged", OnItemValueChanged)
@@ -521,7 +521,7 @@ do
 	
 	do 
 		local widgetType = "LSM30_Statusbar"
-		local widgetVersion = 1
+		local widgetVersion = 11
 		
 		local function SetText(self, text)
 			if text and text ~= '' then
@@ -533,7 +533,7 @@ do
 		
 		local function AddListItem(self, value, text)
 			local item = AceGUI:Create("LSM30_Statusbar_Item_Select")
-			item:SetText(text)
+			item:SetText(value)
 			item.userdata.obj = self
 			item.userdata.value = value
 			item:SetCallback("OnValueChanged", OnItemValueChanged)
@@ -581,7 +581,7 @@ do
 
 	do 
 		local widgetType = "LSM30_Background"
-		local widgetVersion = 1
+		local widgetVersion = 11
 		
 		local function Frame_OnEnter(this)
 			local self = this.obj
@@ -605,7 +605,7 @@ do
 		
 		local function AddListItem(self, value, text)
 			local item = AceGUI:Create("LSM30_Background_Item_Select")
-			item:SetText(text)
+			item:SetText(value)
 			item.userdata.obj = self
 			item.userdata.value = value
 			item:SetCallback("OnValueChanged", OnItemValueChanged)
@@ -665,11 +665,11 @@ do
 
 	do 
 		local widgetType = "LSM30_Sound"
-		local widgetVersion = 1
+		local widgetVersion = 11
 		
 		local function AddListItem(self, value, text)
 			local item = AceGUI:Create("LSM30_Sound_Item_Select")
-			item:SetText(text)
+			item:SetText(value)
 			item.userdata.obj = self
 			item.userdata.value = value
 			item:SetCallback("OnValueChanged", OnItemValueChanged)
@@ -707,7 +707,7 @@ do
 	
 	do 
 		local widgetType = "LSM30_Border"
-		local widgetVersion = 1
+		local widgetVersion = 11
 		
 		local function Frame_OnEnter(this)
 			local self = this.obj
@@ -724,7 +724,7 @@ do
 		
 		local function AddListItem(self, value, text)
 			local item = AceGUI:Create("LSM30_Border_Item_Select")
-			item:SetText(text)
+			item:SetText(value)
 			item.userdata.obj = self
 			item.userdata.value = value
 			item:SetCallback("OnValueChanged", OnItemValueChanged)

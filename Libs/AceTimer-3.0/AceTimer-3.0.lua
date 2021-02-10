@@ -1,4 +1,22 @@
---[[ $Id: AceTimer-3.0.lua 74633 2008-05-21 08:20:50Z nevcairiel $ ]]
+--- **AceTimer-3.0** provides a central facility for registering timers.
+-- AceTimer supports one-shot timers and repeating timers. All timers are stored in an efficient
+-- data structure that allows easy dispatching and fast rescheduling. Timers can be registered, rescheduled
+-- or canceled at any time, even from within a running timer, without conflict or large overhead.\\
+-- AceTimer is currently limited to firing timers at a frequency of 0.1s. This constant may change
+-- in the future, but for now it seemed like a good compromise in efficiency and accuracy.
+--
+-- All `:Schedule` functions will return a handle to the current timer, which you will need to store if you
+-- need to cancel or reschedule the timer you just registered.
+--
+-- **AceTimer-3.0** can be embeded into your addon, either explicitly by calling AceTimer:Embed(MyAddon) or by 
+-- specifying it as an embeded library in your AceAddon. All functions will be available on your addon object
+-- and can be accessed directly, without having to explicitly call AceTimer itself.\\
+-- It is recommended to embed AceTimer, otherwise you'll have to specify a custom `self` on all calls you
+-- make into AceTimer.
+-- @class file
+-- @name AceTimer-3.0
+-- @release $Id: AceTimer-3.0.lua 895 2009-12-06 16:28:55Z nevcairiel $
+
 --[[
 	Basic assumptions:
 	* In a typical system, we do more re-scheduling per second than there are timer pulses per second
@@ -18,7 +36,7 @@
 	- ALLOWS unscheduling ANY timer (including the current running one) at any time, including during OnUpdate processing
 ]]
 
-local MAJOR, MINOR = "AceTimer-3.0", 4
+local MAJOR, MINOR = "AceTimer-3.0", 5
 local AceTimer, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceTimer then return end -- No upgrade needed
@@ -28,13 +46,19 @@ AceTimer.hash = AceTimer.hash or {}         -- Array of [0..BUCKET-1] = linked l
 AceTimer.selfs = AceTimer.selfs or {}       -- Array of [self]={[handle]=timerobj, [handle2]=timerobj2, ...}
 AceTimer.frame = AceTimer.frame or CreateFrame("Frame", "AceTimer30Frame")
 
-local type = type
-local next = next
-local pairs = pairs
-local select = select
-local tostring = tostring
-local floor = floor
-local max = max
+-- Lua APIs
+local assert, error, loadstring = assert, error, loadstring
+local setmetatable, rawset, rawget = setmetatable, rawset, rawget
+local select, pairs, type, next, tostring = select, pairs, type, next, tostring
+local floor, max, min = math.floor, math.max, math.min
+local tconcat = table.concat
+
+-- WoW APIs
+local GetTime = GetTime
+
+-- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
+-- List them here for Mikk's FindGlobals script
+-- GLOBALS: DEFAULT_CHAT_FRAME, geterrorhandler
 
 -- Simple ONE-SHOT timer cache. Much more efficient than a full compost for our purposes.
 local timerCache = nil
@@ -85,7 +109,7 @@ local function CreateDispatcher(argCount)
 	
 	local ARGS = {}
 	for i = 1, argCount do ARGS[i] = "arg"..i end
-	code = code:gsub("ARGS", table.concat(ARGS, ", "))
+	code = code:gsub("ARGS", tconcat(ARGS, ", "))
 	return assert(loadstring(code, "safecall Dispatcher["..argCount.."]"))(xpcall, errorhandler)
 end
 
@@ -106,7 +130,7 @@ end
 
 local lastint = floor(GetTime() * HZ)
 
-----------------------------------------------------------------------
+-- --------------------------------------------------------------------
 -- OnUpdate handler
 --
 -- traverse buckets, always chasing "now", and fire timers that have expired
@@ -126,7 +150,7 @@ local function OnUpdate()
 		local curbucket = (curint % BUCKETS)+1
 		-- Yank the list of timers out of the bucket and empty it. This allows reinsertion in the currently-processed bucket from callbacks.
 		local nexttimer = hash[curbucket]
-		hash[curbucket] = false	-- false rather than nil to prevent the array from becoming a hash
+		hash[curbucket] = false -- false rather than nil to prevent the array from becoming a hash
 
 		while nexttimer do
 			local timer = nexttimer
@@ -175,7 +199,7 @@ local function OnUpdate()
 	lastint = nowint
 end
 
------------------------------------------------------------------------
+-- ---------------------------------------------------------------------
 -- Reg( callback, delay, arg, repeating )
 --
 -- callback( function or string ) - direct function ref or method name in our object for the callback
@@ -234,38 +258,59 @@ local function Reg(self, callback, delay, arg, repeating)
 	return handle
 end
 
-
------------------------------------------------------------------------
--- AceTimer:ScheduleTimer( callback, delay, arg )
--- AceTimer:ScheduleRepeatingTimer( callback, delay, arg )
+--- Schedule a new one-shot timer.
+-- The timer will fire once in `delay` seconds, unless canceled before.
+-- @param callback Callback function for the timer pulse (funcref or method name).
+-- @param delay Delay for the timer, in seconds.
+-- @param arg An optional argument to be passed to the callback function.
+-- @usage
+-- MyAddon = LibStub("AceAddon-3.0"):NewAddon("TimerTest", "AceTimer-3.0")
+-- 
+-- function MyAddon:OnEnable()
+--   self:ScheduleTimer("TimerFeedback", 5)
+-- end
 --
--- callback( function or string ) - direct function ref or method name in our object for the callback
--- delay(int) - delay for the timer
--- arg(variant) - any argument to be passed to the callback function
---
--- returns a handle to the timer, which is used for cancelling it
+-- function MyAddon:TimerFeedback()
+--   print("5 seconds passed")
+-- end
 function AceTimer:ScheduleTimer(callback, delay, arg)
 	return Reg(self, callback, delay, arg)
 end
 
+--- Schedule a repeating timer.
+-- The timer will fire every `delay` seconds, until canceled.
+-- @param callback Callback function for the timer pulse (funcref or method name).
+-- @param delay Delay for the timer, in seconds.
+-- @param arg An optional argument to be passed to the callback function.
+-- @usage
+-- MyAddon = LibStub("AceAddon-3.0"):NewAddon("TimerTest", "AceTimer-3.0")
+-- 
+-- function MyAddon:OnEnable()
+--   self.timerCount = 0
+--   self.testTimer = self:ScheduleRepeatingTimer("TimerFeedback", 5)
+-- end
+--
+-- function MyAddon:TimerFeedback()
+--   self.timerCount = self.timerCount + 1
+--   print(("%d seconds passed"):format(5 * self.timerCount))
+--   -- run 30 seconds in total
+--   if self.timerCount == 6 then
+--     self:CancelTimer(self.testTimer)
+--   end
+-- end
 function AceTimer:ScheduleRepeatingTimer(callback, delay, arg)
 	return Reg(self, callback, delay, arg, true)
 end
 
-
------------------------------------------------------------------------
--- AceTimer:CancelTimer(handle)
---
--- handle - Opaque object given by ScheduleTimer
--- silent - true: Do not error if the timer does not exist / is already cancelled. Default: false
---
--- Cancels a timer with the given handle, registered by the same 'self' as given in ScheduleTimer
---
--- Returns true if a timer was cancelled
-
+--- Cancels a timer with the given handle, registered by the same addon object as used for `:ScheduleTimer`
+-- Both one-shot and repeating timers can be canceled with this function, as long as the `handle` is valid
+-- and the timer has not fired yet or was canceled before.
+-- @param handle The handle of the timer, as returned by `:ScheduleTimer` or `:ScheduleRepeatingTimer`
+-- @param silent If true, no error is raised if the timer handle is invalid (expired or already canceled)
+-- @return True if the timer was successfully cancelled.
 function AceTimer:CancelTimer(handle, silent)
 	if not handle then return end -- nil handle -> bail out without erroring
-	if type(handle)~="string" then
+	if type(handle) ~= "string" then
 		error(MAJOR..": CancelTimer(handle): 'handle' - expected a string", 2)	-- for now, anyway
 	end
 	local selftimers = AceTimer.selfs[self]
@@ -292,32 +337,45 @@ function AceTimer:CancelTimer(handle, silent)
 	end
 end
 
-
------------------------------------------------------------------------
--- AceTimer:CancelAllTimers()
---
--- Cancels all timers registered to given 'self'
+--- Cancels all timers registered to the current addon object ('self')
 function AceTimer:CancelAllTimers()
-	if not(type(self)=="string" or type(self)=="table") then
+	if not(type(self) == "string" or type(self) == "table") then
 		error(MAJOR..": CancelAllTimers(): 'self' - must be a string or a table",2)
 	end
-	if self==AceTimer then
+	if self == AceTimer then
 		error(MAJOR..": CancelAllTimers(): supply a meaningful 'self'", 2)
 	end
 	
 	local selftimers = AceTimer.selfs[self]
 	if selftimers then
 		for handle,v in pairs(selftimers) do
-			if type(v)=="table" then	-- avoid __ops, etc
+			if type(v) == "table" then  -- avoid __ops, etc
 				AceTimer.CancelTimer(self, handle, true)
 			end
 		end
 	end
 end
 
+--- Returns the time left for a timer with the given handle, registered by the current addon object ('self').
+-- This function will raise a warning when the handle is invalid, but not stop execution.
+-- @param handle The handle of the timer, as returned by `:ScheduleTimer` or `:ScheduleRepeatingTimer`
+-- @return The time left on the timer, or false if the handle is invalid.
+function AceTimer:TimeLeft(handle)
+	if not handle then return end
+	if type(handle) ~= "string" then
+		error(MAJOR..": TimeLeft(handle): 'handle' - expected a string", 2)    -- for now, anyway
+	end
+	local selftimers = AceTimer.selfs[self]
+	local timer = selftimers and selftimers[handle]
+	if not timer then
+		geterrorhandler()(MAJOR..": TimeLeft(handle): '"..tostring(handle).."' - no such timer registered")
+		return false
+	end
+	return timer.when - GetTime()
+end
 
 
------------------------------------------------------------------------
+-- ---------------------------------------------------------------------
 -- PLAYER_REGEN_ENABLED: Run through our .selfs[] array step by step
 -- and clean it out - otherwise the table indices can grow indefinitely
 -- if an addon starts and stops a lot of timers. AceBucket does this!
@@ -365,14 +423,15 @@ local function OnEvent(this, event)
 	selfs[self] = newlist
 end
 
------------------------------------------------------------------------
+-- ---------------------------------------------------------------------
 -- Embed handling
 
 AceTimer.embeds = AceTimer.embeds or {}
 
 local mixins = {
 	"ScheduleTimer", "ScheduleRepeatingTimer", 
-	"CancelTimer", "CancelAllTimers"
+	"CancelTimer", "CancelAllTimers",
+	"TimeLeft"
 }
 
 function AceTimer:Embed(target)
@@ -383,7 +442,7 @@ function AceTimer:Embed(target)
 	return target
 end
 
---AceTimer:OnEmbedDisable( target )
+-- AceTimer:OnEmbedDisable( target )
 -- target (object) - target object that AceTimer is embedded in.
 --
 -- cancel all timers registered for the object
@@ -396,13 +455,13 @@ for addon in pairs(AceTimer.embeds) do
 	AceTimer:Embed(addon)
 end
 
------------------------------------------------------------------------
+-- ---------------------------------------------------------------------
 -- Debug tools (expose copies of internals to test suites)
 AceTimer.debug = AceTimer.debug or {}
 AceTimer.debug.HZ = HZ
 AceTimer.debug.BUCKETS = BUCKETS
 
------------------------------------------------------------------------
+-- ---------------------------------------------------------------------
 -- Finishing touchups
 
 AceTimer.frame:SetScript("OnUpdate", OnUpdate)
