@@ -1,374 +1,383 @@
-local AddOn = "PlateCastBar"
 local Gladdy = LibStub("Gladdy")
+local L = Gladdy.L
+local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
 local WorldFrame = WorldFrame
 local select = select
 local pairs = pairs
 
--- TODO: this needs channeling spells again
-local Table = {
-    ["Nameplates"] = {},
-    ["CheckButtons"] = {
-        ["Test"] = {
-            ["PointX"] = 170,
-            ["PointY"] = -10,
-        },
-        ["Player Pet"] = {
-            ["PointX"] = 300,
-            ["PointY"] = -90,
-        },
-        ["Icon"] = {
-            ["PointX"] = 300,
-            ["PointY"] = -120,
-        },
-        ["Timer"] = {
-            ["PointX"] = 300,
-            ["PointY"] = -150,
-        },
-        ["Spell"] = {
-            ["PointX"] = 300,
-            ["PointY"] = -180,
-        },
-    },
-}
-
-_G[AddOn .. "_SavedVariables"] = {
-    ["CastBar"] = {
-        ["Width"] = 105,
-        ["PointX"] = 15,
-        ["PointY"] = -5,
-    },
-    ["Icon"] = {
-        ["PointX"] = -62,
-        ["PointY"] = 0,
-    },
-    ["Timer"] = {
-        ["Anchor"] = "RIGHT",
-        ["PointX"] = 52,
-        ["PointY"] = 0,
-        ["Format"] = "LEFT"
-    },
-    ["Spell"] = {
-        ["Anchor"] = "LEFT",
-        ["PointX"] = -53,
-        ["PointY"] = 0,
-    },
-    ["Enable"] = {
-        ["Test"] = false,
-        ["Player Pet"] = true,
-        ["Icon"] = true,
-        ["Timer"] = true,
-        ["Spell"] = true,
-    },
-}
-
-local unitsToCheck = {
-    ["mouseover"] = true,
-    ["mouseovertarget"] = true,
-    ["mouseovertargettarget"] = true,
-    ["target"] = true,
-    ["targettarget"] = true,
-    ["targettargettarget"] = true,
-    ["focus"] = true,
-    ["focustargettarget"] = true,
-    ["focustarget"] = true,
-    ["pet"] = true,
-    ["pettarget"] = true,
-    ["pettargettarget"] = true,
-    ["party1"] = true,
-    ["party2"] = true,
-    ["party3"] = true,
-    ["party4"] = true,
-    ["party1target"] = true,
-    ["party2target"] = true,
-    ["party3target"] = true,
-    ["party4target"] = true,
-    ["partypet1target"] = true,
-    ["partypet2target"] = true,
-    ["partypet3target"] = true,
-    ["partypet4target"] = true,
-    ["party1targettarget"] = true,
-    ["party2targettarget"] = true,
-    ["party3targettarget"] = true,
-    ["party4targettarget"] = true,
-    ["raid1"] = true,
-    ["raid2"] = true,
-    ["raid3"] = true,
-    ["raid4"] = true,
-    ["raid1target"] = true,
-    ["raid2target"] = true,
-    ["raid3target"] = true,
-    ["raid4target"] = true,
-    ["raidpet1target"] = true,
-    ["raidpet2target"] = true,
-    ["raidpet3target"] = true,
-    ["raidpet4target"] = true,
-    ["raid1targettarget"] = true,
-    ["raid2targettarget"] = true,
-    ["raid3targettarget"] = true,
-    ["raid4targettarget"] = true,
-}
-
-local Frame = CreateFrame("Frame")
-Frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-local function Frame_RegisterEvents()
-    Frame:RegisterEvent("UNIT_SPELLCAST_START")
-    Frame:RegisterEvent("UNIT_SPELLCAST_DELAYED")
-    Frame:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
-    Frame:RegisterEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
-    Frame:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
-    Frame:RegisterEvent("UNIT_SPELLCAST_FAILED")
-    Frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-    Frame:RegisterEvent("PLAYER_TARGET_CHANGED")
-    Frame:RegisterEvent("PLAYER_FOCUS_CHANGED")
+local knownNameplates = {}
+local unitsToCheck = {}
+local function generateUnitsToCheck()
+    local function targettarget(unit, max)
+        for i=1, max do
+            local index
+            if max == 1 then index = "" else index = i end
+            unitsToCheck[unit .. index] = true
+            unitsToCheck[unit .. index .. "pet"] = true
+            unitsToCheck[unit .. index .. "pettarget"] = true
+            unitsToCheck[unit .. index .. "target"] = true
+            unitsToCheck[unit .. index .. "targetpet"] = true
+            unitsToCheck[unit .. index .. "targetpettarget"] = true
+            unitsToCheck[unit .. index .. "targettarget"] = true
+            unitsToCheck[unit .. index .. "targettargetpet"] = true
+            unitsToCheck[unit .. index .. "targettargetpettarget"] = true
+        end
+    end
+    targettarget("raid", 15) -- typical BG size
+    targettarget("party", 4)
+    targettarget("target", 1)
+    targettarget("focus", 1)
+    targettarget("mouseover", 1)
+    targettarget("player", 1)
 end
 
-local function UnitCastBar_Update(unit)
-    local Texture = _G[AddOn .. "_Texture_" .. unit .. "CastBar_CastBar"]
-    if Texture then
-        Texture:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.npCastBarTexture))
+---------------------------------------------------
+
+-- Core
+
+---------------------------------------------------
+
+local PlateCastBar = Gladdy:NewModule("PlateCastBar", nil, {
+    --module
+    npCastbars = true,
+    npCastbarGuess = false,
+    --castbar
+    npCastbarsTexture = "Smooth",
+    npCastbarsWidth = 105,
+    npCastbarsHeight = 14,
+    npCastbarsPointX = 0,
+    npCastbarsPointY = -5,
+    npCastbarsBarColor = { r = 1, g = 0.8, b = 0.2, a = 1 },
+    npCastbarsBgColor = { r = 0, g = 0, b = 0, a = 1 },
+    --icon
+    npCastbarsIconSize = 14,
+    npCastbarsIconPos = "LEFT",
+    --flags
+    npCastbarsEnableTest = false,
+    npCastbarsEnablePlayerPet = true,
+    npCastbarsEnableIcon = true,
+    npCastbarsEnableTimer = true,
+    npCastbarsEnableSpell = true,
+    --font
+    npCastbarsFont = "DorisPP",
+    npCastbarsFontColor = {r = 1, g = 1, b = 1, a = 1},
+    npCastbarsFontSize = 9,
+    npCastbarsTimerFormat = "LEFT",
+    --borders
+    npCastbarsBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade",
+    npCastbarsBorderColor = {r = 0, g = 0, b = 0, a = 1},
+    npCastbarsIconStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
+    npCastbarsIconColor = {r = 0, g = 0, b = 0, a = 1},
+    npCastbarsBorderSize = 3,
+
+})
+LibStub("AceHook-3.0"):Embed(PlateCastBar)
+LibStub("AceTimer-3.0"):Embed(PlateCastBar)
+
+function PlateCastBar:Initialise()
+    generateUnitsToCheck()
+    self.unitCastBars = {}
+    self.numChildren = 0
+    self:CastBars_Create()
+    self:SetScript("OnUpdate", self.Update)
+    self.Aloft = IsAddOnLoaded("Aloft")
+    self.SoHighPlates = IsAddOnLoaded("SoHighPlates")
+    self.ElvUI = IsAddOnLoaded("ElvUI")
+    self.ShaguPlates = IsAddOnLoaded("ShaguPlates-tbc") or IsAddOnLoaded("ShaguPlates")
+end
+
+---------------------------------------------------
+
+-- PlateCastBar nameplate functions
+
+---------------------------------------------------
+
+local function getName(namePlate)
+    local name, parent
+    if PlateCastBar.Aloft then
+        if namePlate.aloftData then
+            name = namePlate.aloftData.name
+            parent = namePlate.aloftData.healthBar
+        end
+    elseif PlateCastBar.SoHighPlates then
+        if namePlate.oldname or namePlate.name then
+            name = (namePlate.oldname and namePlate.oldname:GetText()) or (namePlate.name and namePlate.name:GetText())
+            parent = namePlate.container
+        end
+    else
+        if PlateCastBar.ElvUI then
+            if namePlate.UnitFrame then
+                name = namePlate.UnitFrame.oldName:GetText()
+                parent = namePlate.container
+            end
+        end
+        if not name then
+            local hpborder, _, _, _, nameRegion1, nameRegion2 = namePlate:GetRegions()
+            if strmatch(nameRegion1:GetText(), "%d") then
+                name = nameRegion2:GetText()
+            else
+                name = nameRegion1:GetText()
+            end
+            parent = hpborder
+        end
+    end
+    return name, parent
+end
+
+function PlateCastBar:UnitCastBar_Create(unit)
+    self.unitCastBars["castbar"..unit] = CreateFrame("StatusBar", nil)
+    local CastBar = self.unitCastBars["castbar"..unit]
+    CastBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.npCastbarsTexture))
+    CastBar:SetStatusBarColor(Gladdy.db.npCastbarsBarColor.r, Gladdy.db.npCastbarsBarColor.g, Gladdy.db.npCastbarsBarColor.b, Gladdy.db.npCastbarsBarColor.a)
+    CastBar:SetWidth(Gladdy.db.npCastbarsWidth);
+    CastBar:SetHeight(Gladdy.db.npCastbarsHeight);
+    CastBar:SetMinMaxValues(0, 100)
+    CastBar:SetPoint("CENTER")
+    CastBar:SetFrameStrata("MEDIUM")
+    CastBar:Hide()
+
+    CastBar.border = CreateFrame("Frame", nil, CastBar)
+    CastBar.border:SetBackdrop({ edgeFile = Gladdy.db.npCastbarsBorderStyle,
+                                 edgeSize = Gladdy.db.npCastbarsBorderSize })
+    CastBar.border:SetBackdropBorderColor(Gladdy.db.npCastbarsBorderColor.r, Gladdy.db.npCastbarsBorderColor.g, Gladdy.db.npCastbarsBorderColor.b, Gladdy.db.npCastbarsBorderColor.a)
+    CastBar.border:ClearAllPoints()
+    CastBar.border:SetPoint("TOPLEFT", CastBar, "TOPLEFT")
+    CastBar.border:SetPoint("BOTTOMRIGHT", CastBar, "BOTTOMRIGHT")
+
+    CastBar.background = CastBar:CreateTexture(nil, "BORDER");
+    CastBar.background:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.npCastbarsTexture))
+    CastBar.background:SetVertexColor(Gladdy.db.npCastbarsBgColor.r, Gladdy.db.npCastbarsBgColor.g, Gladdy.db.npCastbarsBgColor.b, Gladdy.db.npCastbarsBgColor.a)
+    CastBar.background:SetAllPoints(CastBar)
+
+    CastBar.spellName = CastBar:CreateFontString(nil)
+    CastBar.spellName:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npCastbarsFont), Gladdy.db.npCastbarsFontSize, "OUTLINE")
+    CastBar.spellName:SetPoint("LEFT", CastBar, "LEFT", 2, 0);
+    if (Gladdy.db.npCastbarsEnableSpell) then
+        CastBar.spellName:Show()
+    else
+        CastBar.spellName:Hide()
     end
 
-    local SpellName = _G[AddOn .. "_FontString_" .. unit .. "CastBar_SpellName"]
-    if SpellName then
-        SpellName:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npCastbarsFont), 9, "OUTLINE")
-        SpellName:SetTextColor(Gladdy.db.npCastbarsFontColor.r, Gladdy.db.npCastbarsFontColor.g, Gladdy.db.npCastbarsFontColor.b, Gladdy.db.npCastbarsFontColor.a)
+    CastBar.spellTime = CastBar:CreateFontString(nil)
+    CastBar.spellTime:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npCastbarsFont), Gladdy.db.npCastbarsFontSize, "OUTLINE")
+    CastBar.spellTime:SetPoint("RIGHT", CastBar, "RIGHT", -1, 0);
+    if (Gladdy.db.npCastbarsEnableTimer) then
+        CastBar.spellTime:Show()
+    else
+        CastBar.spellTime:Hide()
     end
 
-    local CastTime = _G[AddOn .. "_FontString_" .. unit .. "CastBar_CastTime"]
-    if CastTime then
-        CastTime:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npCastbarsFont), 9, "OUTLINE")
-        CastTime:SetTextColor(Gladdy.db.npCastbarsFontColor.r, Gladdy.db.npCastbarsFontColor.g, Gladdy.db.npCastbarsFontColor.b, Gladdy.db.npCastbarsFontColor.a)
+    CastBar.icon = CastBar:CreateTexture(nil, "BACKGROUND");
+    CastBar.icon:SetHeight(Gladdy.db.npCastbarsIconSize);
+    CastBar.icon:SetWidth(Gladdy.db.npCastbarsIconSize);
+    CastBar.icon:SetPoint("RIGHT", CastBar, Gladdy.db.npCastbarsIconPos);
+    CastBar.icon.border = CastBar:CreateTexture(nil, "BORDER")
+    CastBar.icon.border:SetTexture(Gladdy.db.npCastbarsIconStyle)
+    CastBar.icon.border:SetAllPoints(CastBar.icon)
+    CastBar.icon.border:SetVertexColor(Gladdy.db.npCastbarsIconColor.r, Gladdy.db.npCastbarsIconColor.g, Gladdy.db.npCastbarsIconColor.b, Gladdy.db.npCastbarsIconColor.a)
+    if (Gladdy.db.npCastbarsEnableIcon) then
+        CastBar.icon:Show()
+        CastBar.icon.border:Show()
+    else
+        CastBar.icon:Hide()
+        CastBar.icon.border:Hide()
     end
 end
 
-local function UnitCastBar_Create(unit)
-    _G[AddOn .. "_Frame_" .. unit .. "CastBar"] = CreateFrame("Frame", nil);
-    local CastBar = _G[AddOn .. "_Frame_" .. unit .. "CastBar"]
-    CastBar:SetFrameStrata("BACKGROUND");
-    CastBar:SetWidth(_G[AddOn .. "_SavedVariables"]["CastBar"]["Width"]);
-    CastBar:SetHeight(11);
-    CastBar:SetPoint("CENTER");
-    CastBar:Hide();
+local function UpdateFrame(unit)
+    local CastBar = PlateCastBar.unitCastBars["castbar"..unit]
+    --bar
+    CastBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.npCastbarsTexture))
+    CastBar:SetStatusBarColor(Gladdy.db.npCastbarsBarColor.r, Gladdy.db.npCastbarsBarColor.g, Gladdy.db.npCastbarsBarColor.b, Gladdy.db.npCastbarsBarColor.a)
 
-    _G[AddOn .. "_Texture_" .. unit .. "CastBar_CastBar"] = CastBar:CreateTexture(nil, "ARTWORK");
-    local Texture = _G[AddOn .. "_Texture_" .. unit .. "CastBar_CastBar"]
-    Texture:SetHeight(11);
-    Texture:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.npCastBarTexture));
-    Texture:SetPoint("CENTER", AddOn .. "_Frame_" .. unit .. "CastBar", "CENTER");
+    CastBar:SetWidth(Gladdy.db.npCastbarsWidth)
+    CastBar:SetHeight(Gladdy.db.npCastbarsHeight)
 
-    _G[AddOn .. "_Texture_" .. unit .. "CastBar_Icon"] = CastBar:CreateTexture(nil, "ARTWORK");
-    local Icon = _G[AddOn .. "_Texture_" .. unit .. "CastBar_Icon"]
-    Icon:SetHeight(13);
-    Icon:SetWidth(13);
-    Icon:SetPoint("CENTER", AddOn .. "_Frame_" .. unit .. "CastBar", "CENTER",
-            _G[AddOn .. "_SavedVariables"]["Icon"]["PointX"],
-            _G[AddOn .. "_SavedVariables"]["Icon"]["PointY"]);
-    if (_G[AddOn .. "_SavedVariables"]["Enable"]["Icon"]) then
-        Icon:Show()
+    CastBar.border:SetBackdrop({ edgeFile = Gladdy.db.npCastbarsBorderStyle,
+                                 edgeSize = Gladdy.db.npCastbarsBorderSize })
+    CastBar.border:SetBackdropBorderColor(Gladdy.db.npCastbarsBorderColor.r, Gladdy.db.npCastbarsBorderColor.g, Gladdy.db.npCastbarsBorderColor.b, Gladdy.db.npCastbarsBorderColor.a)
+    CastBar.border:ClearAllPoints()
+    CastBar.border:SetPoint("TOPLEFT", CastBar, "TOPLEFT")
+    CastBar.border:SetPoint("BOTTOMRIGHT", CastBar, "BOTTOMRIGHT")
+
+    CastBar.background:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.npCastbarsTexture))
+    CastBar.background:SetVertexColor(Gladdy.db.npCastbarsBgColor.r, Gladdy.db.npCastbarsBgColor.g, Gladdy.db.npCastbarsBgColor.b, Gladdy.db.npCastbarsBgColor.a)
+
+    --font
+    CastBar.spellName:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npCastbarsFont), Gladdy.db.npCastbarsFontSize, "OUTLINE")
+    CastBar.spellName:SetTextColor(Gladdy.db.npCastbarsFontColor.r, Gladdy.db.npCastbarsFontColor.g, Gladdy.db.npCastbarsFontColor.b, Gladdy.db.npCastbarsFontColor.a)
+
+    CastBar.spellTime:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npCastbarsFont), Gladdy.db.npCastbarsFontSize, "OUTLINE")
+    CastBar.spellTime:SetTextColor(Gladdy.db.npCastbarsFontColor.r, Gladdy.db.npCastbarsFontColor.g, Gladdy.db.npCastbarsFontColor.b, Gladdy.db.npCastbarsFontColor.a)
+
+    --icon
+    CastBar.icon:SetHeight(Gladdy.db.npCastbarsIconSize)
+    CastBar.icon:SetWidth(Gladdy.db.npCastbarsIconSize)
+    CastBar.icon:ClearAllPoints()
+    if Gladdy.db.npCastbarsIconPos == "LEFT" then
+        CastBar.icon:SetPoint("RIGHT", CastBar, Gladdy.db.npCastbarsIconPos)
     else
-        Icon:Hide()
+        CastBar.icon:SetPoint("LEFT", CastBar, Gladdy.db.npCastbarsIconPos)
+    end
+    CastBar.icon.border:SetTexture(Gladdy.db.npCastbarsIconStyle)
+    CastBar.icon.border:SetVertexColor(Gladdy.db.npCastbarsIconColor.r, Gladdy.db.npCastbarsIconColor.g, Gladdy.db.npCastbarsIconColor.b, Gladdy.db.npCastbarsIconColor.a)
+    if (Gladdy.db.npCastbarsEnableIcon) then
+        CastBar.icon:Show()
+        CastBar.icon.border:Show()
+    else
+        CastBar.icon:Hide()
+        CastBar.icon.border:Hide()
     end
 
-    _G[AddOn .. "_Texture_" .. unit .. "CastBar_IconBorder"] = CastBar:CreateTexture(nil, "BACKGROUND");
-    local IconBorder = _G[AddOn .. "_Texture_" .. unit .. "CastBar_IconBorder"]
-    IconBorder:SetHeight(16);
-    IconBorder:SetWidth(16);
-    IconBorder:SetPoint("CENTER", Icon, "CENTER");
-    if (_G[AddOn .. "_SavedVariables"]["Enable"]["Icon"]) then
-        IconBorder:Show()
-    else
-        IconBorder:Hide()
-    end
-
-    _G[AddOn .. "_FontString_" .. unit .. "CastBar_SpellName"] = CastBar:CreateFontString(nil)
-    local SpellName = _G[AddOn .. "_FontString_" .. unit .. "CastBar_SpellName"]
-    SpellName:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npCastbarsFont), 9, "OUTLINE")
-    SpellName:SetPoint(_G[AddOn .. "_SavedVariables"]["Spell"]["Anchor"],
-            AddOn .. "_Frame_" .. unit .. "CastBar", "CENTER",
-            _G[AddOn .. "_SavedVariables"]["Spell"]["PointX"],
-            _G[AddOn .. "_SavedVariables"]["Spell"]["PointY"]);
-    if (_G[AddOn .. "_SavedVariables"]["Enable"]["Spell"]) then
-        SpellName:Show()
-    else
-        SpellName:Hide()
-    end
-
-    _G[AddOn .. "_FontString_" .. unit .. "CastBar_CastTime"] = CastBar:CreateFontString(nil)
-    local CastTime = _G[AddOn .. "_FontString_" .. unit .. "CastBar_CastTime"]
-    CastTime:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npCastbarsFont), 9, "OUTLINE")
-    CastTime:SetPoint(_G[AddOn .. "_SavedVariables"]["Timer"]["Anchor"],
-            AddOn .. "_Frame_" .. unit .. "CastBar", "CENTER",
-            _G[AddOn .. "_SavedVariables"]["Timer"]["PointX"],
-            _G[AddOn .. "_SavedVariables"]["Timer"]["PointY"]);
-    if (_G[AddOn .. "_SavedVariables"]["Enable"]["Timer"]) then
-        CastTime:Show()
-    else
-        CastTime:Hide()
-    end
-
-    _G[AddOn .. "_Texture_" .. unit .. "CastBar_Border"] = CastBar:CreateTexture(nil, "BACKGROUND");
-    local Border = _G[AddOn .. "_Texture_" .. unit .. "CastBar_Border"]
-    Border:SetPoint("CENTER", AddOn .. "_Frame_" .. unit .. "CastBar", "CENTER");
-    Border:SetWidth(_G[AddOn .. "_SavedVariables"]["CastBar"]["Width"] + 5);
-    Border:SetHeight(16);
-
-    local Background = CastBar:CreateTexture(nil, "BORDER");
-    Background:SetTexture(1 / 10, 1 / 10, 1 / 10, 1);
-    Background:SetAllPoints(AddOn .. "_Frame_" .. unit .. "CastBar");
 end
 
-local function CastBars_Create()
+function PlateCastBar:CastBars_Create()
     for k, v in pairs(unitsToCheck) do
-        UnitCastBar_Create(k)
+        PlateCastBar:UnitCastBar_Create(k)
     end
 end
 
-function Gladdy:PlateCastBarUpdate()
+function PlateCastBar:UpdateFrame(unit)
     for k, v in pairs(unitsToCheck) do
-        UnitCastBar_Update(k)
+        UpdateFrame(k)
     end
 end
 
-local function keepCastbar(unit, elapsed)
-
-    local Texture = _G[AddOn .. "_Texture_" .. unit .. "CastBar_CastBar"]
-    local CastTime = _G[AddOn .. "_FontString_" .. unit .. "CastBar_CastTime"]
-    local CastBar = _G[AddOn .. "_Frame_" .. unit .. "CastBar"]
-    local Border = _G[AddOn .. "_Texture_" .. unit .. "CastBar_Border"]
-    local IconBorder = _G[AddOn .. "_Texture_" .. unit .. "CastBar_IconBorder"]
-    local SpellName = _G[AddOn .. "_FontString_" .. unit .. "CastBar_SpellName"]
-    local CastTime = _G[AddOn .. "_FontString_" .. unit .. "CastBar_CastTime"]
-    local Icon = _G[AddOn .. "_Texture_" .. unit .. "CastBar_Icon"]
-    local Width = _G[AddOn .. "_SavedVariables"]["CastBar"]["Width"]
+local function keepCastbar(unit)
+    local CastBar = PlateCastBar.unitCastBars["castbar"..unit]
 
     if (Gladdy.db.npCastbarGuess == false) then
+        CastBar.castTime = nil
         CastBar:SetAlpha(0)
         CastBar:Hide()
+        return
     end
 
-    if Texture.castTime and Texture.castTime < Texture.maxCastTime then
-        local total = string.format("%.2f", Texture.maxCastTime)
-        local left = string.format("%.1f", total - Texture.castTime / Texture.maxCastTime * total)
-        Texture:SetWidth(Width * (Texture.castTime / Texture.maxCastTime))
-        local point, relativeTo, relativePoint, xOfs, yOfs = Texture:GetPoint()
-        Texture:SetPoint(point, relativeTo, relativePoint, -Width / 2 + Width / 2 * Texture.castTime / Texture.maxCastTime, yOfs)
-        Texture:SetVertexColor(1, 0.5, 0)
-        if (_G[AddOn .. "_SavedVariables"]["Timer"]["Format"] == "LEFT") then
-            CastTime:SetText(left)
-        elseif (_G[AddOn .. "_SavedVariables"]["Timer"]["Format"] == "TOTAL") then
-            CastTime:SetText(total)
-        elseif (_G[AddOn .. "_SavedVariables"]["Timer"]["Format"] == "BOTH") then
-            CastTime:SetText(left .. " /" .. total)
+    if CastBar.isChannelling then
+        CastBar.castTime = CastBar.endTime - GetTime()
+    else
+        CastBar.castTime = GetTime() - CastBar.startTime
+    end
+    CastBar:SetValue(CastBar.castTime)
+
+    if CastBar.castTime and CastBar.castTime < CastBar.maxCastTime then
+
+        local total = string.format("%.2f", CastBar.maxCastTime)
+        local left = string.format("%.1f", total - CastBar.castTime / CastBar.maxCastTime * total)
+
+        if (Gladdy.db.npCastbarsTimerFormat == "LEFT") then
+            CastBar.spellTime:SetText(left)
+        elseif (Gladdy.db.npCastbarsTimerFormat == "TOTAL") then
+            CastBar.spellTime:SetText(total)
+        elseif (Gladdy.db.npCastbarsTimerFormat == "BOTH") then
+            CastBar.spellTime:SetText(left .. " /" .. total)
         end
         -- in case nameplate with matching name isn't found, hide castbar
         local found = false
-        for plate, _ in pairs(Table["Nameplates"]) do
-            local hpborder, cbborder, cbicon, overlay, oldname, level, bossicon, raidicon = plate:GetRegions()
-            if (plate:IsVisible() and oldname:GetText() == CastBar.name) then
+        for plate, _ in pairs(knownNameplates) do
+            local oldname, parent = getName(plate)
+            if (plate:IsVisible() and oldname and oldname == CastBar.name) then
                 found = true
-                CastBar:SetPoint("TOP", hpborder, "BOTTOM", 6, -4.5)
+                CastBar:SetPoint("TOP", parent, "BOTTOM", Gladdy.db.npCastbarsPointX, Gladdy.db.npCastbarsPointY)
             end
         end
         if not found then
-            --			log("hiding castbar because no nameplate was found")
             CastBar:SetAlpha(0)
             CastBar:Hide()
         end
-        Texture.castTime = Texture.castTime + elapsed
-
-    elseif Texture.castTime and Texture.castTime > Texture.maxCastTime then
-        --		log("hiding castbar because cast finished")
+    elseif CastBar.castTime and CastBar.castTime > CastBar.maxCastTime then
+        CastBar.castTime = nil
         CastBar:SetAlpha(0)
         CastBar:Hide()
-        Texture.castTime = Texture.castTime + elapsed
     end
 end
 
-local function keepCastbars(elapsed)
-    for k, v in pairs(unitsToCheck) do
+local function keepCastbars()
+    for unit, v in pairs(unitsToCheck) do
         -- double check that fallback function is only used if no info is pulled for unit
-        if (not UnitCastingInfo(k)) then
-            keepCastbar(k, elapsed)
+
+        if PlateCastBar.unitCastBars["castbar"..unit].castTime
+                and (PlateCastBar.unitCastBars["castbar"..unit].isChannelling and not UnitChannelInfo(unit)
+                or not PlateCastBar.unitCastBars["castbar"..unit].isChannelling and not UnitCastingInfo(unit)) then
+            keepCastbar(unit)
         end
     end
 end
 
-local function getName(namePlate)
-    local name
-    local _, _, _, _, eman, _, _ = namePlate:GetRegions()
-    if namePlate.aloftData then
-        name = namePlate.aloftData.name
-    elseif sohighPlates then
-        --name = namePlate.name:GetText()
-        name = namePlate.oldname:GetText()
-    elseif ElvUI then
-        if namePlate.UnitFrame then
-            name = namePlate.UnitFrame.oldName:GetText()
-        end
-    elseif strmatch(eman:GetText(), "%d") then
-        local _, _, _, _, _, nameRegion = namePlate:GetRegions()
-        name = nameRegion:GetText()
-    else
-        name = eman:GetText()
-    end
-    return name
-end
-
-local function createCastbars(elapsed)
+local function createCastbars()
     -- decide whether castbar should be showing or not
 
-    for frame, _ in pairs(Table["Nameplates"]) do
-        if frame:IsVisible() and not sohighPlates then
-            local hpborder, cbborder, cbicon, overlay, oldname, level, bossicon, raidicon = frame:GetRegions()
-
-            for k, v in pairs(unitsToCheck) do
-                local unit = k
-                local name = getName(frame)
-                local Texture = _G[AddOn .. "_Texture_" .. unit .. "CastBar_CastBar"]
-                local CastTime = _G[AddOn .. "_FontString_" .. unit .. "CastBar_CastTime"]
-                local CastBar = _G[AddOn .. "_Frame_" .. unit .. "CastBar"]
-                local Border = _G[AddOn .. "_Texture_" .. unit .. "CastBar_Border"]
-                local IconBorder = _G[AddOn .. "_Texture_" .. unit .. "CastBar_IconBorder"]
-                local SpellName = _G[AddOn .. "_FontString_" .. unit .. "CastBar_SpellName"]
-                local CastTime = _G[AddOn .. "_FontString_" .. unit .. "CastBar_CastTime"]
-                local Icon = _G[AddOn .. "_Texture_" .. unit .. "CastBar_Icon"]
-                local Width = _G[AddOn .. "_SavedVariables"]["CastBar"]["Width"]
+    for frame, _ in pairs(knownNameplates) do
+        if frame:IsVisible() then
+            for unit, _ in pairs(unitsToCheck) do
+                local name,parent = getName(frame)
+                local CastBar = PlateCastBar.unitCastBars["castbar"..unit]
+                local Texture = CastBar.texture
+                local CastTime = CastBar.spellTime
+                local Border = CastBar.border
+                local IconBorder = CastBar.icon.border
+                local SpellName = CastBar.spellName
+                local Icon = CastBar.icon
+                local Width = Gladdy.db.npCastbarsWidth
 
                 -- cast detected, display castbar
-                if (name == UnitName(unit) and UnitCastingInfo(unit)) then
-                    local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitCastingInfo(unit);
+                if (name and name == UnitName(unit) and (UnitCastingInfo(unit) or UnitChannelInfo(unit))) then
+                    local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill
+                    if (UnitChannelInfo(unit)) then
+                        CastBar.isChannelling = true
+                        name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo(unit)
+                    else
+                        CastBar.isChannelling = false
+                        name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitCastingInfo(unit)
+                    end
+
                     if (string.len(name) > 12) then
                         name = (string.sub(name, 1, 12) .. ".. ")
                     end
 
                     SpellName:SetText(name)
                     Icon:SetTexture(texture)
-                    Border:SetTexture(0, 0, 0, 1)
-                    IconBorder:SetTexture(0, 0, 0, 1)
-                    Texture.castTime = (GetTime() - (startTime / 1000))
-                    Texture.maxCastTime = (endTime - startTime) / 1000
-                    Texture:SetWidth(Width * Texture.castTime / Texture.maxCastTime)
-                    local point, relativeTo, relativePoint, xOfs, yOfs = Texture:GetPoint()
-                    Texture:SetPoint(point, relativeTo, relativePoint, -Width / 2 + Width / 2 * Texture.castTime / Texture.maxCastTime, yOfs)
-                    Texture:SetVertexColor(1, 0.5, 0)
+
+                    if endTime / 1000 ~= CastBar.endTime then
+                        CastBar.startTime = startTime/1000
+                        CastBar.endTime = endTime/1000
+                        CastBar.maxCastTime = CastBar.endTime - CastBar.startTime
+                        if CastBar.isChannelling then
+                            CastBar.castTime = CastBar.endTime - GetTime()
+                        else
+                            CastBar.castTime = 0
+                        end
+                        CastBar:SetMinMaxValues(0, CastBar.maxCastTime)
+                    end
+                    if CastBar.isChannelling then
+                        CastBar.castTime = CastBar.endTime - GetTime()
+                    else
+                        CastBar.castTime = GetTime() - CastBar.startTime
+                    end
+                    CastBar:SetValue(CastBar.castTime)
 
                     CastBar.name = UnitName(unit)
                     CastBar:SetAlpha(1)
-                    CastBar:SetPoint("TOP", hpborder, "BOTTOM", 6, -4.5)
-                    CastBar:SetParent(frame)
+                    CastBar:SetPoint("TOP", parent, "BOTTOM", Gladdy.db.npCastbarsPointX, Gladdy.db.npCastbarsPointY)
                     CastBar:Show()
+                    CastBar.parent = frame
+                    CastBar:SetScript("OnUpdate", function(self)
+                        if not self.parent:IsVisible() then
+                            self:Hide()
+                        end
+                    end)
 
-                    local total = string.format("%.2f", Texture.maxCastTime)
-                    local left = string.format("%.1f", total - Texture.castTime / Texture.maxCastTime * total)
-                    if (_G[AddOn .. "_SavedVariables"]["Timer"]["Format"] == "LEFT") then
+                    local total = string.format("%.2f", CastBar.maxCastTime)
+                    local left = string.format("%.1f", total - CastBar.castTime / CastBar.maxCastTime * total)
+                    if (Gladdy.db.npCastbarsTimerFormat == "LEFT") then
                         CastTime:SetText(left)
-                    elseif (_G[AddOn .. "_SavedVariables"]["Timer"]["Format"] == "TOTAL") then
+                    elseif (Gladdy.db.npCastbarsTimerFormat == "TOTAL") then
                         CastTime:SetText(total)
-                    elseif (_G[AddOn .. "_SavedVariables"]["Timer"]["Format"] == "BOTH") then
+                    elseif (Gladdy.db.npCastbarsTimerFormat == "BOTH") then
                         CastTime:SetText(left .. " /" .. total)
                     end
                     -- hide castbar if unit stops casting
-                elseif (name == UnitName(unit) and not UnitCastingInfo(unit)) then
+                elseif (name == UnitName(unit) and (not UnitCastingInfo(unit) or not UnitChannelInfo(unit))) then
                     --				log("hiding castbar because unit stopped")
                     CastBar:SetAlpha(0)
                     CastBar:Hide()
@@ -377,41 +386,256 @@ local function createCastbars(elapsed)
         end
     end
     --fallback function in case no casting information was found but we still want to display progress on the bar
-    keepCastbars(elapsed)
+    keepCastbars()
 end
 
-local numChildren = -1
-local function HookFrames(...)
+function PlateCastBar:HookFrames(...)
     for index = 1, select('#', ...) do
         local frame = select(index, ...)
-        local region = frame:GetRegions()
-        if (not frame:GetName() and region and region:GetObjectType() == "Texture" and region:GetTexture() == "Interface\\Tooltips\\Nameplate-Border") then
-            Table["Nameplates"][frame] = true
+        if (frame:GetNumRegions() > 2 and frame:GetNumChildren() >= 1) then
+            knownNameplates[frame] = true
         end
     end
 end
 
-local function Update(self, elapsed)
-    if (WorldFrame:GetNumChildren() ~= numChildren) then
+function PlateCastBar:Update()
+    if (WorldFrame:GetNumChildren() ~= self.numChildren) then
         if Gladdy.db.npCastbars then
-            numChildren = WorldFrame:GetNumChildren()
-            HookFrames(WorldFrame:GetChildren())
+            self.numChildren = WorldFrame:GetNumChildren()
+            self:HookFrames(WorldFrame:GetChildren())
         end
     end
-    if sohighPlates then
-        return
-    end
-    createCastbars(elapsed)
+    createCastbars()
 end
 
-Frame:SetScript("OnEvent", function(self, event, unitID, spell, ...)
-    local timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = ...
-    if (event == "PLAYER_ENTERING_WORLD") then
-        if (not _G[AddOn .. "_PlayerEnteredWorld"]) then
-            Frame_RegisterEvents()
-            CastBars_Create()
-            _G[AddOn .. "_PlayerEnteredWorld"] = true
-            Frame:SetScript("OnUpdate", Update)
-        end
+---------------------------------------------------
+
+-- PlateCastBar options
+
+---------------------------------------------------
+
+local function option(params)
+    local defaults = {
+        get = function(info)
+            local key = info.arg or info[#info]
+            return Gladdy.dbi.profile[key]
+        end,
+        set = function(info, value)
+            local key = info.arg or info[#info]
+            Gladdy.dbi.profile[key] = value
+            Gladdy.options.args.PlateCastBar.args.npCastbarsBorderSize.max = Gladdy.db.npCastbarsHeight/2
+            if Gladdy.db.npCastbarsBorderSize > Gladdy.db.npCastbarsHeight/2 then
+                Gladdy.db.npCastbarsBorderSize = Gladdy.db.npCastbarsHeight/2
+            end
+            PlateCastBar:UpdateFrame()
+        end,
+    }
+
+    for k, v in pairs(params) do
+        defaults[k] = v
     end
-end)
+
+    return defaults
+end
+
+local function colorOption(params)
+    local defaults = {
+        get = function(info)
+            local key = info.arg or info[#info]
+            return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
+        end,
+        set = function(info, r, g, b, a)
+            local key = info.arg or info[#info]
+            Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
+            PlateCastBar:UpdateFrame()
+        end,
+    }
+
+    for k, v in pairs(params) do
+        defaults[k] = v
+    end
+
+    return defaults
+end
+
+function PlateCastBar:GetOptions()
+    --[[
+
+    npCastbarsTimerFormat = "LEFT",
+    npCastbarsEnableTest = false,
+    npCastbarsEnablePlayerPet = true,
+    npCastbarsEnableIcon = true,
+    npCastbarsEnableTimer = true,
+    npCastbarsEnableSpell = true,
+    --]]
+
+    return {
+        headerCastbar = {
+            type = "header",
+            name = L["Castbar"],
+            order = 2,
+        },
+        npCastbars = option({
+            type = "toggle",
+            name = L["Castbars on/off"],
+            desc = L["Turns castbars of nameplates on or off. (Requires reload)"],
+            order = 3,
+        }),
+        npCastbarGuess = option({
+            type = "toggle",
+            name = L["Castbar guesses on/off"],
+            desc = L["If disabled, castbars will stop as soon as you lose your 'unit', e.g. mouseover or your party targeting someone else."
+                    .. "\nDisable this, if you see castbars, even though the player isn't casting."],
+            order = 4,
+        }),
+        npCastbarsTexture = option({
+            type = "select",
+            name = L["Bar texture"],
+            desc = L["Texture of the bar"],
+            order = 5,
+            dialogControl = "LSM30_Statusbar",
+            values = AceGUIWidgetLSMlists.statusbar, --Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture)
+        }),
+        npCastbarsWidth = option({
+            type = "range",
+            name = L["Bar width"],
+            desc = L["Height of the bar"],
+            order = 6,
+            min = 1,
+            max = 300,
+            step = 1,
+        }),
+        npCastbarsHeight = option({
+            type = "range",
+            name = L["Bar height"],
+            desc = L["Height of the bar"],
+            order = 7,
+            min = 1,
+            max = 50,
+            step = 1,
+        }),
+        npCastbarsPointX = option({
+            type = "range",
+            name = L["Horizontal offset"],
+            desc = L["Height of the bar"],
+            order = 8,
+            min = -100,
+            max = 100,
+            step = 1,
+        }),
+        npCastbarsPointY = option({
+            type = "range",
+            name = L["Vertical offset"],
+            desc = L["Height of the bar"],
+            order = 9,
+            min = -100,
+            max = 100,
+            step = 1,
+        }),
+        npCastbarsBarColor = colorOption({
+            type = "color",
+            name = L["Bar color"],
+            desc = L["Color of the cast bar"],
+            order = 8,
+            hasAlpha = true,
+        }),
+        npCastbarsBgColor = colorOption({
+            type = "color",
+            name = L["Background color"],
+            desc = L["Color of the cast bar background"],
+            order = 9,
+            hasAlpha = false,
+        }),
+        --Icon
+        headerIcon = {
+            type = "header",
+            name = L["Icon"],
+            order = 20,
+        },
+        npCastbarsIconSize = option({
+            type = "range",
+            name = L["Icon size"],
+            desc = L["Height of the bar"],
+            order = 21,
+            min = 1,
+            max = 50,
+            step = 1,
+        }),
+        npCastbarsIconPos = option({
+            type = "select",
+            name = L["Position"],
+            order = 22,
+            values = {
+                ["LEFT"] = L["Left"],
+                ["RIGHT"] = L["Right"],
+            },
+        }),
+        --Font
+        headerFont = {
+            type = "header",
+            name = L["Font"],
+            order = 30,
+        },
+        npCastbarsFont = option({
+            type = "select",
+            name = L["Bar font"],
+            desc = L["Font of the status text"],
+            order = 31,
+            dialogControl = "LSM30_Font",
+            values = AceGUIWidgetLSMlists.font,
+        }),
+        npCastbarsFontColor = colorOption({
+            type = "color",
+            name = L["Font color"],
+            order = 32,
+            hasAlpha = true,
+        }),
+
+        npCastbarsFontSize = option({
+            type = "range",
+            name = L["Font size"],
+            desc = L["Size of the text"],
+            order = 32,
+            min = 1,
+            max = 20,
+        }),
+        --borders
+        headerBorder = {
+            type = "header",
+            name = L["Borders"],
+            order = 40,
+        },
+        npCastbarsBorderStyle = option({
+            type = "select",
+            name = L["Status Bar border"],
+            order = 41,
+            values = Gladdy:GetBorderStyles()
+        }),
+        npCastbarsBorderSize = option({
+            type = "range",
+            name = L["Border size"],
+            order = 42,
+            min = 0,
+            max = Gladdy.db.npCastbarsHeight/2,
+            step = 1,
+        }),
+        npCastbarsBorderColor = colorOption({
+            type = "color",
+            name = L["Status Bar border color"],
+            order = 43,
+            hasAlpha = true,
+        }),
+        npCastbarsIconStyle = option({
+            type = "select",
+            name = L["Icon border"],
+            order = 44,
+            values = Gladdy:GetIconStyles(),
+        }),
+        npCastbarsIconColor = colorOption({
+            type = "color",
+            name = L["Icon border color"],
+            order = 45,
+            hasAlpha = true,
+        }),
+    }
+end

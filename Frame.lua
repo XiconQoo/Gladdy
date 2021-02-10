@@ -272,13 +272,11 @@ function Gladdy:UpdateFrame()
         else
             button.spellCooldownFrame:Hide()
         end
-
         for k, v in self:IterModules() do
             self:Call(v, "UpdateFrame", button.unit)
         end
         Gladdy:UpdateTestCooldowns(i)
     end
-    Gladdy:PlateCastBarUpdate()
 end
 
 function Gladdy:HideFrame()
