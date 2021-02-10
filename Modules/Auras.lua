@@ -224,16 +224,27 @@ end
 
 function Auras:GetOptions()
     return {
+        headerAuras = {
+            type = "header",
+            name = L["Auras"],
+            order = 2,
+        },
         auraDisableCircle = Gladdy:option({
             type = "toggle",
             name = L["No Cooldown Circle"],
-            order = 2,
+            order = 3,
+            width = "full"
         }),
+        headerFont = {
+            type = "header",
+            name = L["Font"],
+            order = 4,
+        },
         auraFont = Gladdy:option({
             type = "select",
             name = L["Font"],
             desc = L["Font of the cooldown"],
-            order = 3,
+            order = 5,
             dialogControl = "LSM30_Font",
             values = AceGUIWidgetLSMlists.font,
         }),
@@ -241,7 +252,7 @@ function Auras:GetOptions()
             type = "range",
             name = L["Font size"],
             desc = L["Size of the text"],
-            order = 4,
+            order = 6,
             min = 1,
             max = 20,
         }),
@@ -249,28 +260,35 @@ function Auras:GetOptions()
             type = "color",
             name = L["Font color"],
             desc = L["Color of the text"],
-            order = 5,
+            order = 7,
             hasAlpha = true,
         }),
+        headerBorder = {
+            type = "header",
+            name = L["Border"],
+            order = 8,
+        },
         auraBorderStyle = Gladdy:option({
             type = "select",
             name = L["Border style"],
-            order = 6,
-            values = Gladdy:GetIconStyles()
+            order = 9,
+            values = Gladdy:GetIconStyles(),
         }),
         auraBuffBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Buff color"],
             desc = L["Color of the text"],
-            order = 7,
+            order = 10,
             hasAlpha = true,
+            width = "0.8",
         }),
         auraDebuffBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Debuff color"],
             desc = L["Color of the text"],
-            order = 8,
+            order = 11,
             hasAlpha = true,
+            width = "0.8",
         }),
     }
 end

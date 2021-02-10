@@ -266,6 +266,11 @@ end
 
 function Castbar:GetOptions()
     return {
+        headerCastbar = {
+            type = "header",
+            name = L["Cast Bar"],
+            order = 2,
+        },
         castBarHeight = option({
             type = "range",
             name = L["Bar height"],
@@ -284,51 +289,18 @@ function Castbar:GetOptions()
             max = 300,
             step = 1,
         }),
-        castBarIconSize = option({
-            type = "range",
-            name = L["Icon size"],
-            order = 5,
-            min = 0,
-            max = 100,
-            step = 1,
-        }),
         castBarBorderSize = option({
             type = "range",
             name = L["Border size"],
-            order = 6,
+            order = 5,
             min = 0,
             max = Gladdy.db.castBarHeight/2,
             step = 1,
         }),
-        castBarFont = option({
-            type = "select",
-            name = L["Font"],
-            desc = L["Font of the castbar"],
-            order = 7,
-            dialogControl = "LSM30_Font",
-            values = AceGUIWidgetLSMlists.font,
-        }),
-        castBarFontSize = option({
-            type = "range",
-            name = L["Font size"],
-            desc = L["Size of the text"],
-            order = 8,
-            min = 1,
-            max = 20,
-        }),
         castBarPos = option({
             type = "select",
             name = L["Position"],
-            order = 9,
-            values = {
-                ["LEFT"] = L["Left"],
-                ["RIGHT"] = L["Right"],
-            },
-        }),
-        castBarIconPos = option( {
-            type = "select",
-            name = L["Icon position"],
-            order = 10,
+            order = 6,
             values = {
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],
@@ -338,53 +310,104 @@ function Castbar:GetOptions()
             type = "select",
             name = L["Bar texture"],
             desc = L["Texture of the bar"],
-            order = 11,
+            order = 7,
             dialogControl = "LSM30_Statusbar",
             values = AceGUIWidgetLSMlists.statusbar,
-        }),
-        castBarIconStyle = option({
-            type = "select",
-            name = L["Icon style"],
-            order = 12,
-            values = Gladdy:GetIconStyles(),
-        }),
-        castBarBorderStyle = option({
-            type = "select",
-            name = L["Border style"],
-            order = 13,
-            values = Gladdy:GetBorderStyles()
         }),
         castBarColor = Gladdy:colorOption({
             type = "color",
             name = L["Bar color"],
             desc = L["Color of the cast bar"],
-            order = 14,
+            order = 8,
             hasAlpha = true,
         }),
         castBarBgColor = Gladdy:colorOption({
             type = "color",
             name = L["Background color"],
             desc = L["Color of the cast bar background"],
-            order = 15,
+            order = 9,
             hasAlpha = true,
         }),
-        castBarIconColor = Gladdy:colorOption({
-            type = "color",
-            name = L["Icon border color"],
-            order = 16,
-            hasAlpha = true,
+        --Icon
+        headerIcon = {
+            type = "header",
+            name = L["Icon"],
+            order = 20,
+        },
+        castBarIconSize = option({
+            type = "range",
+            name = L["Icon size"],
+            order = 21,
+            min = 0,
+            max = 100,
+            step = 1,
         }),
-        castBarBorderColor = Gladdy:colorOption({
-            type = "color",
-            name = L["Status Bar border color"],
-            order = 17,
-            hasAlpha = true,
+        castBarIconPos = option( {
+            type = "select",
+            name = L["Position"],
+            order = 22,
+            values = {
+                ["LEFT"] = L["Left"],
+                ["RIGHT"] = L["Right"],
+            },
+        }),
+        --Font
+        headerFont = {
+            type = "header",
+            name = L["Font"],
+            order = 30,
+        },
+        castBarFont = option({
+            type = "select",
+            name = L["Font"],
+            desc = L["Font of the castbar"],
+            order = 31,
+            dialogControl = "LSM30_Font",
+            values = AceGUIWidgetLSMlists.font,
+        }),
+        castBarFontSize = option({
+            type = "range",
+            name = L["Font size"],
+            desc = L["Size of the text"],
+            order = 32,
+            min = 1,
+            max = 20,
         }),
         castBarFontColor = Gladdy:colorOption({
             type = "color",
             name = L["Font color"],
             desc = L["Color of the text"],
-            order = 18,
+            order = 33,
+            hasAlpha = true,
+        }),
+        --Borders
+        headerBorder = {
+            type = "header",
+            name = L["Borders"],
+            order = 40,
+        },
+        castBarBorderStyle = option({
+            type = "select",
+            name = L["Status Bar border"],
+            order = 41,
+            values = Gladdy:GetBorderStyles()
+        }),
+        castBarBorderColor = Gladdy:colorOption({
+            type = "color",
+            name = L["Status Bar border color"],
+            order = 42,
+            hasAlpha = true,
+        }),
+        castBarIconStyle = option({
+            type = "select",
+            name = L["Icon border"],
+            order = 43,
+            values = Gladdy:GetIconStyles(),
+        }),
+        castBarIconColor = Gladdy:colorOption({
+            type = "color",
+            name = L["Icon border color"],
+            order = 44,
             hasAlpha = true,
         }),
     }

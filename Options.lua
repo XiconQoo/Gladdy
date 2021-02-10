@@ -41,7 +41,8 @@ SlashCmdList["GLADDY"] = function(msg)
         Gladdy:UpdateTestCooldowns(2)
         Gladdy:UpdateTestCooldowns(3)
     elseif (msg == "ui" or msg == "options" or msg == "config") then
-        Gladdy:ShowOptions()
+        LibStub("AceConfigDialog-3.0"):Open("Gladdy")
+        --Gladdy:ShowOptions()
     elseif (msg == "reset") then
         Gladdy.dbi:ResetProfile()
     elseif (msg == "hide") then
@@ -191,15 +192,15 @@ function Gladdy:SetupOptions()
                         desc = L["Toggle if frame can be moved"],
                         order = 1,
                     },
-                    headerFrame = {
-                        type = "header",
-                        name = L["Frame General"],
-                        order = 2,
-                    },
                     growUp = {
                         type = "toggle",
                         name = L["Grow frame upwards"],
                         desc = L["If enabled the frame will grow upwards instead of downwards"],
+                        order = 2,
+                    },
+                    headerFrame = {
+                        type = "header",
+                        name = L["Frame General"],
                         order = 3,
                     },
                     frameScale = {
@@ -265,6 +266,7 @@ function Gladdy:SetupOptions()
                             Gladdy.db.drDisableCircle = value
                             Gladdy:UpdateFrame()
                         end,
+                        width= "full",
                     },
                     headerFont = {
                         type = "header",
@@ -412,6 +414,7 @@ function Gladdy:SetupOptions()
                             Gladdy.db.npCastBarTexture = value
                             Gladdy:UpdateFrame()
                         end,
+                        width= "full",
                     },
                     statusbarBorderStyle = {
                         type = "select",

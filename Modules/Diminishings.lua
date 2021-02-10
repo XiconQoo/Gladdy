@@ -316,22 +316,41 @@ end
 
 function Diminishings:GetOptions()
     return {
+        headerDiminishings = {
+            type = "header",
+            name = L["Diminishings"],
+            order = 2,
+        },
         drEnabled = Gladdy:option({
             type = "toggle",
             name = L["Enable"],
             desc = L["Enabled DR module"],
-            order = 2,
+            order = 3,
         }),
         drDisableCircle = Gladdy:option({
             type = "toggle",
             name = L["No Cooldown Circle"],
-            order = 3,
+            order = 4,
         }),
+        drIconSize = Gladdy:option({
+            type = "range",
+            name = L["Icon Size"],
+            desc = L["Size of the DR Icons"],
+            order = 5,
+            min = 5,
+            max = 50,
+            step = 1,
+        }),
+        headerFont = {
+            type = "header",
+            name = L["Font"],
+            order = 10,
+        },
         drFont = Gladdy:option({
             type = "select",
             name = L["Font"],
             desc = L["Font of the cooldown"],
-            order = 4,
+            order = 11,
             dialogControl = "LSM30_Font",
             values = AceGUIWidgetLSMlists.font,
         }),
@@ -339,47 +358,48 @@ function Diminishings:GetOptions()
             type = "color",
             name = L["Font color"],
             desc = L["Color of the text"],
-            order = 5,
+            order = 12,
             hasAlpha = true,
         }),
         drFontSize = Gladdy:option({
             type = "range",
             name = L["Font size"],
             desc = L["Size of the text"],
-            order = 6,
+            order = 13,
             min = 1,
             max = 20,
         }),
+        headerFont = {
+            type = "header",
+            name = L["Position"],
+            order = 20,
+        },
         drCooldownPos = Gladdy:option({
             type = "select",
             name = L["DR Cooldown position"],
             desc = L["Position of the cooldown icons"],
-            order = 7,
+            order = 21,
             values = {
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],
             },
         }),
-        drIconSize = Gladdy:option({
-            type = "range",
-            name = L["Icon Size"],
-            desc = L["Size of the DR Icons"],
-            order = 8,
-            min = 5,
-            max = 50,
-            step = 1,
-        }),
+        headerBorder = {
+            type = "header",
+            name = L["Border"],
+            order = 30,
+        },
         drBorderStyle = Gladdy:option({
             type = "select",
             name = L["Border style"],
-            order = 9,
+            order = 31,
             values = Gladdy:GetIconStyles()
         }),
         drBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Border color"],
             desc = L["Color of the border"],
-            order = 10,
+            order = 32,
             hasAlpha = true,
         }),
     }

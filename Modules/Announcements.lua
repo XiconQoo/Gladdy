@@ -205,41 +205,58 @@ function Announcements:GetOptions()
     }
 
     return {
+        headerAnnouncements = {
+            type = "header",
+            name = L["Announcements"],
+            order = 2,
+        },
+        trinketUsed = option({
+            type = "toggle",
+            name = L["Trinket used"],
+            desc = L["Announce when an enemy's trinket is used"],
+            order = 3,
+        }),
+        trinketReady = option({
+            type = "toggle",
+            name = L["Trinket ready"],
+            desc = L["Announce when an enemy's trinket is ready again"],
+            order = 4,
+        }),
         drinks = option({
             type = "toggle",
             name = L["Drinking"],
             desc = L["Announces when enemies sit down to drink"],
-            order = 2,
+            order = 5,
         }),
         resurrections = option({
             type = "toggle",
             name = L["Resurrection"],
             desc = L["Announces when an enemy tries to resurrect a teammate"],
-            order = 3,
+            order = 6,
         }),
         enemy = option({
             type = "toggle",
             name = L["New enemies"],
             desc = L["Announces when new enemies are discovered"],
-            order = 4,
+            order = 7,
         }),
         spec = option({
             type = "toggle",
             name = L["Spec Detection"],
             desc = L["Announces when the spec of an enemy was detected"],
-            order = 5,
+            order = 8,
         }),
         health = option({
             type = "toggle",
             name = L["Low health"],
             desc = L["Announces when an enemy drops below a certain health threshold"],
-            order = 6,
+            order = 9,
         }),
         healthThreshold = option({
             type = "range",
             name = L["Low health threshold"],
             desc = L["Choose how low an enemy must be before low health is announced"],
-            order = 7,
+            order = 10,
             min = 1,
             max = 100,
             step = 1,
@@ -247,23 +264,11 @@ function Announcements:GetOptions()
                 return not Gladdy.dbi.profile.announcements.health
             end,
         }),
-        trinketUsed = option({
-            type = "toggle",
-            name = L["Trinket used"],
-            desc = L["Announce when an enemy's trinket is used"],
-            order = 8,
-        }),
-        trinketReady = option({
-            type = "toggle",
-            name = L["Trinket ready"],
-            desc = L["Announce when an enemy's trinket is ready again"],
-            order = 9,
-        }),
         dest = option({
             type = "select",
             name = L["Destination"],
             desc = L["Choose how your announcements are displayed"],
-            order = 10,
+            order = 11,
             values = destValues,
         }),
     }

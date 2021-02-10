@@ -142,11 +142,16 @@ end
 
 function Highlight:GetOptions()
     return {
+        headerHighlight = {
+            type = "header",
+            name = L["Highlight"],
+            order = 2,
+        },
         highlightBorderSize = {
             type = "range",
             name = L["Border size"],
             desc = L["Border size"],
-            order = 2,
+            order = 3,
             min = 1,
             max = 10,
             step = 1,
@@ -155,43 +160,48 @@ function Highlight:GetOptions()
             type = "color",
             name = L["Target border color"],
             desc = L["Color of the selected targets border"],
-            order = 3,
+            order = 4,
         }),
         focusBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Focus border color"],
             desc = L["Color of the focus border"],
-            order = 4,
+            order = 5,
         }),
         leaderBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Raid leader border color"],
             desc = L["Color of the raid leader border"],
-            order = 5,
+            order = 6,
         }),
+        headerEnable = {
+            type = "header",
+            name = L["Enable/Disable"],
+            order = 10,
+        },
         highlight = Gladdy:option({
             type = "toggle",
             name = L["Highlight target"],
             desc = L["Toggle if the selected target should be highlighted"],
-            order = 6,
+            order = 11,
         }),
         targetBorder = Gladdy:option({
             type = "toggle",
             name = L["Show border around target"],
             desc = L["Toggle if a border should be shown around the selected target"],
-            order = 7,
+            order = 12,
         }),
         focusBorder = Gladdy:option({
             type = "toggle",
             name = L["Show border around focus"],
             desc = L["Toggle of a border should be shown around the current focus"],
-            order = 9,
+            order = 13,
         }),
         leaderBorder = Gladdy:option({
             type = "toggle",
             name = L["Show border around raid leader"],
             desc = L["Toggle if a border should be shown around the raid leader"],
-            order = 9,
+            order = 14,
         }),
     }
 end

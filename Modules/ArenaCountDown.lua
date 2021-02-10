@@ -116,11 +116,17 @@ end
 
 function ACDFrame:GetOptions()
     return {
+        headerArenaCountdown = {
+            type = "header",
+            name = L["Arena Countdown"],
+            order = 2,
+        },
         countdown = Gladdy:option({
             type = "toggle",
             name = L["Turn on/off"],
             desc = L["Turns countdown before the start of an arena match on/off."],
-            order = 2,
+            order = 3,
+            width = "full",
         }),
     }
 end

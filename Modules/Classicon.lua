@@ -82,27 +82,37 @@ end
 
 function Classicon:GetOptions()
     return {
+        headerClassicon = {
+            type = "header",
+            name = L["Class Icon"],
+            order = 2,
+        },
         classIconPos = Gladdy:option({
             type = "select",
             name = L["Icon position"],
             desc = L["This changes positions with trinket"],
-            order = 2,
+            order = 3,
             values = {
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],
             },
         }),
+        headerBorder = {
+            type = "header",
+            name = L["Border"],
+            order = 4,
+        },
         classIconBorderStyle = Gladdy:option({
             type = "select",
             name = L["Border style"],
-            order = 3,
+            order = 5,
             values = Gladdy:GetIconStyles()
         }),
         classIconBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Border color"],
             desc = L["Color of the border"],
-            order = 4,
+            order = 6,
             hasAlpha = true,
         }),
     }

@@ -59,11 +59,17 @@ end
 
 function ArenaIdentify:GetOptions()
     return {
+        headerArenaIdentify = {
+            type = "header",
+            name = L["Arena Identify"],
+            order = 2,
+        },
         arenaIdentifyEnabled = Gladdy:option({
             type = "toggle",
             name = L["Turn option to automatically discover enemies on/off"],
             desc = L["Turn this off if you experience any issues with enemies showing in Gladdy that don't exist"],
-            order = 2,
+            order = 3,
+            width = "full",
         }),
     }
 end

@@ -20,6 +20,11 @@ end
 
 function Cooldown:GetOptions()
     return {
+        headerCooldown = {
+            type = "header",
+            name = L["Cooldown"],
+            order = 2,
+        },
         cooldown = Gladdy:option({
             type = "toggle",
             name = L["Enable"],
@@ -31,27 +36,37 @@ function Cooldown:GetOptions()
             name = L["No Cooldown Circle"],
             order = 3,
         }),
-        cooldownFont = Gladdy:option({
-            type = "select",
-            name = L["Font"],
-            desc = L["Font of the cooldown"],
-            order = 4,
-            dialogControl = "LSM30_Font",
-            values = AceGUIWidgetLSMlists.font,
-        }),
         cooldownSize = Gladdy:option({
             type = "range",
             name = L["Cooldown size"],
             desc = L["Size of each cd icon"],
-            order = 5,
+            order = 4,
             min = 5,
             max = (Gladdy.db.healthBarHeight + Gladdy.db.castBarHeight + Gladdy.db.powerBarHeight + Gladdy.db.bottomMargin) / 2,
         }),
+        headerFont = {
+            type = "header",
+            name = L["Font"],
+            order = 5,
+        },
+        cooldownFont = Gladdy:option({
+            type = "select",
+            name = L["Font"],
+            desc = L["Font of the cooldown"],
+            order = 6,
+            dialogControl = "LSM30_Font",
+            values = AceGUIWidgetLSMlists.font,
+        }),
+        headerPosition = {
+            type = "header",
+            name = L["Position"],
+            order = 7,
+        },
         cooldownYPos = Gladdy:option({
             type = "select",
             name = L["Position"],
             desc = L["Position of the cooldown icons"],
-            order = 6,
+            order = 8,
             values = {
                 ["TOP"] = L["Top"],
                 ["BOTTOM"] = L["Bottom"],
@@ -61,23 +76,28 @@ function Cooldown:GetOptions()
             type = "select",
             name = L["Position"],
             desc = L["Position of the cooldown icons"],
-            order = 7,
+            order = 9,
             values = {
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],
             },
         }),
+        headerBorder = {
+            type = "header",
+            name = L["Border"],
+            order = 10,
+        },
         cooldownBorderStyle = Gladdy:option({
             type = "select",
             name = L["Border style"],
-            order = 8,
+            order = 11,
             values = Gladdy:GetIconStyles()
         }),
         cooldownBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Border color"],
             desc = L["Color of the border"],
-            order = 9,
+            order = 12,
             hasAlpha = true,
         }),
     }

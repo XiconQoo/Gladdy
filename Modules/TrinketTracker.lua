@@ -285,10 +285,12 @@ local logEvents = {
     ["SPELL_CAST_SUCCESS"] = 1,
 }
 local RealmNames = {
-    ["EU Arena-tournament.com 2.4.3"] = 1,
-    ["Smolderforge"] = 1,
-    ["Tournament"] = 1,
-    ["Sunstrider"] = 1
+    ["EU Arena-tournament.com 2.4.3"] = "AT.com",
+    ["Smolderforge"] = "smolderforge.com",
+    ["Tournament"] = "endless.gg",
+    ["Sunstrider"] = "endless.gg",
+    ["Karazhan"] = "atlantis.org",
+    ["Netherwing"] = "atlantis.org"
 }
 local immunityIDs = {
     [1020] = 1, -- Divine Shield
@@ -393,23 +395,30 @@ end
 
 function TrinketTracker:GetOptions()
     return {
+        headerTrinketTracker = {
+            type = "header",
+            name = L["Trinket Tracker"],
+            order = 2,
+        },
         ttActive = Gladdy:option({
             type = "toggle",
             name = L["Enable TrinketTracker (required /reload)"],
             desc = L["Enable/disable TrinketTracker - server side messages will still work"],
-            order = 2,
+            order = 3,
+            width = "full",
         }),
         ttDebug = Gladdy:option({
             type = "toggle",
             name = L["Debug logs for what broke CC"],
             desc = L["Enable/disable chat logging showing what broke a specific CC."],
-            order = 3,
+            order = 4,
+            width = "full",
         }),
         timeOutBuffer = Gladdy:option({
             type = "range",
             name = L["Minimum CC duration for TrinketTracker to work"],
             desc = L["Below this duration left on the CC, it will assume that the player didn't trinket because duration guesses were incorrect."],
-            order = 4,
+            order = 5,
             min = 0.1,
             max = 1,
             step = 0.1,
@@ -418,11 +427,27 @@ function TrinketTracker:GetOptions()
             type = "range",
             name = L["Minimum damage done for fear/roots to break from"],
             desc = L["Set the minimum damage done to a player before the addon will assume that damage broke CC like fear or roots."],
-            order = 5,
+            order = 6,
             min = 100,
             max = 1500,
             step = 100,
         }),
+        headerDisabled = {
+            type = "header",
+            name = L["Disabled On Realms"],
+            order = 10,
+        },
+        disabled = {
+            type = "description",
+            name = function()
+                local str = ""
+                for k,v in pairs(RealmNames) do
+                    str = str .. k .. " - " .. v .. "\n"
+                end
+                return str
+            end,
+
+        }
     }
 end
 
