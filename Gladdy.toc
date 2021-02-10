@@ -23,7 +23,7 @@ Modules\Clicks.lua
 Modules\Diminishings.lua
 Modules\Healthbar.lua
 Modules\Highlight.lua
-Modules\Nameplates.lua
+Modules\TotemPlates.lua
 Modules\PlateCastbar.lua
 Modules\Powerbar.lua
 Modules\Trinket.lua
