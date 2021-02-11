@@ -10,7 +10,7 @@ local L = Gladdy.L
 
 ---------------------------------------------------
 
-local totemPattern = "(.+)%s[I,II,III,IV,V,VI,VII,VIII]"
+local totemReplaceRankPattern = "%s[I,V,X]+$"
 local BLIZZ = "BLIZZ"
 local ALOFT = "ALOFT"
 local SOHIGHPLATES = "SOHIGHPLATES"
@@ -278,6 +278,7 @@ local function nameplateSetAlpha(nameplate, alpha, addonName)
         if nameplate.health.percent then nameplate.health.percent:SetAlpha(alpha) end
         if nameplate.level then nameplate.level:SetAlpha(alpha) end
         if nameplate.name then nameplate.name:SetAlpha(alpha) end
+        if nameplate.oldname then nameplate.oldname:SetAlpha(alpha) end
         if (alpha == 1) then __sNpCore:ConfigSetValue(nameplate) end
     elseif (addonName == ELVUI) then
         if alpha == 1 then
@@ -297,7 +298,7 @@ local function nameplateSetAlpha(nameplate, alpha, addonName)
 end
 
 function TotemPlates:SkinTotem(nameplate, nameplateName, addonName)
-    local totemName = select(1, string.match(nameplateName, totemPattern)) or nameplateName
+    local totemName = string.gsub(nameplateName, totemReplaceRankPattern, "")
     local totemDataEntry = totemData[totemName]
     if (addonName == BLIZZ
             or addonName == ALOFT
