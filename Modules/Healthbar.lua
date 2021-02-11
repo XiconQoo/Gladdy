@@ -53,7 +53,7 @@ function Healthbar:CreateFrame(unit)
         healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.healthBarFont), 1)
         healthBar.nameText:Hide()
     else
-        healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.healthBarFont), Gladdy.db.healthBarFontSize) --Gladdy.LSM:Fetch("font", Gladdy.db.npCastbarsFont)
+        healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.healthBarFont), Gladdy.db.healthBarFontSize)
         healthBar.nameText:Show()
     end
     healthBar.nameText:SetTextColor(Gladdy.db.healthBarFontColor.r, Gladdy.db.healthBarFontColor.g, Gladdy.db.healthBarFontColor.b, Gladdy.db.healthBarFontColor.a)
