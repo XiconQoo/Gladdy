@@ -39,7 +39,7 @@ end
 
 local PlateCastBar = Gladdy:NewModule("PlateCastBar", nil, {
     --module
-    npCastbars = true,
+    npCastbarsEnable = true,
     npCastbarGuess = false,
     --castbar
     npCastbarsTexture = "Smooth",
@@ -182,6 +182,11 @@ function PlateCastBar:UnitCastBar_Create(unit)
         CastBar.icon:Hide()
         CastBar.icon.border:Hide()
     end
+    CastBar:SetScript("OnUpdate", function(self)
+        if self.parent and not self.parent:IsVisible() then
+            self:Hide()
+        end
+    end)
 end
 
 local function UpdateFrame(unit)
@@ -209,6 +214,17 @@ local function UpdateFrame(unit)
 
     CastBar.spellTime:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npCastbarsFont), Gladdy.db.npCastbarsFontSize, "OUTLINE")
     CastBar.spellTime:SetTextColor(Gladdy.db.npCastbarsFontColor.r, Gladdy.db.npCastbarsFontColor.g, Gladdy.db.npCastbarsFontColor.b, Gladdy.db.npCastbarsFontColor.a)
+
+    if (Gladdy.db.npCastbarsEnableSpell) then
+        CastBar.spellName:Show()
+    else
+        CastBar.spellName:Hide()
+    end
+    if (Gladdy.db.npCastbarsEnableTimer) then
+        CastBar.spellTime:Show()
+    else
+        CastBar.spellTime:Hide()
+    end
 
     --icon
     CastBar.icon:SetHeight(Gladdy.db.npCastbarsIconSize)
@@ -263,22 +279,26 @@ local function keepCastbar(unit)
     if CastBar.castTime and CastBar.castTime < CastBar.maxCastTime then
 
         local total = string.format("%.2f", CastBar.maxCastTime)
-        local left = string.format("%.1f", total - CastBar.castTime / CastBar.maxCastTime * total)
+        local left = string.format("%.1f", CastBar.castTime)
 
         if (Gladdy.db.npCastbarsTimerFormat == "LEFT") then
             CastBar.spellTime:SetText(left)
         elseif (Gladdy.db.npCastbarsTimerFormat == "TOTAL") then
             CastBar.spellTime:SetText(total)
         elseif (Gladdy.db.npCastbarsTimerFormat == "BOTH") then
-            CastBar.spellTime:SetText(left .. " /" .. total)
+            CastBar.spellTime:SetText(left .. " / " .. total)
         end
         -- in case nameplate with matching name isn't found, hide castbar
         local found = false
         for plate, _ in pairs(knownNameplates) do
-            local oldname, parent = getName(plate)
-            if (plate:IsVisible() and oldname and oldname == CastBar.name) then
-                found = true
-                CastBar:SetPoint("TOP", parent, "BOTTOM", Gladdy.db.npCastbarsPointX, Gladdy.db.npCastbarsPointY)
+            if (plate:IsVisible()) then
+                local name, parent = getName(plate)
+                if name and name == CastBar.name then
+                    found = true
+                    CastBar:SetPoint("TOP", parent, "BOTTOM", Gladdy.db.npCastbarsPointX, Gladdy.db.npCastbarsPointY)
+                    CastBar.parent = plate
+                    break
+                end
             end
         end
         if not found then
@@ -295,7 +315,6 @@ end
 local function keepCastbars()
     for unit, v in pairs(unitsToCheck) do
         -- double check that fallback function is only used if no info is pulled for unit
-
         if PlateCastBar.unitCastBars["castbar"..unit].castTime
                 and (PlateCastBar.unitCastBars["castbar"..unit].isChannelling and not UnitChannelInfo(unit)
                 or not PlateCastBar.unitCastBars["castbar"..unit].isChannelling and not UnitCastingInfo(unit)) then
@@ -306,87 +325,80 @@ end
 
 local function createCastbars()
     -- decide whether castbar should be showing or not
+    if Gladdy.db.npCastbarsEnable then
+        for frame, _ in pairs(knownNameplates) do
+            if frame:IsVisible() then
+                for unit, _ in pairs(unitsToCheck) do
+                    local name,parent = getName(frame)
+                    local CastBar = PlateCastBar.unitCastBars["castbar"..unit]
 
-    for frame, _ in pairs(knownNameplates) do
-        if frame:IsVisible() then
-            for unit, _ in pairs(unitsToCheck) do
-                local name,parent = getName(frame)
-                local CastBar = PlateCastBar.unitCastBars["castbar"..unit]
-                local Texture = CastBar.texture
-                local CastTime = CastBar.spellTime
-                local Border = CastBar.border
-                local IconBorder = CastBar.icon.border
-                local SpellName = CastBar.spellName
-                local Icon = CastBar.icon
-                local Width = Gladdy.db.npCastbarsWidth
+                    -- cast detected, display castbar
+                    if (name and name == UnitName(unit) and (UnitCastingInfo(unit) or UnitChannelInfo(unit))) then
+                        local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill
+                        if (UnitChannelInfo(unit)) then
+                            CastBar.isChannelling = true
+                            name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo(unit)
+                        else
+                            CastBar.isChannelling = false
+                            name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitCastingInfo(unit)
+                        end
 
-                -- cast detected, display castbar
-                if (name and name == UnitName(unit) and (UnitCastingInfo(unit) or UnitChannelInfo(unit))) then
-                    local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill
-                    if (UnitChannelInfo(unit)) then
-                        CastBar.isChannelling = true
-                        name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo(unit)
-                    else
-                        CastBar.isChannelling = false
-                        name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitCastingInfo(unit)
-                    end
+                        if (string.len(name) > 12) then
+                            name = (string.sub(name, 1, 12) .. ".. ")
+                        end
 
-                    if (string.len(name) > 12) then
-                        name = (string.sub(name, 1, 12) .. ".. ")
-                    end
+                        CastBar.spellName:SetText(name)
+                        CastBar.icon:SetTexture(texture)
 
-                    SpellName:SetText(name)
-                    Icon:SetTexture(texture)
-
-                    if endTime / 1000 ~= CastBar.endTime then
-                        CastBar.startTime = startTime/1000
-                        CastBar.endTime = endTime/1000
-                        CastBar.maxCastTime = CastBar.endTime - CastBar.startTime
+                        if endTime / 1000 ~= CastBar.endTime then
+                            CastBar.startTime = startTime/1000
+                            CastBar.endTime = endTime/1000
+                            CastBar.maxCastTime = CastBar.endTime - CastBar.startTime
+                            if CastBar.isChannelling then
+                                CastBar.castTime = CastBar.endTime - GetTime()
+                            else
+                                CastBar.castTime = 0
+                            end
+                            CastBar:SetMinMaxValues(0, CastBar.maxCastTime)
+                        end
                         if CastBar.isChannelling then
                             CastBar.castTime = CastBar.endTime - GetTime()
                         else
-                            CastBar.castTime = 0
+                            CastBar.castTime = GetTime() - CastBar.startTime
                         end
-                        CastBar:SetMinMaxValues(0, CastBar.maxCastTime)
-                    end
-                    if CastBar.isChannelling then
-                        CastBar.castTime = CastBar.endTime - GetTime()
-                    else
-                        CastBar.castTime = GetTime() - CastBar.startTime
-                    end
-                    CastBar:SetValue(CastBar.castTime)
+                        CastBar:SetValue(CastBar.castTime)
 
-                    CastBar.name = UnitName(unit)
-                    CastBar:SetAlpha(1)
-                    CastBar:SetPoint("TOP", parent, "BOTTOM", Gladdy.db.npCastbarsPointX, Gladdy.db.npCastbarsPointY)
-                    CastBar:Show()
-                    CastBar.parent = frame
-                    CastBar:SetScript("OnUpdate", function(self)
-                        if not self.parent:IsVisible() then
-                            self:Hide()
+                        CastBar.name = UnitName(unit)
+                        CastBar:SetAlpha(1)
+                        CastBar:SetPoint("TOP", parent, "BOTTOM", Gladdy.db.npCastbarsPointX, Gladdy.db.npCastbarsPointY)
+                        CastBar:Show()
+                        CastBar.parent = frame
+
+                        local total = string.format("%.2f", CastBar.maxCastTime)
+                        local left = string.format("%.1f", CastBar.castTime)
+                        if (Gladdy.db.npCastbarsTimerFormat == "LEFT") then
+                            CastBar.spellTime:SetText(left)
+                        elseif (Gladdy.db.npCastbarsTimerFormat == "TOTAL") then
+                            CastBar.spellTime:SetText(total)
+                        elseif (Gladdy.db.npCastbarsTimerFormat == "BOTH") then
+                            CastBar.spellTime:SetText(left .. " / " .. total)
                         end
-                    end)
-
-                    local total = string.format("%.2f", CastBar.maxCastTime)
-                    local left = string.format("%.1f", total - CastBar.castTime / CastBar.maxCastTime * total)
-                    if (Gladdy.db.npCastbarsTimerFormat == "LEFT") then
-                        CastTime:SetText(left)
-                    elseif (Gladdy.db.npCastbarsTimerFormat == "TOTAL") then
-                        CastTime:SetText(total)
-                    elseif (Gladdy.db.npCastbarsTimerFormat == "BOTH") then
-                        CastTime:SetText(left .. " /" .. total)
+                        -- hide castbar if unit stops casting
+                    elseif (name == UnitName(unit) and (not UnitCastingInfo(unit) or not UnitChannelInfo(unit))) then
+                        --CastBar.castTime = nil
+                        CastBar:SetAlpha(0)
+                        CastBar:Hide()
                     end
-                    -- hide castbar if unit stops casting
-                elseif (name == UnitName(unit) and (not UnitCastingInfo(unit) or not UnitChannelInfo(unit))) then
-                    --				log("hiding castbar because unit stopped")
-                    CastBar:SetAlpha(0)
-                    CastBar:Hide()
                 end
             end
         end
+        --fallback function in case no casting information was found but we still want to display progress on the bar
+        keepCastbars()
+    else
+        for unit, v in pairs(unitsToCheck) do
+            PlateCastBar.unitCastBars["castbar"..unit]:Hide()
+        end
     end
-    --fallback function in case no casting information was found but we still want to display progress on the bar
-    keepCastbars()
 end
 
 function PlateCastBar:HookFrames(...)
@@ -400,10 +412,8 @@ end
 
 function PlateCastBar:Update()
     if (WorldFrame:GetNumChildren() ~= self.numChildren) then
-        if Gladdy.db.npCastbars then
-            self.numChildren = WorldFrame:GetNumChildren()
-            self:HookFrames(WorldFrame:GetChildren())
-        end
+        self.numChildren = WorldFrame:GetNumChildren()
+        self:HookFrames(WorldFrame:GetChildren())
     end
     createCastbars()
 end
@@ -460,8 +470,6 @@ end
 
 function PlateCastBar:GetOptions()
     --[[
-
-    npCastbarsTimerFormat = "LEFT",
     npCastbarsEnableTest = false,
     npCastbarsEnablePlayerPet = true,
     npCastbarsEnableIcon = true,
@@ -475,12 +483,21 @@ function PlateCastBar:GetOptions()
             name = L["Castbar"],
             order = 2,
         },
-        npCastbars = option({
+        npCastbarsEnable = {
             type = "toggle",
             name = L["Castbars on/off"],
-            desc = L["Turns castbars of nameplates on or off. (Requires reload)"],
+            desc = L["Turns castbars of nameplates on or off."],
             order = 3,
-        }),
+            get = function(info) return Gladdy.db.npCastbarsEnable end,
+            set = function(info, value)
+                Gladdy.db.npCastbarsEnable = value
+                if value then
+                    pcall(SetCVar, "ShowVKeyCastbar", 0)
+                else
+                    pcall(SetCVar, "ShowVKeyCastbar", 1)
+                end
+            end,
+        },
         npCastbarGuess = option({
             type = "toggle",
             name = L["Castbar guesses on/off"],
@@ -590,7 +607,6 @@ function PlateCastBar:GetOptions()
             order = 32,
             hasAlpha = true,
         }),
-
         npCastbarsFontSize = option({
             type = "range",
             name = L["Font size"],
@@ -598,6 +614,16 @@ function PlateCastBar:GetOptions()
             order = 32,
             min = 1,
             max = 20,
+        }),
+        npCastbarsTimerFormat = option({
+            type = "select",
+            name = L["Position"],
+            order = 33,
+            values = {
+                ["LEFT"] = L["Left"],
+                ["TOTAL"] = L["Total"],
+                ["BOTH"] = L["Both"],
+            },
         }),
         --borders
         headerBorder = {
