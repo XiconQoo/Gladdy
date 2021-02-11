@@ -277,6 +277,7 @@ function Gladdy:UpdateFrame()
         end
         Gladdy:UpdateTestCooldowns(i)
     end
+    Gladdy.modules["PlateCastBar"]:UpdateFrame()
 end
 
 function Gladdy:HideFrame()

@@ -260,7 +260,7 @@ function PlateCastBar:CastBars_Create()
     end
 end
 
-function PlateCastBar:UpdateFrame(unit)
+function PlateCastBar:UpdateFrame()
     for k, v in pairs(unitsToCheck) do
         UpdateFrame(k)
     end
