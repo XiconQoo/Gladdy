@@ -13,7 +13,7 @@ local L = Gladdy.L
 local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drFont = "DorisPP",
     drFontColor = { r = 1, g = 1, b = 0, a = 1 },
-    drFontSize = 20,
+    drFontScale = 1,
     drCooldownPos = "RIGHT",
     drIconSize = 36,
     drEnabled = true,
@@ -110,7 +110,7 @@ function Diminishings:CreateFrame(unit)
 
         icon.text = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
         icon.text:SetDrawLayer("OVERLAY")
-        icon.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), Gladdy.db.drFontSize, "OUTLINE")
+        icon.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), 10, "OUTLINE")
         icon.text:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
         icon.text:SetShadowOffset(1, -1)
         icon.text:SetShadowColor(0, 0, 0, 1)
@@ -119,7 +119,7 @@ function Diminishings:CreateFrame(unit)
 
         icon.timeText = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
         icon.timeText:SetDrawLayer("OVERLAY")
-        icon.timeText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), Gladdy.db.drFontSize - 2, "OUTLINE")
+        icon.timeText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), 10, "OUTLINE")
         icon.timeText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
         icon.timeText:SetShadowOffset(1, -1)
         icon.timeText:SetShadowColor(0, 0, 0, 1)
@@ -204,9 +204,9 @@ function Diminishings:UpdateFrame(unit)
         icon:SetWidth(Gladdy.db.drIconSize)
         icon:SetHeight(Gladdy.db.drIconSize)
 
-        icon.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), Gladdy.db.drFontSize, "OUTLINE")
+        icon.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
         icon.text:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
-        icon.timeText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), Gladdy.db.drFontSize - 2, "OUTLINE")
+        icon.timeText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
         icon.timeText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
 
         icon:ClearAllPoints()
@@ -358,18 +358,19 @@ function Diminishings:GetOptions()
             type = "color",
             name = L["Font color"],
             desc = L["Color of the text"],
-            order = 12,
+            order = 13,
             hasAlpha = true,
         }),
-        drFontSize = Gladdy:option({
+        drFontScale = Gladdy:option({
             type = "range",
-            name = L["Font size"],
-            desc = L["Size of the text"],
-            order = 13,
-            min = 1,
-            max = 20,
+            name = L["Font scale"],
+            desc = L["Scale of the text"],
+            order = 12,
+            min = 0.1,
+            max = 2,
+            step = 0.1,
         }),
-        headerFont = {
+        headerPosition = {
             type = "header",
             name = L["Position"],
             order = 20,

@@ -8,6 +8,7 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 Trinket = Gladdy:NewModule("Trinket", nil, {
     trinketFont = "DorisPP",
+    trinketFontScale = 1,
     trinketEnabled = true,
     --trinketDisableOmniCC = true,
     trinketPos = "RIGHT",
@@ -67,27 +68,27 @@ function Trinket:CreateFrame(unit)
                 -- more than 1 minute
                 self.cooldownFont:SetTextColor(1, 1, 0)
                 self.cooldownFont:SetText(floor(timeLeft / 60) .. ":" .. string.format("%02.f", floor(timeLeft - floor(timeLeft / 60) * 60)))
-                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), 20, "OUTLINE")
+                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (trinket:GetWidth()/2 - 0.15*trinket:GetWidth()) * Gladdy.db.trinketFontScale, "OUTLINE")
             elseif timeLeft < 60 and timeLeft >= 21 then
                 -- between 60s and 21s (green)
                 self.cooldownFont:SetTextColor(0.7, 1, 0)
                 self.cooldownFont:SetText(timeLeft)
-                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), 30, "OUTLINE")
+                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (trinket:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
             elseif timeLeft < 20.9 and timeLeft >= 11 then
                 -- between 20s and 11s (green)
                 self.cooldownFont:SetTextColor(0, 1, 0)
                 self.cooldownFont:SetText(timeLeft)
-                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), 30, "OUTLINE")
+                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (trinket:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
             elseif timeLeftMilliSec <= 10 and timeLeftMilliSec >= 5 then
                 -- between 10s and 5s (orange)
                 self.cooldownFont:SetTextColor(1, 0.7, 0)
                 self.cooldownFont:SetFormattedText("%.1f", timeLeftMilliSec)
-                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), 30, "OUTLINE")
+                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (trinket:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
             elseif timeLeftMilliSec < 5 and timeLeftMilliSec > 0 then
                 -- between 5s and 1s (red)
                 self.cooldownFont:SetTextColor(1, 0, 0)
                 self.cooldownFont:SetFormattedText("%.1f", timeLeftMilliSec)
-                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), 30, "OUTLINE")
+                self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (trinket:GetWidth()/2 - 1) * Gladdy.db.trinketFontScale, "OUTLINE")
             else
                 self.cooldownFont:SetText("")
             end
@@ -231,13 +232,22 @@ function Trinket:GetOptions()
             dialogControl = "LSM30_Font",
             values = AceGUIWidgetLSMlists.font,
         }),
+        trinketFontScale = Gladdy:option({
+            type = "range",
+            name = L["Font scale"],
+            desc = L["Scale of the font"],
+            order = 12,
+            min = 0.1,
+            max = 2,
+            step = 0.1,
+        }),
         --[[trinketDisableOmniCC = Gladdy:option({
             type = "toggle",
             name = L["No OmniCC"],
             desc = L["Disable cooldown timers by addons (reload UI to take effect)"],
             order = 3,
         }),--]]
-        headerFont = {
+        headerPosition = {
             type = "header",
             name = L["Position"],
             order = 20,

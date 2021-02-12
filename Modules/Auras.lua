@@ -7,7 +7,7 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local Auras = Gladdy:NewModule("Auras", nil, {
     auraFont = "DorisPP",
-    auraFontSize = 20,
+    auraFontSizeScale = 1,
     auraFontColor = { r = 1, g = 1, b = 0, a = 1 },
     auraBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     auraBuffBorderColor = { r = 1, g = 0, b = 0, a = 1 },
@@ -63,9 +63,8 @@ function Auras:CreateFrame(unit)
         end
     end)
 
-
     auraFrame.text = auraFrame.cooldownFrame:CreateFontString(nil, "OVERLAY")
-    auraFrame.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.auraFont), 20, "OUTLINE")
+    auraFrame.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.auraFont), 10, "OUTLINE")
     auraFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
     auraFrame.text:SetShadowOffset(1, -1)
     auraFrame.text:SetShadowColor(0, 0, 0, 1)
@@ -93,7 +92,7 @@ function Auras:UpdateFrame(unit)
     auraFrame.cooldown:ClearAllPoints()
     auraFrame.cooldown:SetPoint("CENTER", auraFrame, "CENTER")
 
-    auraFrame.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.auraFont), Gladdy.db.auraFontSize)
+    auraFrame.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.auraFont), (classIcon:GetWidth()/2 - 1) * Gladdy.db.auraFontSizeScale, "OUTLINE")
     auraFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
 
     auraFrame.icon.overlay:SetTexture(Gladdy.db.auraBorderStyle)
@@ -248,13 +247,14 @@ function Auras:GetOptions()
             dialogControl = "LSM30_Font",
             values = AceGUIWidgetLSMlists.font,
         }),
-        auraFontSize = Gladdy:option({
+        auraFontSizeScale = Gladdy:option({
             type = "range",
-            name = L["Font size"],
-            desc = L["Size of the text"],
+            name = L["Font scale"],
+            desc = L["Scale of the text"],
             order = 6,
-            min = 1,
-            max = 20,
+            min = 0.1,
+            max = 2,
+            step = 0.1,
         }),
         auraFontColor = Gladdy:colorOption({
             type = "color",

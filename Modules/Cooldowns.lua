@@ -3,6 +3,8 @@ local L = Gladdy.L
 
 local Cooldown = Gladdy:NewModule("Cooldown", nil, {
     cooldownFont = "DorisPP",
+    cooldownFontScale = 1,
+    cooldownFontColor = { r = 1, g = 1, b = 0, a = 1 },
     cooldown = true,
     cooldownYPos = "TOP",
     cooldownXPos = "LEFT",
@@ -57,16 +59,32 @@ function Cooldown:GetOptions()
             dialogControl = "LSM30_Font",
             values = AceGUIWidgetLSMlists.font,
         }),
+        cooldownFontScale = Gladdy:option({
+            type = "range",
+            name = L["Font scale"],
+            desc = L["Scale of the font"],
+            order = 7,
+            min = 0.1,
+            max = 2,
+            step = 0.1,
+        }),
+        cooldownFontColor = Gladdy:colorOption({
+            type = "color",
+            name = L["Font color"],
+            desc = L["Color of the text"],
+            order = 8,
+            hasAlpha = true,
+        }),
         headerPosition = {
             type = "header",
             name = L["Position"],
-            order = 7,
+            order = 10,
         },
         cooldownYPos = Gladdy:option({
             type = "select",
             name = L["Position"],
             desc = L["Position of the cooldown icons"],
-            order = 8,
+            order = 11,
             values = {
                 ["TOP"] = L["Top"],
                 ["BOTTOM"] = L["Bottom"],
@@ -76,7 +94,7 @@ function Cooldown:GetOptions()
             type = "select",
             name = L["Position"],
             desc = L["Position of the cooldown icons"],
-            order = 9,
+            order = 12,
             values = {
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],
@@ -85,19 +103,19 @@ function Cooldown:GetOptions()
         headerBorder = {
             type = "header",
             name = L["Border"],
-            order = 10,
+            order = 13,
         },
         cooldownBorderStyle = Gladdy:option({
             type = "select",
             name = L["Border style"],
-            order = 11,
+            order = 14,
             values = Gladdy:GetIconStyles()
         }),
         cooldownBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Border color"],
             desc = L["Color of the border"],
-            order = 12,
+            order = 15,
             hasAlpha = true,
         }),
     }

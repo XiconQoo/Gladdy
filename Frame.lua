@@ -235,7 +235,8 @@ function Gladdy:UpdateFrame()
                 local icon = button.spellCooldownFrame["icon" .. i]
                 icon:SetHeight(self.db.cooldownSize)
                 icon:SetWidth(self.db.cooldownSize)
-                icon.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), self.db.cooldownSize / 2, "OUTLINE")
+                icon.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), self.db.cooldownSize / 2 * Gladdy.db.cooldownFontScale, "OUTLINE")
+                icon.cooldownFont:SetTextColor(Gladdy.db.cooldownFontColor.r, Gladdy.db.cooldownFontColor.g, Gladdy.db.cooldownFontColor.b, Gladdy.db.cooldownFontColor.a)
                 icon:ClearAllPoints()
                 if (self.db.cooldownXPos == "RIGHT") then
                     if (i == 1) then
@@ -341,7 +342,8 @@ function Gladdy:CreateButton(i)
         icon.cooldownFrame:SetPoint("TOPLEFT", icon, "TOPLEFT")
         icon.cooldownFrame:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT")
         icon.cooldownFont = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
-        icon.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), self.db.cooldownSize / 2, "OUTLINE")
+        icon:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), self.db.cooldownSize / 2  * Gladdy.db.cooldownFontScale, "OUTLINE")
+        icon.cooldownFont:SetTextColor(Gladdy.db.cooldownFontColor.r, Gladdy.db.cooldownFontColor.g, Gladdy.db.cooldownFontColor.b, Gladdy.db.cooldownFontColor.a)
         icon.cooldownFont:SetAllPoints(icon)
 
         spellCooldownFrame["icon" .. x] = icon
