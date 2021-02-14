@@ -202,6 +202,10 @@ function PlateCastBar:UnitCastBar_Create(unit)
     end
     CastBar:SetScript("OnUpdate", function(self)
         if self.parent and not self.parent:IsVisible() then
+            if self.parent.CastBarEnabled == self then
+                self.parent.CastBarEnabled = nil
+            end
+            self.parent = nil
             self:Hide()
         end
     end)
@@ -282,6 +286,7 @@ local function keepCastbar(unit)
 
     if (Gladdy.db.npCastbarGuess == false) then
         CastBar.castTime = nil
+        CastBar.parent.CastBarEnabled = nil
         CastBar:SetAlpha(0)
         CastBar:Hide()
         return
@@ -316,12 +321,13 @@ local function keepCastbar(unit)
         -- in case nameplate with matching name isn't found, hide castbar
         local found = false
         for plate, _ in pairs(knownNameplates) do
-            if (plate:IsVisible()) then
+            if (plate:IsVisible() and (not plate.CastBarEnabled or plate.CastBarEnabled == CastBar)) then
                 local name, parent = getName(plate)
                 if name and name == CastBar.name then
                     found = true
                     CastBar:SetPoint("TOP", parent, "BOTTOM", Gladdy.db.npCastbarsPointX, Gladdy.db.npCastbarsPointY)
                     CastBar.parent = plate
+                    plate.CastBarEnabled = CastBar
                     break
                 end
             end
@@ -332,6 +338,7 @@ local function keepCastbar(unit)
         end
     elseif CastBar.castTime and CastBar.castTime > CastBar.maxCastTime then
         CastBar.castTime = nil
+        CastBar.parent.CastBarEnabled = nil
         CastBar:SetAlpha(0)
         CastBar:Hide()
     end
@@ -359,63 +366,66 @@ local function createCastbars()
 
                     -- cast detected, display castbar
                     if (name and name == UnitName(unit) and (UnitCastingInfo(unit) or UnitChannelInfo(unit))) then
-                        local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill
-                        if (UnitChannelInfo(unit)) then
-                            CastBar.isChannelling = true
-                            name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo(unit)
-                        else
-                            CastBar.isChannelling = false
-                            name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitCastingInfo(unit)
-                        end
+                        if (not frame.CastBarEnabled or frame.CastBarEnabled == CastBar) then --prevent double castbars
+                            local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill
+                            if (UnitChannelInfo(unit)) then
+                                CastBar.isChannelling = true
+                                name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo(unit)
+                            else
+                                CastBar.isChannelling = false
+                                name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitCastingInfo(unit)
+                            end
 
-                        if (string.len(name) > 12) then
-                            name = (string.sub(name, 1, 12) .. ".. ")
-                        end
+                            if (string.len(name) > 12) then
+                                name = (string.sub(name, 1, 12) .. ".. ")
+                            end
 
-                        CastBar.spellName:SetText(name)
-                        CastBar.icon:SetTexture(texture)
+                            CastBar.spellName:SetText(name)
+                            CastBar.icon:SetTexture(texture)
 
-                        if endTime / 1000 ~= CastBar.endTime then
-                            CastBar.startTime = startTime/1000
-                            CastBar.endTime = endTime/1000
-                            CastBar.maxCastTime = CastBar.endTime - CastBar.startTime
+                            if endTime / 1000 ~= CastBar.endTime then
+                                CastBar.startTime = startTime/1000
+                                CastBar.endTime = endTime/1000
+                                CastBar.maxCastTime = CastBar.endTime - CastBar.startTime
+                                if CastBar.isChannelling then
+                                    CastBar.castTime = CastBar.endTime - GetTime()
+                                else
+                                    CastBar.castTime = 0
+                                end
+                                CastBar.bar:SetMinMaxValues(0, CastBar.maxCastTime)
+                            end
                             if CastBar.isChannelling then
                                 CastBar.castTime = CastBar.endTime - GetTime()
                             else
-                                CastBar.castTime = 0
+                                CastBar.castTime = GetTime() - CastBar.startTime
                             end
-                            CastBar:SetMinMaxValues(0, CastBar.maxCastTime)
-                        end
-                        if CastBar.isChannelling then
-                            CastBar.castTime = CastBar.endTime - GetTime()
-                        else
-                            CastBar.castTime = GetTime() - CastBar.startTime
-                        end
-                        CastBar:SetValue(CastBar.castTime)
-                        local sparkPosition = ((CastBar.castTime) / (CastBar.maxCastTime)) * Gladdy.db.npCastbarsWidth;
-                        if ( sparkPosition < 0 ) then
-                            sparkPosition = 0
-                        end
-                        CastBar.Spark:SetPoint("CENTER", CastBar, "LEFT", sparkPosition, 0)
+                            CastBar.bar:SetValue(CastBar.castTime)
+                            local sparkPosition = ((CastBar.castTime) / (CastBar.maxCastTime)) * (Gladdy.db.npCastbarsWidth - (Gladdy.db.npCastbarsBorderSize/7)*2);
+                            if ( sparkPosition < 0 ) then
+                                sparkPosition = 0
+                            end
+                            CastBar.Spark:SetPoint("CENTER", CastBar.bar, "LEFT", sparkPosition, 0)
 
-                        CastBar.name = UnitName(unit)
-                        CastBar:SetAlpha(1)
-                        CastBar:SetPoint("TOP", parent, "BOTTOM", Gladdy.db.npCastbarsPointX, Gladdy.db.npCastbarsPointY)
-                        CastBar:Show()
-                        CastBar.parent = frame
+                            CastBar.name = UnitName(unit)
+                            CastBar:SetAlpha(1)
+                            CastBar:SetPoint("TOP", parent, "BOTTOM", Gladdy.db.npCastbarsPointX, Gladdy.db.npCastbarsPointY)
+                            CastBar:Show()
+                            CastBar.parent = frame
 
-                        local total = string.format("%.2f", CastBar.maxCastTime)
-                        local left = string.format("%.1f", CastBar.castTime)
-                        if (Gladdy.db.npCastbarsTimerFormat == "LEFT") then
-                            CastBar.spellTime:SetText(left)
-                        elseif (Gladdy.db.npCastbarsTimerFormat == "TOTAL") then
-                            CastBar.spellTime:SetText(total)
-                        elseif (Gladdy.db.npCastbarsTimerFormat == "BOTH") then
-                            CastBar.spellTime:SetText(left .. " / " .. total)
+                            local total = string.format("%.2f", CastBar.maxCastTime)
+                            local left = string.format("%.1f", CastBar.castTime)
+                            if (Gladdy.db.npCastbarsTimerFormat == "LEFT") then
+                                CastBar.spellTime:SetText(left)
+                            elseif (Gladdy.db.npCastbarsTimerFormat == "TOTAL") then
+                                CastBar.spellTime:SetText(total)
+                            elseif (Gladdy.db.npCastbarsTimerFormat == "BOTH") then
+                                CastBar.spellTime:SetText(left .. " / " .. total)
+                            end
+                            frame.CastBarEnabled = CastBar
                         end
                         -- hide castbar if unit stops casting
                     elseif (name == UnitName(unit) and (not UnitCastingInfo(unit) or not UnitChannelInfo(unit))) then
-                        --CastBar.castTime = nil
+                        frame.CastBarEnabled = nil
                         CastBar:SetAlpha(0)
                         CastBar:Hide()
                     end
@@ -565,7 +575,7 @@ function PlateCastBar:GetOptions()
             name = L["Background color"],
             desc = L["Color of the cast bar background"],
             order = 9,
-            hasAlpha = false,
+            hasAlpha = true,
         }),
         headerPosition = {
             type = "header",
