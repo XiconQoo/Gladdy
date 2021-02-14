@@ -253,12 +253,6 @@ function Trinket:GetOptions()
             max = 2,
             step = 0.1,
         }),
-        --[[trinketDisableOmniCC = Gladdy:option({
-            type = "toggle",
-            name = L["No OmniCC"],
-            desc = L["Disable cooldown timers by addons (reload UI to take effect)"],
-            order = 3,
-        }),--]]
         headerPosition = {
             type = "header",
             name = L["Position"],
