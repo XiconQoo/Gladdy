@@ -427,8 +427,12 @@ function Gladdy:SetupOptions()
                         dialogControl = "LSM30_Statusbar",
                         values = AceGUIWidgetLSMlists.statusbar,
                         get = function(info)
-                            if (Gladdy.db.healthBarTexture == Gladdy.db.powerBarTexture and Gladdy.db.healthBarTexture == Gladdy.db.npCastBarTexture) then
-                                return Gladdy.db.healthBarTexture
+                            local a = Gladdy.db.healthBarTexture
+                            local b = Gladdy.db.powerBarTexture
+                            local c = Gladdy.db.npCastbarsTexture
+                            local d = Gladdy.db.castBarTexture
+                            if (a == b and a == c and a == d) then
+                                return a
                             else
                                 return ""
                             end
@@ -436,7 +440,8 @@ function Gladdy:SetupOptions()
                         set = function(info, value)
                             Gladdy.db.healthBarTexture = value
                             Gladdy.db.powerBarTexture = value
-                            Gladdy.db.npCastBarTexture = value
+                            Gladdy.db.npCastbarsTexture = value
+                            Gladdy.db.castBarTexture = value
                             Gladdy:UpdateFrame()
                         end,
                         width= "full",
@@ -448,8 +453,12 @@ function Gladdy:SetupOptions()
                         order = 49,
                         values = Gladdy:GetBorderStyles(),
                         get = function(info)
-                            if (Gladdy.db.healthBarBorder == Gladdy.db.powerBarBorder and Gladdy.db.healthBarBorder == Gladdy.db.castBarBorderStyle) then
-                                return Gladdy.db.healthBarBorder
+                            local a = Gladdy.db.healthBarBorder
+                            local b = Gladdy.db.powerBarBorder
+                            local c = Gladdy.db.npCastbarsBorderStyle
+                            local d = Gladdy.db.castBarBorderStyle
+                            if (a == b and a == c and a == d) then
+                                return a
                             else
                                 return ""
                             end
@@ -458,6 +467,7 @@ function Gladdy:SetupOptions()
                             Gladdy.db.healthBarBorder = value
                             Gladdy.db.powerBarBorder = value
                             Gladdy.db.castBarBorderStyle = value
+                            Gladdy.db.npCastbarsBorderStyle = value
                             Gladdy:UpdateFrame()
                         end,
                     },
@@ -471,7 +481,10 @@ function Gladdy:SetupOptions()
                             local a = Gladdy.db.castBarBorderColor
                             local b = Gladdy.db.healthBarBorderColor
                             local c = Gladdy.db.powerBarBorderColor
-                            if (a.r == b.r and a.g == b.g and a.b == b.b and a.a == b.a and a.r == c.r and a.g == c.g and a.b == c.b and a.a == c.a) then
+                            local d = Gladdy.db.npCastbarsBorderColor
+                            if (a.r == b.r and a.g == b.g and a.b == b.b and a.a == b.a
+                                    and a.r == c.r and a.g == c.g and a.b == c.b and a.a == c.a
+                                    and a.r == d.r and a.g == d.g and a.b == d.b and a.a == d.a) then
                                 return a.r, a.g, a.b, a.a
                             else
                                 return { r = 0, g = 0, b = 0, a = 0 }
@@ -482,6 +495,7 @@ function Gladdy:SetupOptions()
                             Gladdy.db.castBarBorderColor = rgb
                             Gladdy.db.healthBarBorderColor = rgb
                             Gladdy.db.powerBarBorderColor = rgb
+                            Gladdy.db.npCastbarsBorderColor = rgb
                             Gladdy:UpdateFrame()
                         end,
                     },
