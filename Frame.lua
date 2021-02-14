@@ -219,15 +219,15 @@ function Gladdy:UpdateFrame()
             button.spellCooldownFrame:ClearAllPoints()
             if self.db.cooldownYPos == "TOP" then
                 if self.db.cooldownXPos == "RIGHT" then
-                    button.spellCooldownFrame:SetPoint("BOTTOMRIGHT", button.healthBar, "TOPRIGHT", 0, self.db.highlightBorderSize) -- needs to be properly anchored after trinket
+                    button.spellCooldownFrame:SetPoint("BOTTOMRIGHT", button.healthBar, "TOPRIGHT", Gladdy.db.cooldownXOffset, self.db.highlightBorderSize + Gladdy.db.cooldownYOffset) -- needs to be properly anchored after trinket
                 else
-                    button.spellCooldownFrame:SetPoint("BOTTOMLEFT", button.healthBar, "TOPLEFT", 0, self.db.highlightBorderSize)
+                    button.spellCooldownFrame:SetPoint("BOTTOMLEFT", button.healthBar, "TOPLEFT", Gladdy.db.cooldownXOffset, self.db.highlightBorderSize + Gladdy.db.cooldownYOffset)
                 end
             else
                 if self.db.cooldownXPos == "RIGHT" then
-                    button.spellCooldownFrame:SetPoint("TOPRIGHT", button.powerBar, "BOTTOMRIGHT", 0, -self.db.highlightBorderSize) -- needs to be properly anchored after trinket
+                    button.spellCooldownFrame:SetPoint("TOPRIGHT", button.powerBar, "BOTTOMRIGHT", Gladdy.db.cooldownXOffset, -self.db.highlightBorderSize + Gladdy.db.cooldownYOffset) -- needs to be properly anchored after trinket
                 else
-                    button.spellCooldownFrame:SetPoint("TOPLEFT", button.powerBar, "BOTTOMLEFT", 0, -self.db.highlightBorderSize)
+                    button.spellCooldownFrame:SetPoint("TOPLEFT", button.powerBar, "BOTTOMLEFT", Gladdy.db.cooldownXOffset, -self.db.highlightBorderSize + Gladdy.db.cooldownYOffset)
                 end
             end
             button.spellCooldownFrame:SetHeight(self.db.cooldownSize)
