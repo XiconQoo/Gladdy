@@ -77,7 +77,7 @@ function Castbar:CreateFrame(unit)
             end
         end
         if self.isCasting or self.isChanneling then
-            self.spark.position = ((self.value) / self.maxValue) * (Gladdy.db.castBarWidth - (Gladdy.db.castBarBorderSize/7)*2)
+            self.spark.position = ((self.value) / self.maxValue) * (Gladdy.db.castBarWidth - (Gladdy.db.castBarBorderSize/Gladdy.db.statusbarBorderOffset)*2)
             if ( self.spark.position < 0 ) then
                 self.spark.position = 0
             end
@@ -140,8 +140,8 @@ function Castbar:UpdateFrame(unit)
 
     castBar.bar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
     castBar.bar:ClearAllPoints()
-    castBar.bar:SetPoint("TOPLEFT", castBar, "TOPLEFT", (Gladdy.db.castBarBorderSize/7), -(Gladdy.db.castBarBorderSize/7))
-    castBar.bar:SetPoint("BOTTOMRIGHT", castBar, "BOTTOMRIGHT", -(Gladdy.db.castBarBorderSize/7), (Gladdy.db.castBarBorderSize/7))
+    castBar.bar:SetPoint("TOPLEFT", castBar, "TOPLEFT", (Gladdy.db.castBarBorderSize/Gladdy.db.statusbarBorderOffset), -(Gladdy.db.castBarBorderSize/Gladdy.db.statusbarBorderOffset))
+    castBar.bar:SetPoint("BOTTOMRIGHT", castBar, "BOTTOMRIGHT", -(Gladdy.db.castBarBorderSize/Gladdy.db.statusbarBorderOffset), (Gladdy.db.castBarBorderSize/Gladdy.db.statusbarBorderOffset))
 
     castBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
     castBar.bg:SetVertexColor(Gladdy.db.castBarBgColor.r, Gladdy.db.castBarBgColor.g, Gladdy.db.castBarBgColor.b, Gladdy.db.castBarBgColor.a)

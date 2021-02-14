@@ -147,8 +147,8 @@ function PlateCastBar:UnitCastBar_Create(unit)
     CastBar.bar:SetStatusBarColor(Gladdy.db.npCastbarsBarColor.r, Gladdy.db.npCastbarsBarColor.g, Gladdy.db.npCastbarsBarColor.b, Gladdy.db.npCastbarsBarColor.a)
     CastBar.bar:SetMinMaxValues(0, 100)
     CastBar.bar:ClearAllPoints()
-    CastBar.bar:SetPoint("TOPLEFT", CastBar, "TOPLEFT", (Gladdy.db.npCastbarsBorderSize/7), -(Gladdy.db.npCastbarsBorderSize/7))
-    CastBar.bar:SetPoint("BOTTOMRIGHT", CastBar, "BOTTOMRIGHT", -(Gladdy.db.npCastbarsBorderSize/7), (Gladdy.db.npCastbarsBorderSize/7))
+    CastBar.bar:SetPoint("TOPLEFT", CastBar, "TOPLEFT", (Gladdy.db.npCastbarsBorderSize/Gladdy.db.statusbarBorderOffset), -(Gladdy.db.npCastbarsBorderSize/Gladdy.db.statusbarBorderOffset))
+    CastBar.bar:SetPoint("BOTTOMRIGHT", CastBar, "BOTTOMRIGHT", -(Gladdy.db.npCastbarsBorderSize/Gladdy.db.statusbarBorderOffset), (Gladdy.db.npCastbarsBorderSize/Gladdy.db.statusbarBorderOffset))
     CastBar.bar:SetFrameStrata("MEDIUM")
     CastBar.bar:SetFrameLevel(0)
 
@@ -299,7 +299,7 @@ local function keepCastbar(unit)
     end
     CastBar.bar:SetValue(CastBar.castTime)
 
-    local sparkPosition = ((CastBar.castTime - CastBar.startTime) / (CastBar.maxCastTime - CastBar.startTime)) * (Gladdy.db.npCastbarsWidth - (Gladdy.db.npCastbarsBorderSize/7)*2);
+    local sparkPosition = ((CastBar.castTime - CastBar.startTime) / (CastBar.maxCastTime - CastBar.startTime)) * (Gladdy.db.npCastbarsWidth - (Gladdy.db.npCastbarsBorderSize/Gladdy.db.statusbarBorderOffset)*2);
     if ( sparkPosition < 0 ) then
         sparkPosition = 0
     end
@@ -400,7 +400,7 @@ local function createCastbars()
                                 CastBar.castTime = GetTime() - CastBar.startTime
                             end
                             CastBar.bar:SetValue(CastBar.castTime)
-                            local sparkPosition = ((CastBar.castTime) / (CastBar.maxCastTime)) * (Gladdy.db.npCastbarsWidth - (Gladdy.db.npCastbarsBorderSize/7)*2);
+                            local sparkPosition = ((CastBar.castTime) / (CastBar.maxCastTime)) * (Gladdy.db.npCastbarsWidth - (Gladdy.db.npCastbarsBorderSize/Gladdy.db.statusbarBorderOffset)*2);
                             if ( sparkPosition < 0 ) then
                                 sparkPosition = 0
                             end

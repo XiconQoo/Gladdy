@@ -19,6 +19,7 @@ Gladdy.defaults = {
         padding = 3,
         barWidth = 180,
         bottomMargin = 10,
+        statusbarBorderOffset = 7,
     },
 }
 
@@ -472,6 +473,14 @@ function Gladdy:SetupOptions()
                             Gladdy:UpdateFrame()
                         end,
                     },
+                    statusbarBorderOffset = Gladdy:option({
+                        type = "range",
+                        name = L["Statusbar border offset divider (smaller is higher offset)"],
+                        desc = L["Offset of border to statusbar (in case statusbar shows beyond the border)"],
+                        min = 0,
+                        max = 20,
+                        step = 0.1,
+                    }),
                     statusbarBorderColor = {
                         type = "color",
                         name = L["Statusbar border color"],
