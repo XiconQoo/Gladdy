@@ -45,13 +45,8 @@ function Classicon:UpdateFrame(unit)
         return
     end
 
-    local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight + 1
-
     classIcon:SetWidth(Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1)
     classIcon:SetHeight(Gladdy.db.classIconSize)
-
-    classIcon.texture:SetWidth(iconSize - iconSize * 0.1 - 3)
-    classIcon.texture:SetWidth(iconSize - 3)
 
     classIcon:ClearAllPoints()
     local margin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
