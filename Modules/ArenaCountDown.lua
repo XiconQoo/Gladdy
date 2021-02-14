@@ -3,6 +3,7 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local ACDFrame = Gladdy:NewModule("Countdown", nil, {
     countdown = true,
+    arenaCountdownSize = 256
 })
 
 function ACDFrame:Initialise()
@@ -80,15 +81,15 @@ end)
 function ACDFrame:CHAT_MSG_BG_SYSTEM_NEUTRAL(arg1)
     if (event == "CHAT_MSG_BG_SYSTEM_NEUTRAL") then
         if (string.find(arg1, "L'ar\195\168ne ouvre ses portes dans 60 secondes !")) then
-            countdown = 61;
+            countdown = 60;
             return ;
         end
         if (string.find(arg1, "L'ar\195\168ne ouvre ses portes dans 30 secondes !")) then
-            countdown = 31;
+            countdown = 30;
             return ;
         end
         if (string.find(arg1, "L'ar\195\168ne ouvre ses portes dans 15 secondes !")) then
-            countdown = 16;
+            countdown = 15;
             return ;
         end
         if (string.find(arg1, "L'ar\195\168ne ouvre ses portes dans 10 secondes !")) then
@@ -96,22 +97,44 @@ function ACDFrame:CHAT_MSG_BG_SYSTEM_NEUTRAL(arg1)
             return ;
         end
         if (string.find(arg1, "One minute until the Arena battle begins!")) then
-            self.countdown = 61;
+            self.countdown = 60;
             return ;
         end
         if (string.find(arg1, "Thirty seconds until the Arena battle begins!")) then
-            self.countdown = 31;
+            self.countdown = 30;
             return ;
         end
         if (string.find(arg1, "Fifteen seconds until the Arena battle begins!")) then
-            self.countdown = 16;
+            self.countdown = 15;
             return ;
         end
         if (string.find(arg1, "Ten seconds until the Arena battle begins!")) then
-            self.countdown = 11;
+            self.countdown = 10;
             return ;
         end
     end
+end
+
+function ACDFrame:UpdateFrame()
+    ACDNumFrame:SetHeight(Gladdy.db.arenaCountdownSize)
+    ACDNumFrame:SetWidth(Gladdy.db.arenaCountdownSize)
+    ACDNumFrame:SetPoint("CENTER", 0, 128)
+
+    ACDNumTens:SetWidth(Gladdy.db.arenaCountdownSize)
+    ACDNumTens:SetHeight(Gladdy.db.arenaCountdownSize/2)
+    ACDNumTens:SetPoint("CENTER", ACDNumFrame, "CENTER", -(Gladdy.db.arenaCountdownSize/8 + Gladdy.db.arenaCountdownSize/8/2), 0)
+
+    ACDNumOnes:SetWidth(Gladdy.db.arenaCountdownSize)
+    ACDNumOnes:SetHeight(Gladdy.db.arenaCountdownSize/2)
+    ACDNumOnes:SetPoint("CENTER", ACDNumFrame, "CENTER", (Gladdy.db.arenaCountdownSize/8 + Gladdy.db.arenaCountdownSize/8/2), 0)
+
+    ACDNumOne:SetWidth(Gladdy.db.arenaCountdownSize)
+    ACDNumOne:SetHeight(Gladdy.db.arenaCountdownSize/2)
+    ACDNumOne:SetPoint("CENTER", ACDNumFrame, "CENTER", 0, 0)
+end
+
+function ACDFrame:Test()
+    self.countdown = 30
 end
 
 function ACDFrame:GetOptions()
@@ -127,6 +150,14 @@ function ACDFrame:GetOptions()
             desc = L["Turns countdown before the start of an arena match on/off."],
             order = 3,
             width = "full",
+        }),
+        arenaCountdownSize = Gladdy:option({
+            type = "range",
+            name = L["Size"],
+            order = 4,
+            min = 64,
+            max = 512,
+            step = 16,
         }),
     }
 end
