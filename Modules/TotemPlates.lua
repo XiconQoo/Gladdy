@@ -130,7 +130,7 @@ local function GetTotemColorDefaultOptions()
         return a.name < b.name
     end)
     for i=1,#indexedList do
-        defaultDB["totem" .. indexedList[i].id] = {color = indexedList[i].color, enabled = indexedList[i].enabled}
+        defaultDB["totem" .. indexedList[i].id] = {color = indexedList[i].color, enabled = indexedList[i].enabled, alpha = 0.6}
         options["totem" .. indexedList[i].id] = {
             order = i+1,
             name = "",
@@ -155,7 +155,6 @@ local function GetTotemColorDefaultOptions()
                     name = L["Border color"],
                     desc = L["Color of the border"],
                     order = 2,
-                    width = "full",
                     hasAlpha = true,
                     get = function(info)
                         local key = info.arg or info[#info]
@@ -173,17 +172,31 @@ local function GetTotemColorDefaultOptions()
                         Gladdy:UpdateFrame()
                     end,
                 },
+                alpha = {
+                    type = "range",
+                    name = L["Alpha"],
+                    order = 3,
+                    min = 0,
+                    max = 1,
+                    step = 0.1,
+                    get = function(info)
+                        return Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].alpha
+                    end,
+                    set = function(info, value)
+                        Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].alpha = value
+                    end
+                },
             }
         }
     end
     return defaultDB, options, indexedList
 end
 
-local function GetTotemColorOptions()
+local function GetTotemOptions()
     local indexedList = select(3, GetTotemColorDefaultOptions())
     local colorList = {}
     for i=1, #indexedList do
-        tinsert(colorList, Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].color)
+        tinsert(colorList, Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id])
     end
     return colorList
 end
@@ -204,6 +217,7 @@ local TotemPlates = Gladdy:NewModule("TotemPlates", nil, {
     npTotemPlatesSize = 40,
     npTotemPlatesAlpha = 0.6,
     npTotemPlatesAlphaAlways = false,
+    npTotemPlatesAlphaAlwaysTargeted = false,
     npTotemColors = select(1, GetTotemColorDefaultOptions())
 })
 
@@ -432,18 +446,19 @@ function TotemPlates:SkinTotem(nameplate, nameplateName, addonName)
 
             if (UnitExists("target") and nameplate:GetAlpha() ~= 1) then
                 -- target exists and totem is not target
-                nameplate:SetAlpha(Gladdy.db.npTotemPlatesAlpha)
-                nameplate.gladdyTotemFrame:SetAlpha(Gladdy.db.npTotemPlatesAlpha)
+                nameplate:SetAlpha(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].alpha)
+                nameplate.gladdyTotemFrame:SetAlpha(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].alpha)
+            elseif (UnitExists("target") and nameplate:GetAlpha() == 1 and Gladdy.db.npTotemPlatesAlphaAlwaysTargeted) then
+                -- target but apply alpha anyways
+                nameplate.gladdyTotemFrame:SetAlpha(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].alpha)
             elseif (UnitExists("target") and nameplate:GetAlpha() == 1) then
-                -- target exists and totem is target
-                nameplate:SetAlpha(1)
+                -- target exists and totem is target -> alpha 1
                 nameplate.gladdyTotemFrame:SetAlpha(1)
             elseif (not UnitExists("target") and Gladdy.db.npTotemPlatesAlphaAlways) then
                 -- no target and option npTotemPlatesAlphaAlways == true
-                nameplate:SetAlpha(Gladdy.db.npTotemPlatesAlpha)
-                nameplate.gladdyTotemFrame:SetAlpha(Gladdy.db.npTotemPlatesAlpha)
+                nameplate.gladdyTotemFrame:SetAlpha(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].alpha)
             else
-                -- no target
+                -- no target and option npTotemPlatesAlphaAlways == false
                 nameplate.gladdyTotemFrame:SetAlpha(0.95)
             end
 
@@ -501,49 +516,69 @@ function TotemPlates:GetOptions()
             max = 100,
             step = 1,
         }),
-        npTotemPlatesAlpha = Gladdy:option({
-            type = "range",
-            name = L["Totem alpha"],
-            desc = L["Alpha of totem icons"],
-            order = 11,
-            min = 0.1,
-            max = 0.95,
-            step = 0.01,
-        }),
         npTotemPlatesAlphaAlways = Gladdy:option({
             type = "toggle",
-            name = L["Always apply alpha"],
-            desc = L["Always applies alpha outside of being targeted"],
+            name = L["Apply alpha when no target"],
+            desc = L["Always applies alpha, even when you don't have a target. Else it is 1."],
             order = 12,
+        }),
+        npTotemPlatesAlphaAlwaysTargeted = Gladdy:option({
+            type = "toggle",
+            name = L["Apply alpha when targeted, else it is 1"],
+            desc = L["Always applies alpha, even when you target the totem. Else it is 1."],
+            order = 13,
         }),
         npTotemPlatesBorderStyle = Gladdy:option({
             type = "select",
             name = L["Totem icon border style"],
-            order = 13,
+            order = 15,
             values = Gladdy:GetIconStyles()
         }),
         npAllTotemColors = {
             type = "color",
             name = L["All totem border color"],
-            order = 14,
+            order = 16,
             hasAlpha = true,
             get = function(info)
-                local colors = GetTotemColorOptions()
-                local color = colors[1]
+                local colors = GetTotemOptions()
+                local color = colors[1].color
                 for i=2, #colors do
-                    if colors[i].r ~= color.r or colors[i].r ~= color.r or colors[i].r ~= color.r or colors[i].r ~= color.r then
+                    if colors[i].r ~= color.r or colors[i].color.r ~= color.r or colors[i].color.r ~= color.r or colors[i].color.r ~= color.r then
                         return 0, 0, 0, 0
                     end
                 end
                 return color.r, color.g, color.b, color.a
             end,
             set = function(info, r, g, b, a)
-                local colors = GetTotemColorOptions()
+                local colors = GetTotemOptions()
                 for i=1, #colors do
-                    colors[i].r = r
-                    colors[i].g = g
-                    colors[i].b = b
-                    colors[i].a = a
+                    colors[i].color.r = r
+                    colors[i].color.g = g
+                    colors[i].color.b = b
+                    colors[i].color.a = a
+                end
+            end,
+        },
+        npAllTotemAlphas = {
+            type = "range",
+            name = L["All totem border alphas"],
+            min = 0,
+            max = 1,
+            step = 0.1,
+            order = 14,
+            get = function(info)
+                local alphas = GetTotemOptions()
+                for i=2, #alphas do
+                    if alphas[i].alpha ~= alphas[1].alpha then
+                        return ""
+                    end
+                end
+                return alphas[1].alpha
+            end,
+            set = function(info, value)
+                local alphas = GetTotemOptions()
+                for i=1, #alphas do
+                    alphas[i].alpha = value
                 end
             end,
         },
