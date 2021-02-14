@@ -1,7 +1,10 @@
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local Classicon = Gladdy:NewModule("Classicon", 80, {
-    classIconPos = "LEFT"
+    classIconPos = "LEFT",
+    classIconSize = 60 + 20 + 1,
+    classIconBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
+    classIconBorderColor = { r = 0, g = 0, b = 0, a = 1 },
 })
 
 function Classicon:Initialise()
@@ -13,19 +16,24 @@ end
 
 function Classicon:CreateFrame(unit)
     local classIcon = CreateFrame("Frame", nil, Gladdy.buttons[unit])
+    classIcon:SetFrameStrata("MEDIUM")
+    classIcon:SetFrameLevel(1)
     classIcon.texture = classIcon:CreateTexture(nil, "BACKGROUND")
     classIcon.texture:SetAllPoints(classIcon)
+
+    classIcon.texture.overlay = classIcon:CreateTexture(nil, "BORDER")
+    classIcon.texture.overlay:SetAllPoints(classIcon)
+    classIcon.texture.overlay:SetTexture(Gladdy.db.classIconBorderStyle)
+
+    classIcon:SetFrameStrata("MEDIUM")
+    classIcon:SetFrameLevel(2)
+
     classIcon:ClearAllPoints()
     if (Gladdy.db.classIconPos == "RIGHT") then
         classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit].healthBar, "TOPRIGHT", 2, 2)
     else
         classIcon:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -2, 2)
     end
-
-    classIcon.border = CreateFrame("Frame", nil, classIcon)
-    classIcon.border:SetBackdrop({ edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
-                                   edgeSize = 24 })
-    classIcon.border:SetPoint("CENTER", classIcon, "CENTER", 0, 0)
 
     Gladdy.buttons[unit].classIcon = classIcon
     self.frames[unit] = classIcon
@@ -37,26 +45,22 @@ function Classicon:UpdateFrame(unit)
         return
     end
 
-    local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight
+    classIcon:SetWidth(Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1)
+    classIcon:SetHeight(Gladdy.db.classIconSize)
 
-    classIcon:SetWidth(iconSize - iconSize * 0.1)
-    classIcon:SetHeight(iconSize)
     classIcon:ClearAllPoints()
     local margin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
     if (Gladdy.db.classIconPos == "LEFT") then
-        classIcon:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -margin, 2)
+        classIcon:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -margin, 0)
     else
-        classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", margin, 2)
+        classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", margin, 0)
     end
 
     classIcon.texture:ClearAllPoints()
     classIcon.texture:SetAllPoints(classIcon)
 
-    classIcon.border:SetWidth((iconSize - iconSize * 0.1))
-    classIcon.border:SetHeight(iconSize)
-    classIcon.border:ClearAllPoints()
-    classIcon.border:SetPoint("CENTER", classIcon, "CENTER", 0, 0)
-    classIcon.border:SetBackdropBorderColor(0, 0, 0, 1)
+    classIcon.texture.overlay:SetTexture(Gladdy.db.classIconBorderStyle)
+    classIcon.texture.overlay:SetVertexColor(Gladdy.db.classIconBorderColor.r, Gladdy.db.classIconBorderColor.g, Gladdy.db.classIconBorderColor.b, Gladdy.db.classIconBorderColor.a)
 end
 
 function Classicon:Test(unit)
@@ -72,44 +76,60 @@ function Classicon:ResetUnit(unit)
     classIcon.texture:SetTexture("")
 end
 
-local function option(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key]
-        end,
-        set = function(info, value)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key] = value
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
 function Classicon:GetOptions()
     return {
-        classIconPos = option({
+        headerClassicon = {
+            type = "header",
+            name = L["Class Icon"],
+            order = 2,
+        },
+        classIconSize = Gladdy:option({
+            type = "range",
+            name = L["Icon size"],
+            min = 1,
+            max = 100,
+            step = 1,
+            order = 3,
+        }),
+        headerPosition = {
+            type = "header",
+            name = L["Position"],
+            order = 5,
+        },
+        classIconPos = Gladdy:option({
             type = "select",
             name = L["Icon position"],
             desc = L["This changes positions with trinket"],
-            order = 2,
+            order = 6,
             values = {
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],
             },
-        })
+        }),
+        headerBorder = {
+            type = "header",
+            name = L["Border"],
+            order = 10,
+        },
+        classIconBorderStyle = Gladdy:option({
+            type = "select",
+            name = L["Border style"],
+            order = 11,
+            values = Gladdy:GetIconStyles()
+        }),
+        classIconBorderColor = Gladdy:colorOption({
+            type = "color",
+            name = L["Border color"],
+            desc = L["Color of the border"],
+            order = 12,
+            hasAlpha = true,
+        }),
     }
 end
 
 local function getClassIcon(class)
     -- see https://wow.gamepedia.com/Class_icon
-    local classIcon = "Interface\\Icons\\"
+    local classIcon = "Interface\\Addons\\Gladdy\\Images\\Classes\\"
     if class == "DRUID" then
         return classIcon .. "inv_misc_monsterclaw_04"
     elseif class == "HUNTER" then

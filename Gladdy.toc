@@ -1,10 +1,11 @@
 ## Interface: 20400
 ## Title: Gladdy - Macumba/XiCoN Edit
-## Version: 1.0-Release
+## Version: 1.1-Release
 ## Notes: The most powerful arena AddOn for WoW 2.4.3
 ## Author: Mikhail "miraage" Osher / Schaka / Knall / Macumba
 ## X-Email: miraage.wow@gmail.com / schakaqt@gmail.com / https://discord.gg/5qVu56M
 ## SavedVariables: GladdyXZ
+## OptionalDeps: SharedMedia
 
 embeds.xml
 
@@ -15,16 +16,16 @@ Options.lua
 Speclist.lua
 
 Modules\Announcements.lua
+Modules\Healthbar.lua
+Modules\Powerbar.lua
 Modules\Auras.lua
 Modules\Castbar.lua
 Modules\Classicon.lua
 Modules\Clicks.lua
 Modules\Diminishings.lua
-Modules\Healthbar.lua
 Modules\Highlight.lua
-Modules\Nameplates.lua
+Modules\TotemPlates.lua
 Modules\PlateCastbar.lua
-Modules\Powerbar.lua
 Modules\Trinket.lua
 Modules\TrinketTracker.lua
 Modules\Cooldowns.lua

@@ -103,10 +103,22 @@ setmetatable(Gladdy, {
 
 function Gladdy:Print(...)
     local text = "|cff33ff99Gladdy|r:"
+    local val
     for i = 1, select("#", ...) do
-        text = text .. " " .. tostring(select(i, ...))
+        val = select(i, ...)
+        if (type(val) == 'boolean') then val = val and "true" or false end
+        text = text .. " " .. tostring(val)
     end
     DEFAULT_CHAT_FRAME:AddMessage(text)
+end
+
+function Gladdy:GetIconStyles()
+    return
+    {
+        ["Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp"] = L["Gladdy Tooltip round"],
+        ["Interface\\AddOns\\Gladdy\\Images\\Border_squared_blp"] = L["Gladdy Tooltip squared"],
+        ["Interface\\AddOns\\Gladdy\\Images\\Border_Gloss"] = L["Gloss (black border)"],
+    }
 end
 
 Gladdy.events = CreateFrame("Frame")
@@ -211,7 +223,11 @@ function Gladdy:OnInitialise()
     self.LSM = LibStub("LibSharedMedia-3.0")
     self.LSM:Register("statusbar", "Gloss", "Interface\\AddOns\\Gladdy\\Images\\Gloss")
     self.LSM:Register("statusbar", "Smooth", "Interface\\AddOns\\Gladdy\\Images\\Smooth")
-    self.LSM:Register("statusbar", "Minimalist", "Interface\\AddOns\\Gladdy\\Images\\Minimalist")--*
+    self.LSM:Register("statusbar", "Minimalist", "Interface\\AddOns\\Gladdy\\Images\\Minimalist")
+    self.LSM:Register("statusbar", "LiteStep", "Interface\\AddOns\\Gladdy\\Images\\LiteStep.tga")
+    self.LSM:Register("border", "Gladdy Tooltip round", "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade")
+    self.LSM:Register("border", "Gladdy Tooltip squared", "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_square_selfmade")
+    self.LSM:Register("font", "DorisPP", "Interface\\AddOns\\Gladdy\\Images\\DorisPP.TTF")
 
     L = self.L
 
@@ -1225,23 +1241,20 @@ function Gladdy:CooldownStart(button, spellId, duration)
             local frame = button.spellCooldownFrame["icon" .. i]
             frame.active = true
             frame.timeLeft = duration
-            frame.cooldown:SetCooldown(GetTime(), duration)
+            if (not Gladdy.db.cooldownDisableCircle) then frame.cooldown:SetCooldown(GetTime(), duration) end
             frame:SetScript("OnUpdate", function(self, elapsed)
                 self.timeLeft = self.timeLeft - elapsed
                 local timeLeft = ceil(self.timeLeft)
                 if timeLeft >= 540 then
                     self.cooldownFont:SetText(ceil(timeLeft / 60) .. "m")
-                    self.cooldownFont:SetTextColor(1, 1, 0)
-                    self.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", Gladdy.db.cooldownSize / 3.1, "OUTLINE")
+                    self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), Gladdy.db.cooldownSize / 3.1 * Gladdy.db.cooldownFontScale, "OUTLINE")
                 elseif timeLeft < 540 and timeLeft >= 60 then
                     -- more than 1 minute
                     self.cooldownFont:SetText(ceil(timeLeft / 60) .. "m")
-                    self.cooldownFont:SetTextColor(1, 1, 0)
-                    self.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", Gladdy.db.cooldownSize / 2.15, "OUTLINE")
+                    self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), Gladdy.db.cooldownSize / 2.15 * Gladdy.db.cooldownFontScale, "OUTLINE")
                 elseif timeLeft < 60 and timeLeft > 0 then
                     -- between 60s and 21s (green)
-                    self.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", Gladdy.db.cooldownSize / 2.15, "OUTLINE")
-                    self.cooldownFont:SetTextColor(1, 1, 0)
+                    self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), Gladdy.db.cooldownSize / 2.15 * Gladdy.db.cooldownFontScale, "OUTLINE")
                     self.cooldownFont:SetText(timeLeft)
                 else
                     self.cooldownFont:SetText("")

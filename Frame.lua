@@ -109,22 +109,28 @@ local function StyleActionButton(f)
     local button = _G[name]
     local icon = _G[name .. "Icon"]
     local normalTex = _G[name .. "NormalTexture"]
+    local cooldown = _G[name .. "Cooldown"]
 
     normalTex:SetHeight(button:GetHeight())
     normalTex:SetWidth(button:GetWidth())
     normalTex:SetPoint("CENTER")
 
-    button:SetNormalTexture("Interface\\AddOns\\Gladdy\\Images\\Gloss_CDs")
+    cooldown:SetAlpha(Gladdy.db.cooldownCooldownAlpha)
+
+    button:SetNormalTexture(Gladdy.db.cooldownBorderStyle)
+    normalTex:SetVertexColor(Gladdy.db.cooldownBorderColor.r, Gladdy.db.cooldownBorderColor.g, Gladdy.db.cooldownBorderColor.b, Gladdy.db.cooldownBorderColor.a)
 
     icon:SetTexCoord(.1, .9, .1, .9)
     icon:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
     icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
-
-    normalTex:SetVertexColor(1, 1, 1, 1)
 end
 
 function Gladdy:UpdateFrame()
-    local teamSize = self.curBracket or 5
+
+    if (not self.frame) then
+        self:CreateFrame()
+    end
+    local teamSize = self.curBracket or 0
 
     local iconSize = self.db.healthBarHeight
     local margin = 0
@@ -153,7 +159,7 @@ function Gladdy:UpdateFrame()
     self.frame:SetScale(self.db.frameScale)
     self.frame:SetWidth(width)
     self.frame:SetHeight(height)
-    self.frame:SetBackdropColor(self.db.frameColor.r, self.db.frameColor.g, self.db.frameColor.b, self.db.frameColor.a)
+    --self.frame:SetBackdropColor(self.db.frameColor.r, self.db.frameColor.g, self.db.frameColor.b, self.db.frameColor.a)
     self.frame:ClearAllPoints()
     if (self.db.x == 0 and self.db.y == 0) then
         self.frame:SetPoint("CENTER")
@@ -213,15 +219,15 @@ function Gladdy:UpdateFrame()
             button.spellCooldownFrame:ClearAllPoints()
             if self.db.cooldownYPos == "TOP" then
                 if self.db.cooldownXPos == "RIGHT" then
-                    button.spellCooldownFrame:SetPoint("BOTTOMRIGHT", button.healthBar, "TOPRIGHT", 0, self.db.highlightBorderSize) -- needs to be properly anchored after trinket
+                    button.spellCooldownFrame:SetPoint("BOTTOMRIGHT", button.healthBar, "TOPRIGHT", Gladdy.db.cooldownXOffset, self.db.highlightBorderSize + Gladdy.db.cooldownYOffset) -- needs to be properly anchored after trinket
                 else
-                    button.spellCooldownFrame:SetPoint("BOTTOMLEFT", button.healthBar, "TOPLEFT", 0, self.db.highlightBorderSize)
+                    button.spellCooldownFrame:SetPoint("BOTTOMLEFT", button.healthBar, "TOPLEFT", Gladdy.db.cooldownXOffset, self.db.highlightBorderSize + Gladdy.db.cooldownYOffset)
                 end
             else
                 if self.db.cooldownXPos == "RIGHT" then
-                    button.spellCooldownFrame:SetPoint("TOPRIGHT", button.powerBar, "BOTTOMRIGHT", 0, -self.db.highlightBorderSize) -- needs to be properly anchored after trinket
+                    button.spellCooldownFrame:SetPoint("TOPRIGHT", button.powerBar, "BOTTOMRIGHT", Gladdy.db.cooldownXOffset, -self.db.highlightBorderSize + Gladdy.db.cooldownYOffset) -- needs to be properly anchored after trinket
                 else
-                    button.spellCooldownFrame:SetPoint("TOPLEFT", button.powerBar, "BOTTOMLEFT", 0, -self.db.highlightBorderSize)
+                    button.spellCooldownFrame:SetPoint("TOPLEFT", button.powerBar, "BOTTOMLEFT", Gladdy.db.cooldownXOffset, -self.db.highlightBorderSize + Gladdy.db.cooldownYOffset)
                 end
             end
             button.spellCooldownFrame:SetHeight(self.db.cooldownSize)
@@ -232,7 +238,8 @@ function Gladdy:UpdateFrame()
                 local icon = button.spellCooldownFrame["icon" .. i]
                 icon:SetHeight(self.db.cooldownSize)
                 icon:SetWidth(self.db.cooldownSize)
-                icon.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", self.db.cooldownSize / 2, "OUTLINE")
+                icon.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), self.db.cooldownSize / 2 * Gladdy.db.cooldownFontScale, "OUTLINE")
+                icon.cooldownFont:SetTextColor(Gladdy.db.cooldownFontColor.r, Gladdy.db.cooldownFontColor.g, Gladdy.db.cooldownFontColor.b, Gladdy.db.cooldownFontColor.a)
                 icon:ClearAllPoints()
                 if (self.db.cooldownXPos == "RIGHT") then
                     if (i == 1) then
@@ -269,12 +276,12 @@ function Gladdy:UpdateFrame()
         else
             button.spellCooldownFrame:Hide()
         end
-
         for k, v in self:IterModules() do
             self:Call(v, "UpdateFrame", button.unit)
         end
         Gladdy:UpdateTestCooldowns(i)
     end
+    Gladdy.modules["PlateCastBar"]:UpdateFrame()
 end
 
 function Gladdy:HideFrame()
@@ -333,8 +340,13 @@ function Gladdy:CreateButton(i)
         icon.cooldown = _G[icon:GetName() .. "Cooldown"]
         icon.cooldown:SetReverse(false)
         icon.cooldown.noCooldownCount = true --Gladdy.db.trinketDisableOmniCC
-        icon.cooldownFont = icon.cooldown:CreateFontString(nil, "OVERLAY")
-        icon.cooldownFont:SetFont("Fonts\\FRIZQT__.ttf", self.db.cooldownSize / 2, "OUTLINE")
+        icon.cooldownFrame = CreateFrame("Frame", nil, icon)
+        icon.cooldownFrame:ClearAllPoints()
+        icon.cooldownFrame:SetPoint("TOPLEFT", icon, "TOPLEFT")
+        icon.cooldownFrame:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT")
+        icon.cooldownFont = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
+        icon:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), self.db.cooldownSize / 2  * Gladdy.db.cooldownFontScale, "OUTLINE")
+        icon.cooldownFont:SetTextColor(Gladdy.db.cooldownFontColor.r, Gladdy.db.cooldownFontColor.g, Gladdy.db.cooldownFontColor.b, Gladdy.db.cooldownFontColor.a)
         icon.cooldownFont:SetAllPoints(icon)
 
         spellCooldownFrame["icon" .. x] = icon

@@ -5,7 +5,7 @@ local CreateFrame = CreateFrame
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local Highlight = Gladdy:NewModule("Highlight", nil, {
-    highlightBorderSize = 3,
+    highlightBorderSize = 2,
     targetBorderColor = { r = 1, g = 0.8, b = 0, a = 1 },
     focusBorderColor = { r = 1, g = 0, b = 0, a = 1 },
     leaderBorderColor = { r = 0, g = 1, b = 0, a = 1 },
@@ -59,7 +59,7 @@ function Highlight:UpdateFrame(unit)
     end
 
     local borderSize = Gladdy.db.highlightBorderSize
-    local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight
+    local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight + 1
     local width = Gladdy.db.barWidth + borderSize * 2
     local height = iconSize + borderSize * 2
 
@@ -140,98 +140,68 @@ function Highlight:Toggle(unit, frame, show)
     end
 end
 
-local function option(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key]
-        end,
-        set = function(info, value)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key] = value
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
-local function colorOption(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
-        end,
-        set = function(info, r, g, b, a)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
 function Highlight:GetOptions()
     return {
+        headerHighlight = {
+            type = "header",
+            name = L["Highlight"],
+            order = 2,
+        },
         highlightBorderSize = {
             type = "range",
             name = L["Border size"],
             desc = L["Border size"],
-            order = 2,
+            order = 3,
             min = 1,
             max = 10,
             step = 1,
         },
-        targetBorderColor = colorOption({
+        targetBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Target border color"],
             desc = L["Color of the selected targets border"],
-            order = 3,
+            order = 4,
         }),
-        focusBorderColor = colorOption({
+        focusBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Focus border color"],
             desc = L["Color of the focus border"],
-            order = 4,
+            order = 5,
         }),
-        leaderBorderColor = colorOption({
+        leaderBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Raid leader border color"],
             desc = L["Color of the raid leader border"],
-            order = 5,
+            order = 6,
         }),
-        highlight = option({
+        headerEnable = {
+            type = "header",
+            name = L["Enable/Disable"],
+            order = 10,
+        },
+        highlight = Gladdy:option({
             type = "toggle",
             name = L["Highlight target"],
             desc = L["Toggle if the selected target should be highlighted"],
-            order = 6,
+            order = 11,
         }),
-        targetBorder = option({
+        targetBorder = Gladdy:option({
             type = "toggle",
             name = L["Show border around target"],
             desc = L["Toggle if a border should be shown around the selected target"],
-            order = 7,
+            order = 12,
         }),
-        focusBorder = option({
+        focusBorder = Gladdy:option({
             type = "toggle",
             name = L["Show border around focus"],
             desc = L["Toggle of a border should be shown around the current focus"],
-            order = 9,
+            order = 13,
         }),
-        leaderBorder = option({
+        leaderBorder = Gladdy:option({
             type = "toggle",
             name = L["Show border around raid leader"],
             desc = L["Toggle if a border should be shown around the raid leader"],
-            order = 9,
+            order = 14,
         }),
     }
 end

@@ -15,7 +15,9 @@ TO DO:
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local ArenaIdentify = Gladdy:NewModule("ArenaIdentify", nil, {
-    scanTable = {},
+    scanTable = {
+        [GetRealmName()] = {}
+    },
     guidsByName = {},
     arenaIdentifyEnabled = true,
 })
@@ -55,33 +57,19 @@ function ArenaIdentify:Initialise()
     end
 end
 
-local function option(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key]
-        end,
-        set = function(info, value)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key] = value
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
 function ArenaIdentify:GetOptions()
     return {
-        arenaIdentifyEnabled = option({
+        headerArenaIdentify = {
+            type = "header",
+            name = L["Arena Identify"],
+            order = 2,
+        },
+        arenaIdentifyEnabled = Gladdy:option({
             type = "toggle",
             name = L["Turn option to automatically discover enemies on/off"],
             desc = L["Turn this off if you experience any issues with enemies showing in Gladdy that don't exist"],
-            order = 2,
+            order = 3,
+            width = "full",
         }),
     }
 end

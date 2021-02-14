@@ -7,8 +7,12 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
 local Powerbar = Gladdy:NewModule("Powerbar", 90, {
+    powerBarFont = "DorisPP",
     powerBarHeight = 20,
     powerBarTexture = "Smooth",
+    powerBarBorderStyle = "Gladdy Tooltip round",
+    powerBarBorderSize = 9,
+    powerBarBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     powerBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
     powerBarBgColor = { r = 0.3, g = 0.3, b = 0.3, a = 0.7 },
     powerBarFontSize = 10,
@@ -28,24 +32,26 @@ end
 
 function Powerbar:CreateFrame(unit)
     local button = Gladdy.buttons[unit]
-    local powerBar = CreateFrame("StatusBar", nil, Gladdy.buttons[unit])
-    powerBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
-    powerBar:SetMinMaxValues(0, 100)
 
-    powerBar.border = CreateFrame("Frame", nil, powerBar)
-    powerBar.border:SetBackdrop({ edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
-                                  edgeSize = 13 })
-    powerBar.border:SetBackdropBorderColor(0, 0, 0, 1)
+    local powerBar = CreateFrame("Frame", nil, Gladdy.buttons[unit])
+    powerBar:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.powerBarBorderStyle),
+                                  edgeSize = Gladdy.db.powerBarBorderSize })
+    powerBar:SetBackdropBorderColor(Gladdy.db.powerBarBorderColor.r, Gladdy.db.powerBarBorderColor.g, Gladdy.db.powerBarBorderColor.b, Gladdy.db.powerBarBorderColor.a)
+    powerBar:SetFrameLevel(1)
 
-    powerBar.bg = powerBar:CreateTexture(nil, "BACKGROUND")
+    powerBar.energy = CreateFrame("StatusBar", nil, powerBar)
+    powerBar.energy:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
+    powerBar.energy:SetMinMaxValues(0, 100)
+    powerBar.energy:SetFrameLevel(0)
+
+    powerBar.bg = powerBar.energy:CreateTexture(nil, "BACKGROUND")
     powerBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
     powerBar.bg:ClearAllPoints()
-    powerBar.bg:SetAllPoints(powerBar)
+    powerBar.bg:SetAllPoints(powerBar.energy)
     powerBar.bg:SetVertexColor(Gladdy.db.powerBarBgColor.r, Gladdy.db.powerBarBgColor.g, Gladdy.db.powerBarBgColor.b, Gladdy.db.powerBarBgColor.a)
-    powerBar.bg:SetAlpha(0.7)
 
     powerBar.raceText = powerBar:CreateFontString(nil, "LOW")
-    powerBar.raceText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.powerBarFontSize)
+    powerBar.raceText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.powerBarFont), Gladdy.db.powerBarFontSize)
     powerBar.raceText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)
     powerBar.raceText:SetShadowOffset(1, -1)
     powerBar.raceText:SetShadowColor(0, 0, 0, 1)
@@ -53,7 +59,7 @@ function Powerbar:CreateFrame(unit)
     powerBar.raceText:SetPoint("LEFT", 5, 1)
 
     powerBar.powerText = powerBar:CreateFontString(nil, "LOW")
-    powerBar.powerText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.powerBarFontSize)
+    powerBar.powerText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.powerBarFont), Gladdy.db.powerBarFontSize)
     powerBar.powerText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)
     powerBar.powerText:SetShadowOffset(1, -1)
     powerBar.powerText:SetShadowColor(0, 0, 0, 1)
@@ -66,7 +72,6 @@ function Powerbar:CreateFrame(unit)
 end
 
 function Powerbar:UpdateFrame(unit)
-    local button = Gladdy.buttons[unit]
     local powerBar = self.frames[unit]
     if (not powerBar) then
         return
@@ -74,7 +79,7 @@ function Powerbar:UpdateFrame(unit)
 
     local healthBar = Gladdy.modules.Healthbar.frames[unit]
 
-    powerBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
+
     powerBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
     powerBar.bg:SetVertexColor(Gladdy.db.powerBarBgColor.r, Gladdy.db.powerBarBgColor.g, Gladdy.db.powerBarBgColor.b, Gladdy.db.powerBarBgColor.a)
 
@@ -84,14 +89,18 @@ function Powerbar:UpdateFrame(unit)
     powerBar:ClearAllPoints()
     powerBar:SetPoint("TOPLEFT", healthBar, "BOTTOMLEFT", 0, -1)
 
-    powerBar.border:SetWidth(powerBar:GetWidth() + 4)
-    powerBar.border:SetHeight(powerBar:GetHeight() + 4)
-    powerBar.border:ClearAllPoints()
-    powerBar.border:SetPoint("CENTER", powerBar, "CENTER", 0, 0)
+    powerBar:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.powerBarBorderStyle),
+                                  edgeSize = Gladdy.db.powerBarBorderSize })
+    powerBar:SetBackdropBorderColor(Gladdy.db.powerBarBorderColor.r, Gladdy.db.powerBarBorderColor.g, Gladdy.db.powerBarBorderColor.b, Gladdy.db.powerBarBorderColor.a)
 
-    powerBar.raceText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.powerBarFontSize)
+    powerBar.energy:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
+    powerBar.energy:ClearAllPoints()
+    powerBar.energy:SetPoint("TOPLEFT", powerBar, "TOPLEFT", (Gladdy.db.powerBarBorderSize/Gladdy.db.statusbarBorderOffset), -(Gladdy.db.powerBarBorderSize/Gladdy.db.statusbarBorderOffset))
+    powerBar.energy:SetPoint("BOTTOMRIGHT", powerBar, "BOTTOMRIGHT", -(Gladdy.db.powerBarBorderSize/Gladdy.db.statusbarBorderOffset), (Gladdy.db.powerBarBorderSize/Gladdy.db.statusbarBorderOffset))
+
+    powerBar.raceText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.powerBarFont), Gladdy.db.powerBarFontSize)
     powerBar.raceText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)
-    powerBar.powerText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.powerBarFontSize)
+    powerBar.powerText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.powerBarFont), Gladdy.db.powerBarFontSize)
     powerBar.powerText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)
 end
 
@@ -101,10 +110,10 @@ function Powerbar:ResetUnit(unit)
         return
     end
 
-    powerBar:SetStatusBarColor(1, 1, 1, 1)
+    powerBar.energy:SetStatusBarColor(1, 1, 1, 1)
     powerBar.raceText:SetText("")
     powerBar.powerText:SetText("")
-    powerBar:SetValue(0)
+    powerBar.energy:SetValue(0)
 end
 
 function Powerbar:Test(unit)
@@ -175,15 +184,15 @@ function Powerbar:UNIT_POWER(unit, power, powerMax, powerType)
     end
 
     if (powerType == 1) then
-        powerBar:SetStatusBarColor(1, 0, 0, 1)
+        powerBar.energy:SetStatusBarColor(1, 0, 0, 1)
     elseif (powerType == 3) then
-        powerBar:SetStatusBarColor(1, 1, 0, 1)
+        powerBar.energy:SetStatusBarColor(1, 1, 0, 1)
     else
-        powerBar:SetStatusBarColor(.18, .44, .75, 1)
+        powerBar.energy:SetStatusBarColor(.18, .44, .75, 1)
     end
 
     powerBar.powerText:SetText(powerText)
-    powerBar:SetValue(powerPercentage)
+    powerBar.energy:SetValue(powerPercentage)
 end
 
 function Powerbar:UNIT_DEATH(unit)
@@ -192,7 +201,7 @@ function Powerbar:UNIT_DEATH(unit)
         return
     end
 
-    powerBar:SetValue(0)
+    powerBar.energy:SetValue(0)
     powerBar.powerText:SetText("0%")
 end
 
@@ -205,26 +214,10 @@ local function option(params)
         set = function(info, value)
             local key = info.arg or info[#info]
             Gladdy.dbi.profile[key] = value
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
-local function colorOption(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
-        end,
-        set = function(info, r, g, b, a)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
+            Gladdy.options.args.Powerbar.args.powerBarBorderSize.max = Gladdy.db.powerBarHeight/2
+            if Gladdy.db.powerBarBorderSize > Gladdy.db.powerBarHeight/2 then
+                Gladdy.db.powerBarBorderSize = Gladdy.db.powerBarHeight/2
+            end
             Gladdy:UpdateFrame()
         end,
     }
@@ -238,11 +231,16 @@ end
 
 function Powerbar:GetOptions()
     return {
+        headerPowerbar = {
+            type = "header",
+            name = L["Power Bar"],
+            order = 2,
+        },
         powerBarHeight = option({
             type = "range",
             name = L["Bar height"],
             desc = L["Height of the bar"],
-            order = 2,
+            order = 3,
             min = 0,
             max = 50,
             step = 1,
@@ -251,49 +249,95 @@ function Powerbar:GetOptions()
             type = "select",
             name = L["Bar texture"],
             desc = L["Texture of the bar"],
-            order = 3,
+            order = 4,
             dialogControl = "LSM30_Statusbar",
             values = AceGUIWidgetLSMlists.statusbar,
         }),
-        powerBarBgColor = colorOption({
+        powerBarBgColor = Gladdy:colorOption({
             type = "color",
             name = L["Background color"],
             desc = L["Color of the status bar background"],
-            order = 4,
+            order = 5,
             hasAlpha = true,
         }),
-        powerBarFontColor = colorOption({
+        headerFont = {
+            type = "header",
+            name = L["Font"],
+            order = 10,
+        },
+        powerBarFont = option({
+            type = "select",
+            name = L["Font"],
+            desc = L["Font of the bar"],
+            order = 11,
+            dialogControl = "LSM30_Font",
+            values = AceGUIWidgetLSMlists.font,
+        }),
+        powerBarFontColor = Gladdy:colorOption({
             type = "color",
             name = L["Font color"],
             desc = L["Color of the text"],
-            order = 5,
+            order = 12,
             hasAlpha = true,
         }),
         powerBarFontSize = option({
             type = "range",
             name = L["Font size"],
             desc = L["Size of the text"],
-            order = 6,
+            order = 13,
             min = 1,
             max = 20,
         }),
+        headerBorder = {
+            type = "header",
+            name = L["Border"],
+            order = 20,
+        },
+        powerBarBorderStyle = option({
+            type = "select",
+            name = L["Border style"],
+            order = 21,
+            dialogControl = "LSM30_Border",
+            values = AceGUIWidgetLSMlists.border,
+        }),
+        powerBarBorderSize = option({
+            type = "range",
+            name = L["Border size"],
+            desc = L["Size of the border"],
+            order = 22,
+            min = 0.5,
+            max = Gladdy.db.powerBarHeight/2,
+            step = 0.5,
+        }),
+        powerBarBorderColor = Gladdy:colorOption({
+            type = "color",
+            name = L["Border color"],
+            desc = L["Color of the border"],
+            order = 23,
+            hasAlpha = true,
+        }),
+        headerPowerValues = {
+            type = "header",
+            name = L["Power Values"],
+            order = 30,
+        },
         powerActual = option({
             type = "toggle",
             name = L["Show the actual power"],
             desc = L["Show the actual power on the power bar"],
-            order = 7,
+            order = 31,
         }),
         powerMax = option({
             type = "toggle",
             name = L["Show max power"],
             desc = L["Show max power on the power bar"],
-            order = 8,
+            order = 32,
         }),
         powerPercentage = option({
             type = "toggle",
             name = L["Show power percentage"],
             desc = L["Show power percentage on the power bar"],
-            order = 9,
+            order = 33,
         }),
     }
 end

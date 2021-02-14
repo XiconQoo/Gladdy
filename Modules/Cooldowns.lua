@@ -2,10 +2,19 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 
 local Cooldown = Gladdy:NewModule("Cooldown", nil, {
+    cooldownFont = "DorisPP",
+    cooldownFontScale = 1,
+    cooldownFontColor = { r = 1, g = 1, b = 0, a = 1 },
     cooldown = true,
     cooldownYPos = "TOP",
     cooldownXPos = "LEFT",
+    cooldownYOffset = 0,
+    cooldownXOffset = 0,
     cooldownSize = 30,
+    cooldownBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_Gloss",
+    cooldownBorderColor = { r = 1, g = 1, b = 1, a = 1 },
+    cooldownDisableCircle = false,
+    cooldownCooldownAlpha = 1
 })
 
 function Cooldown:Test(unit)
@@ -14,68 +23,127 @@ function Cooldown:Test(unit)
     button.lastCooldownSpell = 1
 end
 
-local function option(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key]
-        end,
-        set = function(info, value)
-            local key = info.arg or info[#info]
-            -- hackfix to prevent DR/cooldown to be on the same side
-            --[[if( key == "cooldownPos" and value == "LEFT" ) then
-              Gladdy.db.drCooldownPos = "RIGHT"
-            elseif ( key == "cooldownPos" and value == "RIGHT" ) then
-              Gladdy.db.drCooldownPos = "RIGHT"
-            end--]]
-            --Gladdy.db.cooldownPos = value
-            Gladdy.dbi.profile[key] = value
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
 function Cooldown:GetOptions()
     return {
-        cooldown = option({
+        headerCooldown = {
+            type = "header",
+            name = L["Cooldown"],
+            order = 2,
+        },
+        cooldown = Gladdy:option({
             type = "toggle",
             name = L["Enable"],
             desc = L["Enabled cooldown module"],
-            order = 4,
+            order = 2,
         }),
-        cooldownSize = option({
+        cooldownSize = Gladdy:option({
             type = "range",
             name = L["Cooldown size"],
             desc = L["Size of each cd icon"],
-            order = 5,
+            order = 3,
             min = 5,
             max = (Gladdy.db.healthBarHeight + Gladdy.db.castBarHeight + Gladdy.db.powerBarHeight + Gladdy.db.bottomMargin) / 2,
         }),
-        cooldownYPos = option({
+        cooldownDisableCircle = Gladdy:option({
+            type = "toggle",
+            name = L["No Cooldown Circle"],
+            order = 4,
+        }),
+        cooldownCooldownAlpha = Gladdy:option({
+            type = "range",
+            name = L["Cooldown circle alpha"],
+            min = 0,
+            max = 1,
+            step = 0.1,
+            order = 5,
+        }),
+        headerFont = {
+            type = "header",
+            name = L["Font"],
+            order = 5,
+        },
+        cooldownFont = Gladdy:option({
+            type = "select",
+            name = L["Font"],
+            desc = L["Font of the cooldown"],
+            order = 6,
+            dialogControl = "LSM30_Font",
+            values = AceGUIWidgetLSMlists.font,
+        }),
+        cooldownFontScale = Gladdy:option({
+            type = "range",
+            name = L["Font scale"],
+            desc = L["Scale of the font"],
+            order = 7,
+            min = 0.1,
+            max = 2,
+            step = 0.1,
+        }),
+        cooldownFontColor = Gladdy:colorOption({
+            type = "color",
+            name = L["Font color"],
+            desc = L["Color of the text"],
+            order = 8,
+            hasAlpha = true,
+        }),
+        headerPosition = {
+            type = "header",
+            name = L["Position"],
+            order = 10,
+        },
+        cooldownYPos = Gladdy:option({
             type = "select",
             name = L["Position"],
             desc = L["Position of the cooldown icons"],
-            order = 6,
+            order = 11,
             values = {
                 ["TOP"] = L["Top"],
                 ["BOTTOM"] = L["Bottom"],
             },
         }),
-        cooldownXPos = option({
+        cooldownXPos = Gladdy:option({
             type = "select",
             name = L["Position"],
             desc = L["Position of the cooldown icons"],
-            order = 7,
+            order = 12,
             values = {
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],
             },
+        }),
+        cooldownXOffset = Gladdy:option({
+            type = "range",
+            name = L["Horizontal offset"],
+            order = 13,
+            min = -300,
+            max = 300,
+            step = 0.1,
+        }),
+        cooldownYOffset = Gladdy:option({
+            type = "range",
+            name = L["Vertical offset"],
+            order = 14,
+            min = -300,
+            max = 300,
+            step = 0.1,
+        }),
+        headerBorder = {
+            type = "header",
+            name = L["Border"],
+            order = 20,
+        },
+        cooldownBorderStyle = Gladdy:option({
+            type = "select",
+            name = L["Border style"],
+            order = 21,
+            values = Gladdy:GetIconStyles()
+        }),
+        cooldownBorderColor = Gladdy:colorOption({
+            type = "color",
+            name = L["Border color"],
+            desc = L["Color of the border"],
+            order = 22,
+            hasAlpha = true,
         }),
     }
 end

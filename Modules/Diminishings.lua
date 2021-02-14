@@ -11,11 +11,19 @@ local GetTime = GetTime
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local Diminishings = Gladdy:NewModule("Diminishings", nil, {
+    drFont = "DorisPP",
     drFontColor = { r = 1, g = 1, b = 0, a = 1 },
-    drFontSize = 20,
+    drFontScale = 1,
     drCooldownPos = "RIGHT",
+    drXOffset = 0,
+    drYOffset = 0,
     drIconSize = 36,
-    drEnabled = true
+    drEnabled = true,
+    drEnableCooldown = true,
+    drBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_Gloss",
+    drBorderColor = { r = 1, g = 1, b = 1, a = 1 },
+    drDisableCircle = false,
+    drCooldownAlpha = 1
 })
 
 local function StyleActionButton(f)
@@ -28,13 +36,12 @@ local function StyleActionButton(f)
     normalTex:SetWidth(button:GetWidth())
     normalTex:SetPoint("CENTER")
 
-    button:SetNormalTexture("Interface\\AddOns\\Gladdy\\Images\\Gloss_CDs")
+    button:SetNormalTexture(Gladdy.db.drBorderStyle)
+    normalTex:SetVertexColor(Gladdy.db.drBorderColor.r, Gladdy.db.drBorderColor.g, Gladdy.db.drBorderColor.b, Gladdy.db.drBorderColor.a)
 
     icon:SetTexCoord(.1, .9, .1, .9)
     icon:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
     icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
-
-    normalTex:SetVertexColor(1, 1, 1, 1)
 end
 
 function Diminishings:OnEvent(event, ...)
@@ -96,18 +103,27 @@ function Diminishings:CreateFrame(unit)
             end
         end)
 
-        icon.text = icon:CreateFontString(nil, "OVERLAY")
+        icon.cooldown = CreateFrame("Cooldown", nil, icon, "CooldownFrameTemplate")
+        icon.cooldown.noCooldownCount = true --Gladdy.db.trinketDisableOmniCC
+        icon.cooldown:SetAlpha(Gladdy.db.drCooldownAlpha)
+
+        icon.cooldownFrame = CreateFrame("Frame", nil, icon)
+        icon.cooldownFrame:ClearAllPoints()
+        icon.cooldownFrame:SetPoint("TOPLEFT", icon, "TOPLEFT")
+        icon.cooldownFrame:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT")
+
+        icon.text = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
         icon.text:SetDrawLayer("OVERLAY")
-        icon.text:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.drFontSize, "OUTLINE")
+        icon.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), 10, "OUTLINE")
         icon.text:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
         icon.text:SetShadowOffset(1, -1)
         icon.text:SetShadowColor(0, 0, 0, 1)
         icon.text:SetJustifyH("CENTER")
         icon.text:SetPoint("CENTER")
 
-        icon.timeText = icon:CreateFontString(nil, "OVERLAY")
+        icon.timeText = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
         icon.timeText:SetDrawLayer("OVERLAY")
-        icon.timeText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.drFontSize - 2, "OUTLINE")
+        icon.timeText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), 10, "OUTLINE")
         icon.timeText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
         icon.timeText:SetShadowOffset(1, -1)
         icon.timeText:SetShadowColor(0, 0, 0, 1)
@@ -135,51 +151,42 @@ function Diminishings:UpdateFrame(unit)
     end
 
     drFrame:ClearAllPoints()
-    local margin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
+    local horizontalMargin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
+    local verticalMargin = (Gladdy.db.powerBarHeight)/2
     if (Gladdy.db.drCooldownPos == "LEFT") then
         if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-            if (Gladdy.db.castBarPos == "LEFT") then
-                drFrame:SetPoint("BOTTOMRIGHT", Gladdy.buttons[unit].trinketButton, "BOTTOMLEFT", -Gladdy.db.padding, 0)
-            else
-                drFrame:SetPoint("RIGHT", Gladdy.buttons[unit].trinketButton, "LEFT", -Gladdy.db.padding, 0)
+            horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+            if (Gladdy.db.classIconPos == "LEFT") then
+                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
             end
+        elseif (Gladdy.db.classIconPos == "LEFT") then
+            horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+            if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
+                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+            end
+        end
+        if (Gladdy.db.castBarPos == "LEFT") then
+            drFrame:SetPoint("BOTTOMRIGHT", Gladdy.buttons[unit].powerBar, "BOTTOMLEFT", -horizontalMargin + Gladdy.db.drXOffset, Gladdy.db.drYOffset)
         else
-            if Gladdy.db.classIconPos == "LEFT" then
-                if (Gladdy.db.castBarPos == "LEFT") then
-                    drFrame:SetPoint("BOTTOMRIGHT", Gladdy.buttons[unit].classIcon, "BOTTOMLEFT", -Gladdy.db.padding, 0)
-                else
-                    drFrame:SetPoint("RIGHT", Gladdy.buttons[unit].classIcon, "LEFT", -Gladdy.db.padding, 0)
-                end
-            else
-                if (Gladdy.db.castBarPos == "LEFT") then
-                    drFrame:SetPoint("BOTTOMRIGHT", Gladdy.buttons[unit].powerBar, "BOTTOMLEFT", -Gladdy.db.padding, 0)
-                else
-                    drFrame:SetPoint("RIGHT", Gladdy.buttons[unit].healthBar, "LEFT", -margin, 0)
-                end
-            end
+            drFrame:SetPoint("RIGHT", Gladdy.buttons[unit].healthBar, "LEFT", -horizontalMargin + Gladdy.db.drXOffset, Gladdy.db.drYOffset - verticalMargin)
         end
     end
     if (Gladdy.db.drCooldownPos == "RIGHT") then
         if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
-            if (Gladdy.db.castBarPos == "RIGHT") then
-                drFrame:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].trinketButton, "BOTTOMRIGHT", Gladdy.db.padding, 0)
-            else
-                drFrame:SetPoint("LEFT", Gladdy.buttons[unit].trinketButton, "RIGHT", Gladdy.db.padding, 0)
+            horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+            if (Gladdy.db.classIconPos == "RIGHT") then
+                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
             end
+        elseif (Gladdy.db.classIconPos == "RIGHT") then
+            horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+            if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
+                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+            end
+        end
+        if (Gladdy.db.castBarPos == "RIGHT") then
+            drFrame:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].powerBar, "BOTTOMRIGHT", horizontalMargin + Gladdy.db.drXOffset, Gladdy.db.drYOffset)
         else
-            if Gladdy.db.classIconPos == "RIGHT" then
-                if (Gladdy.db.castBarPos == "RIGHT") then
-                    drFrame:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].classIcon, "BOTTOMRIGHT", Gladdy.db.padding, 0)
-                else
-                    drFrame:SetPoint("LEFT", Gladdy.buttons[unit].classIcon, "RIGHT", Gladdy.db.padding, 0)
-                end
-            else
-                if (Gladdy.db.castBarPos == "RIGHT") then
-                    drFrame:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].powerBar, "BOTTOMRIGHT", Gladdy.db.padding, 0)
-                else
-                    drFrame:SetPoint("LEFT", Gladdy.buttons[unit].healthBar, "RIGHT", margin, 0)
-                end
-            end
+            drFrame:SetPoint("LEFT", Gladdy.buttons[unit].healthBar, "RIGHT", horizontalMargin + Gladdy.db.drXOffset, Gladdy.db.drYOffset - verticalMargin)
         end
     end
 
@@ -192,9 +199,9 @@ function Diminishings:UpdateFrame(unit)
         icon:SetWidth(Gladdy.db.drIconSize)
         icon:SetHeight(Gladdy.db.drIconSize)
 
-        icon.text:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.drFontSize, "OUTLINE")
+        icon.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
         icon.text:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
-        icon.timeText:SetFont(Gladdy.LSM:Fetch("font"), Gladdy.db.drFontSize - 2, "OUTLINE")
+        icon.timeText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
         icon.timeText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
 
         icon:ClearAllPoints()
@@ -256,6 +263,7 @@ function Diminishings:Fade(unit, spell)
         if (not icon.active or (icon.dr and icon.dr == dr)) then
             icon.dr = dr
             icon.timeLeft = drDuration
+            if not Gladdy.db.drDisableCircle then icon.cooldown:SetCooldown(GetTime(), drDuration) end
             icon.texture:SetTexture(self.icons[spell])
             icon.active = true
             self:Positionate(unit)
@@ -263,6 +271,10 @@ function Diminishings:Fade(unit, spell)
             break
         end
     end
+end
+
+function Positionate()
+    Diminishings:Positionate("arena1")
 end
 
 function Diminishings:Positionate(unit)
@@ -282,7 +294,7 @@ function Diminishings:Positionate(unit)
                 if (not lastIcon) then
                     icon:SetPoint("TOPRIGHT")
                 else
-                    icon:SetPoint("LEFT", lastIcon, "RIGHT")
+                    icon:SetPoint("RIGHT", lastIcon, "LEFT")
                 end
             else
                 if (not lastIcon) then
@@ -297,93 +309,118 @@ function Diminishings:Positionate(unit)
     end
 end
 
-local function option(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key]
-        end,
-        set = function(info, value)
-            local key = info.arg or info[#info]
-            -- hackfix to prevent DR/cooldown to be on the same side
-            if (key == "drCooldownPos" and value == "LEFT") then
-                Gladdy.db.cooldownPos = "RIGHT"
-            elseif (key == "drCooldownPos" and value == "RIGHT") then
-                Gladdy.db.cooldownPos = "RIGHT"
-            end
-            Gladdy.dbi.profile[key] = value
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
-local function colorOption(params)
-    local defaults = {
-        get = function(info)
-            local key = info.arg or info[#info]
-            return Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a
-        end,
-        set = function(info, r, g, b, a)
-            local key = info.arg or info[#info]
-            Gladdy.dbi.profile[key].r, Gladdy.dbi.profile[key].g, Gladdy.dbi.profile[key].b, Gladdy.dbi.profile[key].a = r, g, b, a
-            Gladdy:UpdateFrame()
-        end,
-    }
-
-    for k, v in pairs(params) do
-        defaults[k] = v
-    end
-
-    return defaults
-end
-
 function Diminishings:GetOptions()
     return {
-        drEnabled = option({
+        headerDiminishings = {
+            type = "header",
+            name = L["Diminishings"],
+            order = 2,
+        },
+        drEnabled = Gladdy:option({
             type = "toggle",
             name = L["Enable"],
             desc = L["Enabled DR module"],
-            order = 2,
+            order = 3,
         }),
-        drFontColor = colorOption({
+        drIconSize = Gladdy:option({
+            type = "range",
+            name = L["Icon Size"],
+            desc = L["Size of the DR Icons"],
+            order = 4,
+            min = 5,
+            max = 50,
+            step = 1,
+        }),
+        drDisableCircle = Gladdy:option({
+            type = "toggle",
+            name = L["No Cooldown Circle"],
+            order = 5,
+        }),
+        drCooldownAlpha = Gladdy:option({
+            type = "range",
+            name = L["Cooldown circle alpha"],
+            min = 0,
+            max = 1,
+            step = 0.1,
+            order = 6,
+        }),
+        headerFont = {
+            type = "header",
+            name = L["Font"],
+            order = 10,
+        },
+        drFont = Gladdy:option({
+            type = "select",
+            name = L["Font"],
+            desc = L["Font of the cooldown"],
+            order = 11,
+            dialogControl = "LSM30_Font",
+            values = AceGUIWidgetLSMlists.font,
+        }),
+        drFontColor = Gladdy:colorOption({
             type = "color",
             name = L["Font color"],
             desc = L["Color of the text"],
-            order = 3,
+            order = 13,
             hasAlpha = true,
         }),
-        drFontSize = option({
+        drFontScale = Gladdy:option({
             type = "range",
-            name = L["Font size"],
-            desc = L["Size of the text"],
-            order = 4,
-            min = 1,
-            max = 20,
+            name = L["Font scale"],
+            desc = L["Scale of the text"],
+            order = 12,
+            min = 0.1,
+            max = 2,
+            step = 0.1,
         }),
-        drCooldownPos = option({
+        headerPosition = {
+            type = "header",
+            name = L["Position"],
+            order = 20,
+        },
+        drCooldownPos = Gladdy:option({
             type = "select",
             name = L["DR Cooldown position"],
             desc = L["Position of the cooldown icons"],
-            order = 5,
+            order = 21,
             values = {
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],
             },
         }),
-        drIconSize = option({
+        drXOffset = Gladdy:option({
             type = "range",
-            name = L["Icon Size"],
-            desc = L["Size of the DR Icons"],
-            order = 6,
-            min = 5,
-            max = 100,
-            step = 1,
+            name = L["Horizontal offset"],
+            order = 22,
+            min = -300,
+            max = 300,
+            step = 0.1,
+        }),
+        drYOffset = Gladdy:option({
+            type = "range",
+            name = L["Vertical offset"],
+            order = 23,
+            min = -300,
+            max = 300,
+            step = 0.1,
+        }),
+        headerBorder = {
+            type = "header",
+            name = L["Border"],
+            order = 30,
+        },
+        drBorderStyle = Gladdy:option({
+            type = "select",
+            name = L["Border style"],
+            order = 31,
+            values = Gladdy:GetIconStyles()
+        }),
+        drBorderColor = Gladdy:colorOption({
+            type = "color",
+            name = L["Border color"],
+            desc = L["Color of the border"],
+            order = 32,
+            hasAlpha = true,
         }),
     }
 end
