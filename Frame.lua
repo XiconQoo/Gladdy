@@ -109,10 +109,13 @@ local function StyleActionButton(f)
     local button = _G[name]
     local icon = _G[name .. "Icon"]
     local normalTex = _G[name .. "NormalTexture"]
+    local cooldown = _G[name .. "Cooldown"]
 
     normalTex:SetHeight(button:GetHeight())
     normalTex:SetWidth(button:GetWidth())
     normalTex:SetPoint("CENTER")
+
+    cooldown:SetAlpha(Gladdy.db.cooldownCooldownAlpha)
 
     button:SetNormalTexture(Gladdy.db.cooldownBorderStyle)
     normalTex:SetVertexColor(Gladdy.db.cooldownBorderColor.r, Gladdy.db.cooldownBorderColor.g, Gladdy.db.cooldownBorderColor.b, Gladdy.db.cooldownBorderColor.a)

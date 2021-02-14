@@ -15,6 +15,7 @@ Trinket = Gladdy:NewModule("Trinket", nil, {
     trinketBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     trinketBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     trinketDisableCircle = false,
+    trinketCooldownAlpha = 1,
 })
 LibStub("AceComm-3.0"):Embed(Trinket)
 
@@ -40,7 +41,9 @@ function Trinket:CreateFrame(unit)
 
     trinket.cooldownFont = trinket.cooldownFrame:CreateFontString(nil, "OVERLAY")
     trinket.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), 20, "OUTLINE")
-    trinket.cooldownFont:SetAllPoints(trinket.cooldown)
+    --trinket.cooldownFont:SetAllPoints(trinket.cooldown)
+    trinket.cooldownFont:SetJustifyH("CENTER")
+    trinket.cooldownFont:SetPoint("CENTER")
 
     trinket.borderFrame = CreateFrame("Frame", nil, trinket)
     trinket.borderFrame:SetAllPoints(trinket)
@@ -107,13 +110,14 @@ function Trinket:UpdateFrame(unit)
     local classIcon = Gladdy.modules.Classicon.frames[unit]
     local width, height = classIcon:GetWidth(), classIcon:GetHeight()
 
-    trinket:SetWidth(width)
-    trinket:SetHeight(height)
+    trinket:SetWidth(Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1)
+    trinket:SetHeight(Gladdy.db.classIconSize)
     trinket.cooldown:SetWidth(width - 4)
     trinket.cooldown:SetHeight(height - 4)
     trinket.cooldown:ClearAllPoints()
     trinket.cooldown:SetPoint("CENTER", trinket, "CENTER")
     trinket.cooldown.noCooldownCount = true -- Gladdy.db.trinketDisableOmniCC
+    trinket.cooldown:SetAlpha(Gladdy.db.trinketCooldownAlpha)
 
     trinket.texture:ClearAllPoints()
     trinket.texture:SetAllPoints(trinket)
@@ -125,7 +129,7 @@ function Trinket:UpdateFrame(unit)
     local margin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
     if (Gladdy.db.classIconPos == "LEFT") then
         if (Gladdy.db.trinketPos == "RIGHT") then
-            trinket:SetPoint("TOPLEFT", Gladdy.buttons[unit].healthBar, "TOPRIGHT", margin, 2)
+            trinket:SetPoint("TOPLEFT", Gladdy.buttons[unit].healthBar, "TOPRIGHT", margin, 0)
         else
             trinket:SetPoint("TOPRIGHT", Gladdy.buttons[unit].classIcon, "TOPLEFT", -Gladdy.db.padding, 0)
         end
@@ -133,7 +137,7 @@ function Trinket:UpdateFrame(unit)
         if (Gladdy.db.trinketPos == "RIGHT") then
             trinket:SetPoint("TOPLEFT", Gladdy.buttons[unit].classIcon, "TOPRIGHT", Gladdy.db.padding, 0)
         else
-            trinket:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -margin, 2)
+            trinket:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -margin, 0)
         end
     end
 
@@ -218,6 +222,14 @@ function Trinket:GetOptions()
             type = "toggle",
             name = L["No Cooldown Circle"],
             order = 4,
+        }),
+        trinketCooldownAlpha = Gladdy:option({
+            type = "range",
+            name = L["Cooldown circle alpha"],
+            min = 0,
+            max = 1,
+            step = 0.1,
+            order = 5,
         }),
         headerFont = {
             type = "header",

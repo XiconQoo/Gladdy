@@ -84,7 +84,7 @@ function Powerbar:UpdateFrame(unit)
     powerBar:SetHeight(Gladdy.db.powerBarHeight)
 
     powerBar:ClearAllPoints()
-    powerBar:SetPoint("TOPLEFT", healthBar, "BOTTOMLEFT", 0, -0.5)
+    powerBar:SetPoint("TOPLEFT", healthBar, "BOTTOMLEFT", 0, -1)
 
     powerBar.border:SetBackdrop({ edgeFile = Gladdy.db.powerBarBorder,
                                   edgeSize = Gladdy.db.powerBarBorderSize })

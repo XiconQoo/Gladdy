@@ -22,8 +22,12 @@ local Castbar = Gladdy:NewModule("Castbar", 70, {
     castBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
     castBarGuesses = true,
     castBarPos = "LEFT",
+    castBarXOffset = 0,
+    castBarYOffset = 0,
     castBarIconPos = "LEFT",
     castBarFont = "DorisPP",
+    castBarSparkEnabled = true,
+    castBarSparkColor = { r = 1, g = 1, b = 1, a = 1 },
 })
 
 function Castbar:Initialise()
@@ -45,6 +49,13 @@ function Castbar:CreateFrame(unit)
     castBar.border:SetBackdropBorderColor(Gladdy.db.castBarBorderColor.r, Gladdy.db.castBarBorderColor.g, Gladdy.db.castBarBorderColor.b, Gladdy.db.castBarBorderColor.a)
     castBar.border:Hide()
 
+    castBar.spark = castBar.border:CreateTexture(nil, "OVERLAY")
+    castBar.spark:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
+    castBar.spark:SetBlendMode("ADD")
+    castBar.spark:SetWidth(16)
+    castBar.spark:SetHeight(Gladdy.db.castBarHeight * 1.8)
+    castBar.spark.position = 0
+
     castBar:SetScript("OnUpdate", function(self, elapsed)
         if (self.isCasting) then
             if (self.value >= self.maxValue) then
@@ -62,6 +73,13 @@ function Castbar:CreateFrame(unit)
                 self:SetValue(self.value)
                 self.timeText:SetFormattedText("%.1f", self.value)
             end
+        end
+        if self.isCasting or self.isChanneling then
+            self.spark.position = ((self.value) / self.maxValue) * Gladdy.db.castBarWidth
+            if ( self.spark.position < 0 ) then
+                self.spark.position = 0
+            end
+            self.spark:SetPoint("CENTER", self, "LEFT", self.spark.position, 0)
         end
     end)
 
@@ -115,6 +133,13 @@ function Castbar:UpdateFrame(unit)
     castBar:SetWidth(Gladdy.db.castBarWidth)
     castBar:SetHeight(Gladdy.db.castBarHeight)
 
+    if Gladdy.db.castBarSparkEnabled then
+        castBar.spark:SetHeight(Gladdy.db.castBarHeight * 1.8)
+        castBar.spark:SetVertexColor(Gladdy.db.castBarSparkColor.r, Gladdy.db.castBarSparkColor.g, Gladdy.db.castBarSparkColor.b, Gladdy.db.castBarSparkColor.a)
+    else
+        castBar.spark:SetAlpha(0)
+    end
+
     castBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
     castBar.bg:ClearAllPoints()
     castBar.bg:SetPoint("TOPLEFT", castBar, "TOPLEFT")
@@ -136,35 +161,54 @@ function Castbar:UpdateFrame(unit)
     local rightMargin = 0
     local leftMargin = 0
     if (Gladdy.db.castBarIconPos == "LEFT") then
-        castBar.icon:SetPoint("RIGHT", castBar, "LEFT", -3, 0) -- Icon of castbar
-        rightMargin = Gladdy.db.castBarIconSize + 3
+        castBar.icon:SetPoint("RIGHT", castBar, "LEFT", -1, 0) -- Icon of castbar
+        rightMargin = Gladdy.db.castBarIconSize + 1
     else
-        castBar.icon:SetPoint("LEFT", castBar, "RIGHT", 3, 0) -- Icon of castbar
-        leftMargin = Gladdy.db.castBarIconSize + 3
+        castBar.icon:SetPoint("LEFT", castBar, "RIGHT", 1, 0) -- Icon of castbar
+        leftMargin = Gladdy.db.castBarIconSize + 1
     end
 
     castBar:ClearAllPoints()
-    local margin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
+    local horizontalMargin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
+    local verticalMargin = (Gladdy.db.powerBarHeight)/2
     if (Gladdy.db.castBarPos == "LEFT") then
         if (Gladdy.db.drCooldownPos == "LEFT" and Gladdy.db.drEnabled) then
-            castBar:SetPoint("BOTTOMRIGHT", button.drFrame, "TOPRIGHT", -leftMargin, Gladdy.db.padding)
-        elseif (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-            castBar:SetPoint("RIGHT", button.trinketButton, "LEFT", -Gladdy.db.padding - leftMargin, 0)
-        elseif (Gladdy.db.classIconPos == "LEFT") then
-            castBar:SetPoint("RIGHT", button.classIcon, "LEFT", -Gladdy.db.padding - leftMargin, 0)
+            castBar:SetPoint("BOTTOMRIGHT", button.drFrame, "TOPRIGHT", -leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.padding + Gladdy.db.castBarYOffset)
         else
-            castBar:SetPoint("RIGHT", button.healthBar, "LEFT", -margin - leftMargin, 0)
+            if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
+                if (Gladdy.db.classIconPos == "LEFT") then
+                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) * 2 + Gladdy.db.padding*2
+                else
+                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+                end
+            elseif (Gladdy.db.classIconPos == "LEFT") then
+                if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
+                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) * 2 + Gladdy.db.padding*2
+                else
+                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+                end
+            end
+            castBar:SetPoint("RIGHT", button.healthBar, "LEFT", -horizontalMargin - leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset - verticalMargin)
         end
     end
     if (Gladdy.db.castBarPos == "RIGHT") then
         if (Gladdy.db.drCooldownPos == "RIGHT" and Gladdy.db.drEnabled) then
-            castBar:SetPoint("BOTTOMLEFT", button.drFrame, "TOPLEFT", rightMargin, Gladdy.db.padding)
-        elseif (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
-            castBar:SetPoint("LEFT", button.trinketButton, "RIGHT", Gladdy.db.padding + rightMargin, 0)
-        elseif (Gladdy.db.classIconPos == "RIGHT") then
-            castBar:SetPoint("LEFT", button.classIcon, "RIGHT", Gladdy.db.padding + rightMargin, 0)
+            castBar:SetPoint("BOTTOMLEFT", button.drFrame, "TOPLEFT", rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.padding + Gladdy.db.castBarYOffset)
         else
-            castBar:SetPoint("LEFT", button.healthBar, "RIGHT", margin + rightMargin, 0)
+            if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
+                if (Gladdy.db.classIconPos == "RIGHT") then
+                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) * 2 + Gladdy.db.padding*2
+                else
+                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+                end
+            elseif (Gladdy.db.classIconPos == "RIGHT") then
+                if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
+                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) * 2 + Gladdy.db.padding*2
+                else
+                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+                end
+            end
+            castBar:SetPoint("LEFT", button.healthBar, "RIGHT", horizontalMargin + rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset - verticalMargin)
         end
     end
 
@@ -306,11 +350,27 @@ function Castbar:GetOptions()
                 ["RIGHT"] = L["Right"],
             },
         }),
+        castBarXOffset = option({
+            type = "range",
+            name = L["Horizontal offset"],
+            order = 7,
+            min = -300,
+            max = 300,
+            step = 0.1,
+        }),
+        castBarYOffset = option({
+            type = "range",
+            name = L["Vertical offset"],
+            order = 8,
+            min = -300,
+            max = 300,
+            step = 0.1,
+        }),
         castBarTexture = option({
             type = "select",
             name = L["Bar texture"],
             desc = L["Texture of the bar"],
-            order = 7,
+            order = 9,
             dialogControl = "LSM30_Statusbar",
             values = AceGUIWidgetLSMlists.statusbar,
         }),
@@ -318,14 +378,32 @@ function Castbar:GetOptions()
             type = "color",
             name = L["Bar color"],
             desc = L["Color of the cast bar"],
-            order = 8,
+            order = 10,
             hasAlpha = true,
         }),
         castBarBgColor = Gladdy:colorOption({
             type = "color",
             name = L["Background color"],
             desc = L["Color of the cast bar background"],
-            order = 9,
+            order = 11,
+            hasAlpha = true,
+        }),
+        --spark
+        headerSpark = {
+            type = "header",
+            name = L["Spark"],
+            order = 15,
+        },
+        castBarSparkEnabled = option({
+            type = "toggle",
+            name = L["Spark enabled"],
+            order = 16,
+        }),
+        castBarSparkColor = Gladdy:colorOption({
+            type = "color",
+            name = L["Spark color"],
+            desc = L["Color of the cast bar spark"],
+            order = 17,
             hasAlpha = true,
         }),
         --Icon

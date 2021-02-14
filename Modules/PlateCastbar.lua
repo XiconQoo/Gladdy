@@ -156,6 +156,12 @@ function PlateCastBar:UnitCastBar_Create(unit)
     CastBar.background:SetVertexColor(Gladdy.db.npCastbarsBgColor.r, Gladdy.db.npCastbarsBgColor.g, Gladdy.db.npCastbarsBgColor.b, Gladdy.db.npCastbarsBgColor.a)
     CastBar.background:SetAllPoints(CastBar)
 
+    CastBar.Spark = CastBar.border:CreateTexture(nil, "OVERLAY")
+    CastBar.Spark:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
+    CastBar.Spark:SetBlendMode("ADD")
+    CastBar.Spark:SetWidth(16)
+    CastBar.Spark:SetHeight(Gladdy.db.npCastbarsHeight * 1.8)
+
     CastBar.spellName = CastBar:CreateFontString(nil)
     CastBar.spellName:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npCastbarsFont), Gladdy.db.npCastbarsFontSize, "OUTLINE")
     CastBar.spellName:SetPoint("LEFT", CastBar, "LEFT", 2, 0);
@@ -252,6 +258,7 @@ local function UpdateFrame(unit)
         CastBar.icon.border:Hide()
     end
 
+    CastBar.Spark:SetHeight(Gladdy.db.npCastbarsHeight * 1.8)
 end
 
 function PlateCastBar:CastBars_Create()
@@ -282,6 +289,13 @@ local function keepCastbar(unit)
         CastBar.castTime = GetTime() - CastBar.startTime
     end
     CastBar:SetValue(CastBar.castTime)
+
+    local sparkPosition = ((CastBar.castTime - CastBar.startTime) / (CastBar.maxCastTime - CastBar.startTime)) * Gladdy.db.npCastbarsWidth;
+    if ( sparkPosition < 0 ) then
+        sparkPosition = 0
+    end
+    CastBar.Spark:SetPoint("CENTER", CastBar, "LEFT", sparkPosition, 0)
+
 
     if CastBar.castTime and CastBar.castTime < CastBar.maxCastTime then
 
@@ -374,6 +388,11 @@ local function createCastbars()
                             CastBar.castTime = GetTime() - CastBar.startTime
                         end
                         CastBar:SetValue(CastBar.castTime)
+                        local sparkPosition = ((CastBar.castTime) / (CastBar.maxCastTime)) * Gladdy.db.npCastbarsWidth;
+                        if ( sparkPosition < 0 ) then
+                            sparkPosition = 0
+                        end
+                        CastBar.Spark:SetPoint("CENTER", CastBar, "LEFT", sparkPosition, 0)
 
                         CastBar.name = UnitName(unit)
                         CastBar:SetAlpha(1)

@@ -13,6 +13,7 @@ local Auras = Gladdy:NewModule("Auras", nil, {
     auraBuffBorderColor = { r = 1, g = 0, b = 0, a = 1 },
     auraDebuffBorderColor = { r = 0, g = 1, b = 0, a = 1 },
     auraDisableCircle = false,
+    auraCooldownAlpha = 1,
 })
 
 function Auras:Initialise()
@@ -83,14 +84,15 @@ function Auras:UpdateFrame(unit)
 
     local classIcon = Gladdy.modules.Classicon.frames[unit]
 
-    auraFrame:SetWidth(classIcon:GetWidth())
-    auraFrame:SetHeight(classIcon:GetHeight())
+    auraFrame:SetWidth(Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1)
+    auraFrame:SetHeight(Gladdy.db.classIconSize)
     auraFrame:SetAllPoints(classIcon)
 
     auraFrame.cooldown:SetWidth(classIcon:GetWidth() - classIcon:GetWidth()/16)
     auraFrame.cooldown:SetHeight(classIcon:GetHeight() - classIcon:GetHeight()/16)
     auraFrame.cooldown:ClearAllPoints()
     auraFrame.cooldown:SetPoint("CENTER", auraFrame, "CENTER")
+    auraFrame.cooldown:SetAlpha(Gladdy.db.auraCooldownAlpha)
 
     auraFrame.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.auraFont), (classIcon:GetWidth()/2 - 1) * Gladdy.db.auraFontSizeScale, "OUTLINE")
     auraFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
@@ -233,6 +235,14 @@ function Auras:GetOptions()
             name = L["No Cooldown Circle"],
             order = 3,
             width = "full"
+        }),
+        auraCooldownAlpha = Gladdy:option({
+            type = "range",
+            name = L["Cooldown circle alpha"],
+            min = 0,
+            max = 1,
+            step = 0.1,
+            order = 4,
         }),
         headerFont = {
             type = "header",

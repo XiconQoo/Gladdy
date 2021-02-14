@@ -12,6 +12,7 @@ local Cooldown = Gladdy:NewModule("Cooldown", nil, {
     cooldownBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_Gloss",
     cooldownBorderColor = { r = 1, g = 1, b = 1, a = 1 },
     cooldownDisableCircle = false,
+    cooldownCooldownAlpha = 1
 })
 
 function Cooldown:Test(unit)
@@ -33,18 +34,26 @@ function Cooldown:GetOptions()
             desc = L["Enabled cooldown module"],
             order = 2,
         }),
-        cooldownDisableCircle = Gladdy:option({
-            type = "toggle",
-            name = L["No Cooldown Circle"],
-            order = 3,
-        }),
         cooldownSize = Gladdy:option({
             type = "range",
             name = L["Cooldown size"],
             desc = L["Size of each cd icon"],
-            order = 4,
+            order = 3,
             min = 5,
             max = (Gladdy.db.healthBarHeight + Gladdy.db.castBarHeight + Gladdy.db.powerBarHeight + Gladdy.db.bottomMargin) / 2,
+        }),
+        cooldownDisableCircle = Gladdy:option({
+            type = "toggle",
+            name = L["No Cooldown Circle"],
+            order = 4,
+        }),
+        cooldownCooldownAlpha = Gladdy:option({
+            type = "range",
+            name = L["Cooldown circle alpha"],
+            min = 0,
+            max = 1,
+            step = 0.1,
+            order = 5,
         }),
         headerFont = {
             type = "header",

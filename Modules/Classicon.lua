@@ -2,6 +2,7 @@ local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
 local Classicon = Gladdy:NewModule("Classicon", 80, {
     classIconPos = "LEFT",
+    classIconSize = 60 + 20 + 1,
     classIconBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     classIconBorderColor = { r = 0, g = 0, b = 0, a = 1 },
 })
@@ -44,10 +45,10 @@ function Classicon:UpdateFrame(unit)
         return
     end
 
-    local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight + 4
+    local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight + 1
 
-    classIcon:SetWidth(iconSize - iconSize * 0.1)
-    classIcon:SetHeight(iconSize)
+    classIcon:SetWidth(Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1)
+    classIcon:SetHeight(Gladdy.db.classIconSize)
 
     classIcon.texture:SetWidth(iconSize - iconSize * 0.1 - 3)
     classIcon.texture:SetWidth(iconSize - 3)
@@ -55,9 +56,9 @@ function Classicon:UpdateFrame(unit)
     classIcon:ClearAllPoints()
     local margin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
     if (Gladdy.db.classIconPos == "LEFT") then
-        classIcon:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -margin, 2)
+        classIcon:SetPoint("TOPRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", -margin, 0)
     else
-        classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", margin, 2)
+        classIcon:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPRIGHT", margin, 0)
     end
 
     classIcon.texture:ClearAllPoints()
@@ -87,11 +88,19 @@ function Classicon:GetOptions()
             name = L["Class Icon"],
             order = 2,
         },
+        classIconSize = Gladdy:option({
+            type = "range",
+            name = L["Icon size"],
+            min = 1,
+            max = 100,
+            step = 1,
+            order = 3,
+        }),
         classIconPos = Gladdy:option({
             type = "select",
             name = L["Icon position"],
             desc = L["This changes positions with trinket"],
-            order = 3,
+            order = 4,
             values = {
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],
@@ -100,19 +109,19 @@ function Classicon:GetOptions()
         headerBorder = {
             type = "header",
             name = L["Border"],
-            order = 4,
+            order = 10,
         },
         classIconBorderStyle = Gladdy:option({
             type = "select",
             name = L["Border style"],
-            order = 5,
+            order = 11,
             values = Gladdy:GetIconStyles()
         }),
         classIconBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Border color"],
             desc = L["Color of the border"],
-            order = 6,
+            order = 12,
             hasAlpha = true,
         }),
     }

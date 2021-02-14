@@ -268,6 +268,31 @@ function Gladdy:SetupOptions()
                         end,
                         width= "full",
                     },
+                    cooldownCircleAlpha = {
+                        type = "range",
+                        name = L["Cooldown circle alpha"],
+                        order = 10,
+                        min = 0,
+                        max = 1,
+                        step = 0.1,
+                        get = function(info)
+                            local a = Gladdy.db.cooldownCooldownAlpha
+                            local b = Gladdy.db.drCooldownAlpha
+                            local c = Gladdy.db.auraCooldownAlpha
+                            local d = Gladdy.db.trinketCooldownAlpha
+                            if (a == b and a == c and a == d) then
+                                return a
+                            else
+                                return ""
+                            end
+                        end,
+                        set = function(info, value)
+                            Gladdy.db.cooldownCooldownAlpha = value
+                            Gladdy.db.drCooldownAlpha = value
+                            Gladdy.db.auraCooldownAlpha = value
+                            Gladdy.db.trinketCooldownAlpha = value
+                        end
+                    },
                     headerFont = {
                         type = "header",
                         name = L["Font General"],

@@ -15,6 +15,7 @@ local ALOFT = "ALOFT"
 local SOHIGHPLATES = "SOHIGHPLATES"
 local ELVUI = "ELVUI"
 local SHAGUPLATES = "SHAGUPLATES"
+local PLATES = "PLATES"
 local totemData = {
     -- Fire
     ["Searing Totem"] = {id = 3599,texture = select(3, GetSpellInfo(3599)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Searing Totem
@@ -211,6 +212,7 @@ LibStub("AceTimer-3.0"):Embed(TotemPlates)
 
 function TotemPlates:Initialise()
     self.numChildren = 0
+    self.knownNameplates = {}
     self:SetScript("OnUpdate", self.Update)
     self.Aloft = IsAddOnLoaded("Aloft")
     self.SoHighPlates = IsAddOnLoaded("SoHighPlates")
@@ -258,6 +260,9 @@ local function getName(namePlate)
             end
             addon = BLIZZ
         end
+        if namePlate.PlatesFrame then
+            addon = PLATES
+        end
     end
     if TotemPlates.ShaguPlates then
         addon = SHAGUPLATES
@@ -269,7 +274,28 @@ local updateInterval, lastUpdate, frame, region, name, addon = .001, 0
 function TotemPlates:Update(elapsed)
     lastUpdate = lastUpdate + elapsed
     if lastUpdate > updateInterval then
-        if NAMEPLATES_ON then
+        if (WorldFrame:GetNumChildren() ~= self.numChildren) then
+            self.numChildren = WorldFrame:GetNumChildren()
+            for i = 1, self.numChildren do
+                frame = select(i, WorldFrame:GetChildren())
+                if (frame:GetNumRegions() > 2 and frame:GetNumChildren() >= 1) then
+                    local PlatesFrame = getglobal("Plate" .. i)
+                    if PlatesFrame and PlatesFrame.frame == frame then
+                        frame.PlatesFrame = PlatesFrame
+                    end
+                    self.knownNameplates[frame] = true
+                end
+            end
+        end
+        for namePlate,_ in pairs(self.knownNameplates) do
+            if namePlate:IsVisible() then
+                name, addon = getName(namePlate)
+                if name and addon then
+                    self:SkinTotem(namePlate, name, addon)
+                end
+            end
+        end
+        --[[if NAMEPLATES_ON then
             for i = 1, WorldFrame:GetNumChildren() do
                 frame = select(i, WorldFrame:GetChildren())
                 region = frame:GetRegions()
@@ -280,7 +306,7 @@ function TotemPlates:Update(elapsed)
                     end
                 end
             end
-        end
+        end--]]
     end
 end
 
@@ -352,9 +378,16 @@ local function nameplateSetAlpha(nameplate, alpha, addonName)
             if shaguPlate.glow then shaguPlate.glow:SetAlpha(alpha) end
             if shaguPlate.level then shaguPlate.level:SetAlpha(alpha) end
         end
+    elseif (addonName == PLATES) then
+        if alpha == 1 then
+            nameplate.PlatesFrame:Show()
+        else
+            nameplate.PlatesFrame:Hide()
+        end
     end
 end
 
+local totemPlateCache = {}
 function TotemPlates:SkinTotem(nameplate, nameplateName, addonName)
     local totemName = string.gsub(nameplateName, totemReplaceRankPattern, "")
     local totemDataEntry = totemData[totemName] or localizedTotemData["default"][totemName] or localizedTotemData["frFR"][totemName]
@@ -362,29 +395,34 @@ function TotemPlates:SkinTotem(nameplate, nameplateName, addonName)
             or addonName == ALOFT
             or addonName == ELVUI
             or addonName == SOHIGHPLATES and GetCVar('_sNpTotem') ~= '1'
-            or addonName == SHAGUPLATES and ShaguPlates_config.nameplates.totemicons ~= "1")
+            or addonName == SHAGUPLATES and ShaguPlates_config.nameplates.totemicons ~= "1"
+            or addonName == PLATES)
             and Gladdy.db.npTotems then
         if (totemDataEntry and Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].enabled) then
             nameplateSetAlpha(nameplate, 0.01, addonName)
 
             if not nameplate.gladdyTotemFrame then
-                nameplate.gladdyTotemFrame = CreateFrame("Frame", nil)
+                if #totemPlateCache > 0 then
+                    nameplate.gladdyTotemFrame = tremove(totemPlateCache, #totemPlateCache)
+                else
+                    nameplate.gladdyTotemFrame = CreateFrame("Frame", nil)
+                    nameplate.gladdyTotemFrame.totemIcon = nameplate.gladdyTotemFrame:CreateTexture(nil, "BACKGROUND")
+                    nameplate.gladdyTotemFrame.totemBorder = nameplate.gladdyTotemFrame:CreateTexture(nil, "BORDER")
+                end
                 nameplate.gladdyTotemFrame:SetFrameStrata("BACKGROUND")
                 nameplate.gladdyTotemFrame.parent = nameplate
                 nameplate.gladdyTotemFrame:ClearAllPoints()
                 nameplate.gladdyTotemFrame:SetPoint("CENTER", nameplate, "CENTER", 0, 0)
                 nameplate.gladdyTotemFrame:SetWidth(Gladdy.db.npTotemPlatesSize)
                 nameplate.gladdyTotemFrame:SetHeight(Gladdy.db.npTotemPlatesSize)
-                nameplate.gladdyTotemFrame.totemIcon = nameplate.gladdyTotemFrame:CreateTexture(nil, "BACKGROUND")
                 nameplate.gladdyTotemFrame.totemIcon:ClearAllPoints()
                 nameplate.gladdyTotemFrame.totemIcon:SetPoint("TOPLEFT", nameplate.gladdyTotemFrame, "TOPLEFT")
                 nameplate.gladdyTotemFrame.totemIcon:SetPoint("BOTTOMRIGHT", nameplate.gladdyTotemFrame, "BOTTOMRIGHT")
-                nameplate.gladdyTotemFrame.totemBorder = nameplate.gladdyTotemFrame:CreateTexture(nil, "BORDER")
                 nameplate.gladdyTotemFrame.totemBorder:ClearAllPoints()
                 nameplate.gladdyTotemFrame.totemBorder:SetPoint("TOPLEFT", nameplate.gladdyTotemFrame, "TOPLEFT")
                 nameplate.gladdyTotemFrame.totemBorder:SetPoint("BOTTOMRIGHT", nameplate.gladdyTotemFrame, "BOTTOMRIGHT")
                 nameplate.gladdyTotemFrame:SetScript("OnUpdate", function(self)
-                    if not self.parent:IsVisible() then
+                    if self.parent and not self.parent:IsVisible() then
                         self:Hide()
                     end
                 end)
@@ -427,6 +465,10 @@ function TotemPlates:SkinTotem(nameplate, nameplateName, addonName)
     else
         if nameplate.gladdyTotemFrame then
             nameplate.gladdyTotemFrame:Hide()
+            nameplate.gladdyTotemFrame.parent = nil
+            tinsert(totemPlateCache, nameplate.gladdyTotemFrame)
+            nameplate.gladdyTotemFrame = nil
+            nameplateSetAlpha(nameplate, 1, addonName)
         end
     end
 end
