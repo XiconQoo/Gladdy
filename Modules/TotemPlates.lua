@@ -309,18 +309,6 @@ function TotemPlates:Update(elapsed)
                 end
             end
         end
-        --[[if NAMEPLATES_ON then
-            for i = 1, WorldFrame:GetNumChildren() do
-                frame = select(i, WorldFrame:GetChildren())
-                region = frame:GetRegions()
-                if (frame:GetNumRegions() > 2 and frame:GetNumChildren() >= 1 and frame:IsVisible()) then
-                    name, addon = getName(frame)
-                    if name and addon then
-                        self:SkinTotem(frame, name, addon)
-                    end
-                end
-            end
-        end--]]
     end
 end
 
