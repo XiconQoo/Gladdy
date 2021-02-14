@@ -53,6 +53,7 @@ ACDFrame:SetScript("OnUpdate", function(self, elapse)
                 ACDNumOne:Hide();
             elseif (string.len(str) == 2) then
                 -- Display has 2 digits
+                ACDNumOne:Hide();
                 ACDNumTens:Show();
                 ACDNumOnes:Show();
 
