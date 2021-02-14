@@ -32,19 +32,22 @@ end
 
 function Healthbar:CreateFrame(unit)
     local button = Gladdy.buttons[unit]
-    local healthBar = CreateFrame("StatusBar", nil, Gladdy.buttons[unit])
-    healthBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.healthBarTexture))
-    healthBar:SetMinMaxValues(0, 100)
 
-    healthBar.border = CreateFrame("Frame", nil, healthBar)
-    healthBar.border:SetBackdrop({ edgeFile = Gladdy.db.healthBarBorder,
+    local healthBar = CreateFrame("Frame", nil, Gladdy.buttons[unit])
+    healthBar:SetBackdrop({ edgeFile = Gladdy.db.healthBarBorder,
                                    edgeSize = Gladdy.db.healthBarBorderSize })
-    healthBar.border:SetBackdropBorderColor(Gladdy.db.healthBarBorderColor.r, Gladdy.db.healthBarBorderColor.g, Gladdy.db.healthBarBorderColor.b, Gladdy.db.healthBarBorderColor.a)
+    healthBar:SetBackdropBorderColor(Gladdy.db.healthBarBorderColor.r, Gladdy.db.healthBarBorderColor.g, Gladdy.db.healthBarBorderColor.b, Gladdy.db.healthBarBorderColor.a)
+    healthBar:SetFrameLevel(1)
 
-    healthBar.bg = healthBar:CreateTexture(nil, "BACKGROUND")
+    healthBar.hp = CreateFrame("StatusBar", nil, healthBar)
+    healthBar.hp:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.healthBarTexture))
+    healthBar.hp:SetMinMaxValues(0, 100)
+    healthBar.hp:SetFrameLevel(0)
+
+    healthBar.bg = healthBar.hp:CreateTexture(nil, "BACKGROUND")
     healthBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.healthBarTexture))
     healthBar.bg:ClearAllPoints()
-    healthBar.bg:SetAllPoints(healthBar)
+    healthBar.bg:SetAllPoints(healthBar.hp)
     healthBar.bg:SetAlpha(1)
     healthBar.bg:SetVertexColor(Gladdy.db.healthBarBgColor.r, Gladdy.db.healthBarBgColor.g, Gladdy.db.healthBarBgColor.b, Gladdy.db.healthBarBgColor.a)
 
@@ -89,20 +92,20 @@ function Healthbar:UpdateFrame(unit)
 
     local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight
 
-    healthBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.healthBarTexture))
     healthBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.healthBarTexture))
     healthBar.bg:SetVertexColor(Gladdy.db.healthBarBgColor.r, Gladdy.db.healthBarBgColor.g, Gladdy.db.healthBarBgColor.b, Gladdy.db.healthBarBgColor.a)
 
+    healthBar:SetBackdrop({ edgeFile = Gladdy.db.healthBarBorder,
+                            edgeSize = Gladdy.db.healthBarBorderSize })
+    healthBar:SetBackdropBorderColor(Gladdy.db.healthBarBorderColor.r, Gladdy.db.healthBarBorderColor.g, Gladdy.db.healthBarBorderColor.b, Gladdy.db.healthBarBorderColor.a)
     healthBar:ClearAllPoints()
     healthBar:SetPoint("TOPLEFT", Gladdy.buttons[unit], "TOPLEFT", iconSize, 0)
     healthBar:SetPoint("BOTTOMRIGHT", Gladdy.buttons[unit], "BOTTOMRIGHT")
 
-    healthBar.border:SetBackdrop({ edgeFile = Gladdy.db.healthBarBorder,
-                                   edgeSize = Gladdy.db.healthBarBorderSize })
-    healthBar.border:SetBackdropBorderColor(Gladdy.db.healthBarBorderColor.r, Gladdy.db.healthBarBorderColor.g, Gladdy.db.healthBarBorderColor.b, Gladdy.db.healthBarBorderColor.a)
-    healthBar.border:ClearAllPoints()
-    healthBar.border:SetPoint("TOPLEFT", healthBar, "TOPLEFT")
-    healthBar.border:SetPoint("BOTTOMRIGHT", healthBar, "BOTTOMRIGHT")
+    healthBar.hp:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.healthBarTexture))
+    healthBar.hp:ClearAllPoints()
+    healthBar.hp:SetPoint("TOPLEFT", healthBar, "TOPLEFT", (Gladdy.db.healthBarBorderSize/7), -(Gladdy.db.healthBarBorderSize/7))
+    healthBar.hp:SetPoint("BOTTOMRIGHT", healthBar, "BOTTOMRIGHT", -(Gladdy.db.healthBarBorderSize/7), (Gladdy.db.healthBarBorderSize/7))
 
     if (Gladdy.db.healthBarFontSize < 1) then
         healthBar.nameText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.healthBarFont), 1)
@@ -125,10 +128,10 @@ function Healthbar:ResetUnit(unit)
         return
     end
 
-    healthBar:SetStatusBarColor(1, 1, 1, 1)
+    healthBar.hp:SetStatusBarColor(1, 1, 1, 1)
     healthBar.nameText:SetText("")
     healthBar.healthText:SetText("")
-    healthBar:SetValue(0)
+    healthBar.hp:SetValue(0)
 end
 
 function Healthbar:Test(unit)
@@ -149,7 +152,7 @@ function Healthbar:ENEMY_SPOTTED(unit)
         return
     end
 
-    healthBar:SetStatusBarColor(RAID_CLASS_COLORS[button.class].r, RAID_CLASS_COLORS[button.class].g, RAID_CLASS_COLORS[button.class].b, 1)
+    healthBar.hp:SetStatusBarColor(RAID_CLASS_COLORS[button.class].r, RAID_CLASS_COLORS[button.class].g, RAID_CLASS_COLORS[button.class].b, 1)
     healthBar.nameText:SetText(button.name)
 end
 
@@ -184,7 +187,7 @@ function Healthbar:UNIT_HEALTH(unit, health, healthMax)
     end
 
     healthBar.healthText:SetText(healthText)
-    healthBar:SetValue(healthPercentage)
+    healthBar.hp:SetValue(healthPercentage)
 end
 
 function Healthbar:UNIT_DEATH(unit)
@@ -193,7 +196,7 @@ function Healthbar:UNIT_DEATH(unit)
         return
     end
 
-    healthBar:SetValue(0)
+    healthBar.hp:SetValue(0)
     healthBar.healthText:SetText(L["DEAD"])
 end
 

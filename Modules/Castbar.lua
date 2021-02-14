@@ -39,17 +39,19 @@ function Castbar:Initialise()
 end
 
 function Castbar:CreateFrame(unit)
-    local castBar = CreateFrame("StatusBar", nil, Gladdy.buttons[unit])
-    castBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
-    castBar:SetStatusBarColor(Gladdy.db.castBarColor.r, Gladdy.db.castBarColor.g, Gladdy.db.castBarColor.b, Gladdy.db.castBarColor.a)
-    castBar:SetMinMaxValues(0, 100)
-    castBar.border = CreateFrame("Frame", nil, castBar)
-    castBar.border:SetBackdrop({ edgeFile = Gladdy.db.castBarBorderStyle,
+    local castBar = CreateFrame("Frame", nil, Gladdy.buttons[unit])
+    castBar:SetBackdrop({ edgeFile = Gladdy.db.castBarBorderStyle,
                                  edgeSize = Gladdy.db.castBarBorderSize })
-    castBar.border:SetBackdropBorderColor(Gladdy.db.castBarBorderColor.r, Gladdy.db.castBarBorderColor.g, Gladdy.db.castBarBorderColor.b, Gladdy.db.castBarBorderColor.a)
-    castBar.border:Hide()
+    castBar:SetBackdropBorderColor(Gladdy.db.castBarBorderColor.r, Gladdy.db.castBarBorderColor.g, Gladdy.db.castBarBorderColor.b, Gladdy.db.castBarBorderColor.a)
+    castBar:SetFrameLevel(1)
 
-    castBar.spark = castBar.border:CreateTexture(nil, "OVERLAY")
+    castBar.bar = CreateFrame("StatusBar", nil, castBar)
+    castBar.bar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
+    castBar.bar:SetStatusBarColor(Gladdy.db.castBarColor.r, Gladdy.db.castBarColor.g, Gladdy.db.castBarColor.b, Gladdy.db.castBarColor.a)
+    castBar.bar:SetMinMaxValues(0, 100)
+    castBar.bar:SetFrameLevel(0)
+
+    castBar.spark = castBar:CreateTexture(nil, "OVERLAY")
     castBar.spark:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
     castBar.spark:SetBlendMode("ADD")
     castBar.spark:SetWidth(16)
@@ -62,7 +64,7 @@ function Castbar:CreateFrame(unit)
                 Castbar:CAST_STOP(unit)
             else
                 self.value = self.value + elapsed
-                self:SetValue(self.value)
+                self.bar:SetValue(self.value)
                 self.timeText:SetFormattedText("%.1f", self.value)
             end
         elseif (self.isChanneling) then
@@ -70,23 +72,24 @@ function Castbar:CreateFrame(unit)
                 Castbar:CAST_STOP(unit)
             else
                 self.value = self.value - elapsed
-                self:SetValue(self.value)
+                self.bar:SetValue(self.value)
                 self.timeText:SetFormattedText("%.1f", self.value)
             end
         end
         if self.isCasting or self.isChanneling then
-            self.spark.position = ((self.value) / self.maxValue) * Gladdy.db.castBarWidth
+            self.spark.position = ((self.value) / self.maxValue) * (Gladdy.db.castBarWidth - (Gladdy.db.castBarBorderSize/7)*2)
             if ( self.spark.position < 0 ) then
                 self.spark.position = 0
             end
-            self.spark:SetPoint("CENTER", self, "LEFT", self.spark.position, 0)
+            self.spark:SetPoint("CENTER", self.bar, "LEFT", self.spark.position, 0)
         end
     end)
 
-    castBar.bg = castBar:CreateTexture(nil, "BACKGROUND")
+    castBar.bg = castBar.bar:CreateTexture(nil, "BACKGROUND")
     castBar.bg:SetAlpha(1)
     castBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
     castBar.bg:SetVertexColor(Gladdy.db.castBarBgColor.r, Gladdy.db.castBarBgColor.g, Gladdy.db.castBarBgColor.b, Gladdy.db.castBarBgColor.a)
+    castBar.bg:SetAllPoints(castBar.bar)
 
     castBar.icon = CreateFrame("Frame", nil, castBar)
     castBar.icon.texture = castBar.icon:CreateTexture(nil, "BACKGROUND")
@@ -129,9 +132,19 @@ function Castbar:UpdateFrame(unit)
         return
     end
 
-    castBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
     castBar:SetWidth(Gladdy.db.castBarWidth)
     castBar:SetHeight(Gladdy.db.castBarHeight)
+    castBar:SetBackdrop({ edgeFile = Gladdy.db.castBarBorderStyle,
+                                 edgeSize = Gladdy.db.castBarBorderSize })
+    castBar:SetBackdropBorderColor(Gladdy.db.castBarBorderColor.r, Gladdy.db.castBarBorderColor.g, Gladdy.db.castBarBorderColor.b, Gladdy.db.castBarBorderColor.a)
+
+    castBar.bar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
+    castBar.bar:ClearAllPoints()
+    castBar.bar:SetPoint("TOPLEFT", castBar, "TOPLEFT", (Gladdy.db.castBarBorderSize/7), -(Gladdy.db.castBarBorderSize/7))
+    castBar.bar:SetPoint("BOTTOMRIGHT", castBar, "BOTTOMRIGHT", -(Gladdy.db.castBarBorderSize/7), (Gladdy.db.castBarBorderSize/7))
+
+    castBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
+    castBar.bg:SetVertexColor(Gladdy.db.castBarBgColor.r, Gladdy.db.castBarBgColor.g, Gladdy.db.castBarBgColor.b, Gladdy.db.castBarBgColor.a)
 
     if Gladdy.db.castBarSparkEnabled then
         castBar.spark:SetHeight(Gladdy.db.castBarHeight * 1.8)
@@ -139,19 +152,6 @@ function Castbar:UpdateFrame(unit)
     else
         castBar.spark:SetAlpha(0)
     end
-
-    castBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.castBarTexture))
-    castBar.bg:ClearAllPoints()
-    castBar.bg:SetPoint("TOPLEFT", castBar, "TOPLEFT")
-    castBar.bg:SetPoint("BOTTOMRIGHT", castBar, "BOTTOMRIGHT")
-    castBar.bg:SetVertexColor(Gladdy.db.castBarBgColor.r, Gladdy.db.castBarBgColor.g, Gladdy.db.castBarBgColor.b, Gladdy.db.castBarBgColor.a)
-
-    castBar.border:SetBackdrop({ edgeFile = Gladdy.db.castBarBorderStyle,
-                                 edgeSize = Gladdy.db.castBarBorderSize })
-    castBar.border:SetBackdropBorderColor(Gladdy.db.castBarBorderColor.r, Gladdy.db.castBarBorderColor.g, Gladdy.db.castBarBorderColor.b, Gladdy.db.castBarBorderColor.a)
-    castBar.border:ClearAllPoints()
-    castBar.border:SetPoint("TOPLEFT", castBar, "TOPLEFT")
-    castBar.border:SetPoint("BOTTOMRIGHT", castBar, "BOTTOMRIGHT")
 
     castBar.icon:SetWidth(Gladdy.db.castBarIconSize)
     castBar.icon:SetHeight(Gladdy.db.castBarIconSize)
@@ -253,15 +253,15 @@ function Castbar:CAST_START(unit, spell, icon, value, maxValue, event)
 
     castBar.value = value
     castBar.maxValue = maxValue
-    castBar:SetMinMaxValues(0, maxValue)
-    castBar:SetValue(value)
+    castBar.bar:SetMinMaxValues(0, maxValue)
+    castBar.bar:SetValue(value)
     castBar.icon.texture:SetTexture(icon)
     castBar.spellText:SetText(spell)
     castBar.timeText:SetText(maxValue)
     castBar.isCasting = event == "cast"
     castBar.isChanneling = event == "channel"
     castBar.bg:Show()
-    castBar.border:Show()
+    castBar:Show()
     castBar.icon:Show()
 end
 
@@ -278,9 +278,9 @@ function Castbar:CAST_STOP(unit)
     castBar.icon.texture:SetTexture("")
     castBar.spellText:SetText("")
     castBar.timeText:SetText("")
-    castBar:SetValue(0)
+    castBar.bar:SetValue(0)
     castBar.bg:Hide()
-    castBar.border:Hide()
+    castBar:Hide()
     castBar.icon:Hide()
 end
 

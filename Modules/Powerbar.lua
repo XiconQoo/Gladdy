@@ -32,19 +32,22 @@ end
 
 function Powerbar:CreateFrame(unit)
     local button = Gladdy.buttons[unit]
-    local powerBar = CreateFrame("StatusBar", nil, Gladdy.buttons[unit])
-    powerBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
-    powerBar:SetMinMaxValues(0, 100)
 
-    powerBar.border = CreateFrame("Frame", nil, powerBar)
-    powerBar.border:SetBackdrop({ edgeFile = Gladdy.db.powerBarBorder,
+    local powerBar = CreateFrame("Frame", nil, Gladdy.buttons[unit])
+    powerBar:SetBackdrop({ edgeFile = Gladdy.db.powerBarBorder,
                                   edgeSize = Gladdy.db.powerBarBorderSize })
-    powerBar.border:SetBackdropBorderColor(Gladdy.db.powerBarBorderColor.r, Gladdy.db.powerBarBorderColor.g, Gladdy.db.powerBarBorderColor.b, Gladdy.db.powerBarBorderColor.a)
+    powerBar:SetBackdropBorderColor(Gladdy.db.powerBarBorderColor.r, Gladdy.db.powerBarBorderColor.g, Gladdy.db.powerBarBorderColor.b, Gladdy.db.powerBarBorderColor.a)
+    powerBar:SetFrameLevel(1)
 
-    powerBar.bg = powerBar:CreateTexture(nil, "BACKGROUND")
+    powerBar.energy = CreateFrame("StatusBar", nil, powerBar)
+    powerBar.energy:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
+    powerBar.energy:SetMinMaxValues(0, 100)
+    powerBar.energy:SetFrameLevel(0)
+
+    powerBar.bg = powerBar.energy:CreateTexture(nil, "BACKGROUND")
     powerBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
     powerBar.bg:ClearAllPoints()
-    powerBar.bg:SetAllPoints(powerBar)
+    powerBar.bg:SetAllPoints(powerBar.energy)
     powerBar.bg:SetVertexColor(Gladdy.db.powerBarBgColor.r, Gladdy.db.powerBarBgColor.g, Gladdy.db.powerBarBgColor.b, Gladdy.db.powerBarBgColor.a)
 
     powerBar.raceText = powerBar:CreateFontString(nil, "LOW")
@@ -76,7 +79,7 @@ function Powerbar:UpdateFrame(unit)
 
     local healthBar = Gladdy.modules.Healthbar.frames[unit]
 
-    powerBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
+
     powerBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
     powerBar.bg:SetVertexColor(Gladdy.db.powerBarBgColor.r, Gladdy.db.powerBarBgColor.g, Gladdy.db.powerBarBgColor.b, Gladdy.db.powerBarBgColor.a)
 
@@ -86,12 +89,14 @@ function Powerbar:UpdateFrame(unit)
     powerBar:ClearAllPoints()
     powerBar:SetPoint("TOPLEFT", healthBar, "BOTTOMLEFT", 0, -1)
 
-    powerBar.border:SetBackdrop({ edgeFile = Gladdy.db.powerBarBorder,
+    powerBar:SetBackdrop({ edgeFile = Gladdy.db.powerBarBorder,
                                   edgeSize = Gladdy.db.powerBarBorderSize })
-    powerBar.border:SetBackdropBorderColor(Gladdy.db.powerBarBorderColor.r, Gladdy.db.powerBarBorderColor.g, Gladdy.db.powerBarBorderColor.b, Gladdy.db.powerBarBorderColor.a)
-    powerBar.border:ClearAllPoints()
-    powerBar.border:SetPoint("TOPLEFT", powerBar, "TOPLEFT")
-    powerBar.border:SetPoint("BOTTOMRIGHT", powerBar, "BOTTOMRIGHT")
+    powerBar:SetBackdropBorderColor(Gladdy.db.powerBarBorderColor.r, Gladdy.db.powerBarBorderColor.g, Gladdy.db.powerBarBorderColor.b, Gladdy.db.powerBarBorderColor.a)
+
+    powerBar.energy:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.powerBarTexture))
+    powerBar.energy:ClearAllPoints()
+    powerBar.energy:SetPoint("TOPLEFT", powerBar, "TOPLEFT", (Gladdy.db.powerBarBorderSize/7), -(Gladdy.db.powerBarBorderSize/7))
+    powerBar.energy:SetPoint("BOTTOMRIGHT", powerBar, "BOTTOMRIGHT", -(Gladdy.db.powerBarBorderSize/7), (Gladdy.db.powerBarBorderSize/7))
 
     powerBar.raceText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.powerBarFont), Gladdy.db.powerBarFontSize)
     powerBar.raceText:SetTextColor(Gladdy.db.powerBarFontColor.r, Gladdy.db.powerBarFontColor.g, Gladdy.db.powerBarFontColor.b, Gladdy.db.powerBarFontColor.a)
@@ -105,10 +110,10 @@ function Powerbar:ResetUnit(unit)
         return
     end
 
-    powerBar:SetStatusBarColor(1, 1, 1, 1)
+    powerBar.energy:SetStatusBarColor(1, 1, 1, 1)
     powerBar.raceText:SetText("")
     powerBar.powerText:SetText("")
-    powerBar:SetValue(0)
+    powerBar.energy:SetValue(0)
 end
 
 function Powerbar:Test(unit)
@@ -179,15 +184,15 @@ function Powerbar:UNIT_POWER(unit, power, powerMax, powerType)
     end
 
     if (powerType == 1) then
-        powerBar:SetStatusBarColor(1, 0, 0, 1)
+        powerBar.energy:SetStatusBarColor(1, 0, 0, 1)
     elseif (powerType == 3) then
-        powerBar:SetStatusBarColor(1, 1, 0, 1)
+        powerBar.energy:SetStatusBarColor(1, 1, 0, 1)
     else
-        powerBar:SetStatusBarColor(.18, .44, .75, 1)
+        powerBar.energy:SetStatusBarColor(.18, .44, .75, 1)
     end
 
     powerBar.powerText:SetText(powerText)
-    powerBar:SetValue(powerPercentage)
+    powerBar.energy:SetValue(powerPercentage)
 end
 
 function Powerbar:UNIT_DEATH(unit)
@@ -196,7 +201,7 @@ function Powerbar:UNIT_DEATH(unit)
         return
     end
 
-    powerBar:SetValue(0)
+    powerBar.energy:SetValue(0)
     powerBar.powerText:SetText("0%")
 end
 

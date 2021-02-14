@@ -44,13 +44,13 @@ local PlateCastBar = Gladdy:NewModule("PlateCastBar", nil, {
     --castbar
     npCastbarsTexture = "Smooth",
     npCastbarsWidth = 105,
-    npCastbarsHeight = 14,
+    npCastbarsHeight = 17,
     npCastbarsPointX = 0,
     npCastbarsPointY = -5,
     npCastbarsBarColor = { r = 1, g = 0.8, b = 0.2, a = 1 },
     npCastbarsBgColor = { r = 0, g = 0, b = 0, a = 1 },
     --icon
-    npCastbarsIconSize = 14,
+    npCastbarsIconSize = 20,
     npCastbarsIconPos = "LEFT",
     --flags
     npCastbarsEnableIcon = true,
@@ -66,7 +66,7 @@ local PlateCastBar = Gladdy:NewModule("PlateCastBar", nil, {
     npCastbarsBorderColor = {r = 0, g = 0, b = 0, a = 1},
     npCastbarsIconStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     npCastbarsIconColor = {r = 0, g = 0, b = 0, a = 1},
-    npCastbarsBorderSize = 3,
+    npCastbarsBorderSize = 8,
 
 })
 LibStub("AceHook-3.0"):Embed(PlateCastBar)
@@ -130,48 +130,51 @@ local function getName(namePlate)
 end
 
 function PlateCastBar:UnitCastBar_Create(unit)
-    self.unitCastBars["castbar"..unit] = CreateFrame("StatusBar", nil)
+    self.unitCastBars["castbar"..unit] = CreateFrame("Frame", nil)
     local CastBar = self.unitCastBars["castbar"..unit]
-    CastBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.npCastbarsTexture))
-    CastBar:SetStatusBarColor(Gladdy.db.npCastbarsBarColor.r, Gladdy.db.npCastbarsBarColor.g, Gladdy.db.npCastbarsBarColor.b, Gladdy.db.npCastbarsBarColor.a)
+    CastBar:SetBackdrop({ edgeFile = Gladdy.db.npCastbarsBorderStyle,
+                                 edgeSize = Gladdy.db.npCastbarsBorderSize })
+    CastBar:SetBackdropBorderColor(Gladdy.db.npCastbarsBorderColor.r, Gladdy.db.npCastbarsBorderColor.g, Gladdy.db.npCastbarsBorderColor.b, Gladdy.db.npCastbarsBorderColor.a)
+    CastBar:SetFrameStrata("MEDIUM")
+    CastBar:SetPoint("CENTER")
     CastBar:SetWidth(Gladdy.db.npCastbarsWidth);
     CastBar:SetHeight(Gladdy.db.npCastbarsHeight);
-    CastBar:SetMinMaxValues(0, 100)
-    CastBar:SetPoint("CENTER")
-    CastBar:SetFrameStrata("MEDIUM")
+    CastBar:SetFrameLevel(1)
     CastBar:Hide()
 
-    CastBar.border = CreateFrame("Frame", nil, CastBar)
-    CastBar.border:SetBackdrop({ edgeFile = Gladdy.db.npCastbarsBorderStyle,
-                                 edgeSize = Gladdy.db.npCastbarsBorderSize })
-    CastBar.border:SetBackdropBorderColor(Gladdy.db.npCastbarsBorderColor.r, Gladdy.db.npCastbarsBorderColor.g, Gladdy.db.npCastbarsBorderColor.b, Gladdy.db.npCastbarsBorderColor.a)
-    CastBar.border:ClearAllPoints()
-    CastBar.border:SetPoint("TOPLEFT", CastBar, "TOPLEFT")
-    CastBar.border:SetPoint("BOTTOMRIGHT", CastBar, "BOTTOMRIGHT")
+    CastBar.bar = CreateFrame("StatusBar",nil, CastBar)
+    CastBar.bar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.npCastbarsTexture))
+    CastBar.bar:SetStatusBarColor(Gladdy.db.npCastbarsBarColor.r, Gladdy.db.npCastbarsBarColor.g, Gladdy.db.npCastbarsBarColor.b, Gladdy.db.npCastbarsBarColor.a)
+    CastBar.bar:SetMinMaxValues(0, 100)
+    CastBar.bar:ClearAllPoints()
+    CastBar.bar:SetPoint("TOPLEFT", CastBar, "TOPLEFT", (Gladdy.db.npCastbarsBorderSize/7), -(Gladdy.db.npCastbarsBorderSize/7))
+    CastBar.bar:SetPoint("BOTTOMRIGHT", CastBar, "BOTTOMRIGHT", -(Gladdy.db.npCastbarsBorderSize/7), (Gladdy.db.npCastbarsBorderSize/7))
+    CastBar.bar:SetFrameStrata("MEDIUM")
+    CastBar.bar:SetFrameLevel(0)
 
-    CastBar.background = CastBar:CreateTexture(nil, "BORDER");
+    CastBar.background = CastBar.bar:CreateTexture(nil, "BACKGROUND");
     CastBar.background:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.npCastbarsTexture))
     CastBar.background:SetVertexColor(Gladdy.db.npCastbarsBgColor.r, Gladdy.db.npCastbarsBgColor.g, Gladdy.db.npCastbarsBgColor.b, Gladdy.db.npCastbarsBgColor.a)
-    CastBar.background:SetAllPoints(CastBar)
+    CastBar.background:SetAllPoints(CastBar.bar)
 
-    CastBar.Spark = CastBar.border:CreateTexture(nil, "OVERLAY")
+    CastBar.Spark = CastBar:CreateTexture(nil, "OVERLAY")
     CastBar.Spark:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
     CastBar.Spark:SetBlendMode("ADD")
     CastBar.Spark:SetWidth(8)
     CastBar.Spark:SetHeight(Gladdy.db.npCastbarsHeight * 1.8)
 
-    CastBar.spellName = CastBar:CreateFontString(nil)
+    CastBar.spellName = CastBar.bar:CreateFontString(nil)
     CastBar.spellName:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npCastbarsFont), Gladdy.db.npCastbarsFontSize, "OUTLINE")
-    CastBar.spellName:SetPoint("LEFT", CastBar, "LEFT", 2, 0);
+    CastBar.spellName:SetPoint("LEFT", CastBar.bar, "LEFT", 2, 0);
     if (Gladdy.db.npCastbarsEnableSpell) then
         CastBar.spellName:Show()
     else
         CastBar.spellName:Hide()
     end
 
-    CastBar.spellTime = CastBar:CreateFontString(nil)
+    CastBar.spellTime = CastBar.bar:CreateFontString(nil)
     CastBar.spellTime:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npCastbarsFont), Gladdy.db.npCastbarsFontSize, "OUTLINE")
-    CastBar.spellTime:SetPoint("RIGHT", CastBar, "RIGHT", -1, 0);
+    CastBar.spellTime:SetPoint("RIGHT", CastBar.bar, "RIGHT", -2, 0);
     if (Gladdy.db.npCastbarsEnableTimer) then
         CastBar.spellTime:Show()
     else
@@ -181,7 +184,11 @@ function PlateCastBar:UnitCastBar_Create(unit)
     CastBar.icon = CastBar:CreateTexture(nil, "BACKGROUND");
     CastBar.icon:SetHeight(Gladdy.db.npCastbarsIconSize);
     CastBar.icon:SetWidth(Gladdy.db.npCastbarsIconSize);
-    CastBar.icon:SetPoint("RIGHT", CastBar, Gladdy.db.npCastbarsIconPos);
+    if Gladdy.db.npCastbarsIconPos == "LEFT" then
+        CastBar.icon:SetPoint("RIGHT", CastBar, Gladdy.db.npCastbarsIconPos, -1, 0)
+    else
+        CastBar.icon:SetPoint("LEFT", CastBar, Gladdy.db.npCastbarsIconPos, 1, 0)
+    end
     CastBar.icon.border = CastBar:CreateTexture(nil, "BORDER")
     CastBar.icon.border:SetTexture(Gladdy.db.npCastbarsIconStyle)
     CastBar.icon.border:SetAllPoints(CastBar.icon)
@@ -203,19 +210,18 @@ end
 local function UpdateFrame(unit)
     local CastBar = PlateCastBar.unitCastBars["castbar"..unit]
     --bar
-    CastBar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.npCastbarsTexture))
-    CastBar:SetStatusBarColor(Gladdy.db.npCastbarsBarColor.r, Gladdy.db.npCastbarsBarColor.g, Gladdy.db.npCastbarsBarColor.b, Gladdy.db.npCastbarsBarColor.a)
+    CastBar.bar:SetStatusBarTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.npCastbarsTexture))
+    CastBar.bar:SetStatusBarColor(Gladdy.db.npCastbarsBarColor.r, Gladdy.db.npCastbarsBarColor.g, Gladdy.db.npCastbarsBarColor.b, Gladdy.db.npCastbarsBarColor.a)
 
+    --border
     CastBar:SetWidth(Gladdy.db.npCastbarsWidth)
     CastBar:SetHeight(Gladdy.db.npCastbarsHeight)
-
-    CastBar.border:SetBackdrop({ edgeFile = Gladdy.db.npCastbarsBorderStyle,
+    CastBar:SetBackdrop({ edgeFile = Gladdy.db.npCastbarsBorderStyle,
                                  edgeSize = Gladdy.db.npCastbarsBorderSize })
-    CastBar.border:SetBackdropBorderColor(Gladdy.db.npCastbarsBorderColor.r, Gladdy.db.npCastbarsBorderColor.g, Gladdy.db.npCastbarsBorderColor.b, Gladdy.db.npCastbarsBorderColor.a)
-    CastBar.border:ClearAllPoints()
-    CastBar.border:SetPoint("TOPLEFT", CastBar, "TOPLEFT")
-    CastBar.border:SetPoint("BOTTOMRIGHT", CastBar, "BOTTOMRIGHT")
+    CastBar:SetBackdropBorderColor(Gladdy.db.npCastbarsBorderColor.r, Gladdy.db.npCastbarsBorderColor.g, Gladdy.db.npCastbarsBorderColor.b, Gladdy.db.npCastbarsBorderColor.a)
+    CastBar:ClearAllPoints()
 
+    --background
     CastBar.background:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.npCastbarsTexture))
     CastBar.background:SetVertexColor(Gladdy.db.npCastbarsBgColor.r, Gladdy.db.npCastbarsBgColor.g, Gladdy.db.npCastbarsBgColor.b, Gladdy.db.npCastbarsBgColor.a)
 
@@ -242,9 +248,9 @@ local function UpdateFrame(unit)
     CastBar.icon:SetWidth(Gladdy.db.npCastbarsIconSize)
     CastBar.icon:ClearAllPoints()
     if Gladdy.db.npCastbarsIconPos == "LEFT" then
-        CastBar.icon:SetPoint("RIGHT", CastBar, Gladdy.db.npCastbarsIconPos)
+        CastBar.icon:SetPoint("RIGHT", CastBar, Gladdy.db.npCastbarsIconPos, -1, 0)
     else
-        CastBar.icon:SetPoint("LEFT", CastBar, Gladdy.db.npCastbarsIconPos)
+        CastBar.icon:SetPoint("LEFT", CastBar, Gladdy.db.npCastbarsIconPos, 1, 0)
     end
     CastBar.icon.border:SetTexture(Gladdy.db.npCastbarsIconStyle)
     CastBar.icon.border:SetVertexColor(Gladdy.db.npCastbarsIconColor.r, Gladdy.db.npCastbarsIconColor.g, Gladdy.db.npCastbarsIconColor.b, Gladdy.db.npCastbarsIconColor.a)
@@ -286,13 +292,13 @@ local function keepCastbar(unit)
     else
         CastBar.castTime = GetTime() - CastBar.startTime
     end
-    CastBar:SetValue(CastBar.castTime)
+    CastBar.bar:SetValue(CastBar.castTime)
 
-    local sparkPosition = ((CastBar.castTime - CastBar.startTime) / (CastBar.maxCastTime - CastBar.startTime)) * Gladdy.db.npCastbarsWidth;
+    local sparkPosition = ((CastBar.castTime - CastBar.startTime) / (CastBar.maxCastTime - CastBar.startTime)) * (Gladdy.db.npCastbarsWidth - (Gladdy.db.npCastbarsBorderSize/7)*2);
     if ( sparkPosition < 0 ) then
         sparkPosition = 0
     end
-    CastBar.Spark:SetPoint("CENTER", CastBar, "LEFT", sparkPosition, 0)
+    CastBar.Spark:SetPoint("CENTER", CastBar.bar, "LEFT", sparkPosition, 0)
 
 
     if CastBar.castTime and CastBar.castTime < CastBar.maxCastTime then
