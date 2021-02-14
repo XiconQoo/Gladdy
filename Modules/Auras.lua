@@ -67,8 +67,8 @@ function Auras:CreateFrame(unit)
     auraFrame.text = auraFrame.cooldownFrame:CreateFontString(nil, "OVERLAY")
     auraFrame.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.auraFont), 10, "OUTLINE")
     auraFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
-    auraFrame.text:SetShadowOffset(1, -1)
-    auraFrame.text:SetShadowColor(0, 0, 0, 1)
+    --auraFrame.text:SetShadowOffset(1, -1)
+    --auraFrame.text:SetShadowColor(0, 0, 0, 1)
     auraFrame.text:SetJustifyH("CENTER")
     auraFrame.text:SetPoint("CENTER")
 
@@ -82,19 +82,19 @@ function Auras:UpdateFrame(unit)
         return
     end
 
-    local classIcon = Gladdy.modules.Classicon.frames[unit]
+    local width, height = Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1, Gladdy.db.classIconSize
 
-    auraFrame:SetWidth(Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1)
-    auraFrame:SetHeight(Gladdy.db.classIconSize)
-    auraFrame:SetAllPoints(classIcon)
+    auraFrame:SetWidth(width)
+    auraFrame:SetHeight(height)
+    auraFrame:SetAllPoints(Gladdy.modules.Classicon.frames[unit])
 
-    auraFrame.cooldown:SetWidth(classIcon:GetWidth() - classIcon:GetWidth()/16)
-    auraFrame.cooldown:SetHeight(classIcon:GetHeight() - classIcon:GetHeight()/16)
+    auraFrame.cooldown:SetWidth(width - width/16)
+    auraFrame.cooldown:SetHeight(height - height/16)
     auraFrame.cooldown:ClearAllPoints()
     auraFrame.cooldown:SetPoint("CENTER", auraFrame, "CENTER")
     auraFrame.cooldown:SetAlpha(Gladdy.db.auraCooldownAlpha)
 
-    auraFrame.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.auraFont), (classIcon:GetWidth()/2 - 1) * Gladdy.db.auraFontSizeScale, "OUTLINE")
+    auraFrame.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.auraFont), (width/2 - 1) * Gladdy.db.auraFontSizeScale, "OUTLINE")
     auraFrame.text:SetTextColor(Gladdy.db.auraFontColor.r, Gladdy.db.auraFontColor.g, Gladdy.db.auraFontColor.b, Gladdy.db.auraFontColor.a)
 
     auraFrame.icon.overlay:SetTexture(Gladdy.db.auraBorderStyle)
