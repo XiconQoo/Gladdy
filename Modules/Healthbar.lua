@@ -11,7 +11,7 @@ local Healthbar = Gladdy:NewModule("Healthbar", 100, {
     healthBarFont = "DorisPP",
     healthBarHeight = 60,
     healthBarTexture = "Smooth",
-    healthBarBorder = "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade",
+    healthBarBorderStyle = "Gladdy Tooltip round",
     healthBarBorderSize = 9,
     healthBarBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     healthBarBgColor = { r = 0, g = 0, b = 0, a = 0.4 },
@@ -34,7 +34,7 @@ function Healthbar:CreateFrame(unit)
     local button = Gladdy.buttons[unit]
 
     local healthBar = CreateFrame("Frame", nil, Gladdy.buttons[unit])
-    healthBar:SetBackdrop({ edgeFile = Gladdy.db.healthBarBorder,
+    healthBar:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.healthBarBorderStyle),
                                    edgeSize = Gladdy.db.healthBarBorderSize })
     healthBar:SetBackdropBorderColor(Gladdy.db.healthBarBorderColor.r, Gladdy.db.healthBarBorderColor.g, Gladdy.db.healthBarBorderColor.b, Gladdy.db.healthBarBorderColor.a)
     healthBar:SetFrameLevel(1)
@@ -95,7 +95,7 @@ function Healthbar:UpdateFrame(unit)
     healthBar.bg:SetTexture(Gladdy.LSM:Fetch("statusbar", Gladdy.db.healthBarTexture))
     healthBar.bg:SetVertexColor(Gladdy.db.healthBarBgColor.r, Gladdy.db.healthBarBgColor.g, Gladdy.db.healthBarBgColor.b, Gladdy.db.healthBarBgColor.a)
 
-    healthBar:SetBackdrop({ edgeFile = Gladdy.db.healthBarBorder,
+    healthBar:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.healthBarBorderStyle),
                             edgeSize = Gladdy.db.healthBarBorderSize })
     healthBar:SetBackdropBorderColor(Gladdy.db.healthBarBorderColor.r, Gladdy.db.healthBarBorderColor.g, Gladdy.db.healthBarBorderColor.b, Gladdy.db.healthBarBorderColor.a)
     healthBar:ClearAllPoints()
@@ -288,11 +288,12 @@ function Healthbar:GetOptions()
             name = L["Border"],
             order = 20,
         },
-        healthBarBorder= option({
+        healthBarBorderStyle = option({
             type = "select",
             name = L["Border style"],
             order = 21,
-            values = Gladdy:GetBorderStyles()
+            dialogControl = "LSM30_Border",
+            values = AceGUIWidgetLSMlists.border,
         }),
         healthBarBorderSize = option({
             type = "range",

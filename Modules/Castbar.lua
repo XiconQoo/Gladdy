@@ -14,7 +14,7 @@ local Castbar = Gladdy:NewModule("Castbar", 70, {
     castBarFontSize = 12,
     castBarTexture = "Smooth",
     castBarIconStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
-    castBarBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade",
+    castBarBorderStyle = "Gladdy Tooltip round",
     castBarColor = { r = 1, g = 0.8, b = 0.2, a = 1 },
     castBarBgColor = { r = 0, g = 0, b = 0, a = 0.4 },
     castBarIconColor = { r = 0, g = 0, b = 0, a = 1 },
@@ -40,7 +40,7 @@ end
 
 function Castbar:CreateFrame(unit)
     local castBar = CreateFrame("Frame", nil, Gladdy.buttons[unit])
-    castBar:SetBackdrop({ edgeFile = Gladdy.db.castBarBorderStyle,
+    castBar:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.castBarBorderStyle),
                                  edgeSize = Gladdy.db.castBarBorderSize })
     castBar:SetBackdropBorderColor(Gladdy.db.castBarBorderColor.r, Gladdy.db.castBarBorderColor.g, Gladdy.db.castBarBorderColor.b, Gladdy.db.castBarBorderColor.a)
     castBar:SetFrameLevel(1)
@@ -134,7 +134,7 @@ function Castbar:UpdateFrame(unit)
 
     castBar:SetWidth(Gladdy.db.castBarWidth)
     castBar:SetHeight(Gladdy.db.castBarHeight)
-    castBar:SetBackdrop({ edgeFile = Gladdy.db.castBarBorderStyle,
+    castBar:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.castBarBorderStyle),
                                  edgeSize = Gladdy.db.castBarBorderSize })
     castBar:SetBackdropBorderColor(Gladdy.db.castBarBorderColor.r, Gladdy.db.castBarBorderColor.g, Gladdy.db.castBarBorderColor.b, Gladdy.db.castBarBorderColor.a)
 
@@ -470,7 +470,8 @@ function Castbar:GetOptions()
             type = "select",
             name = L["Status Bar border"],
             order = 51,
-            values = Gladdy:GetBorderStyles()
+            dialogControl = "LSM30_Border",
+            values = AceGUIWidgetLSMlists.border,
         }),
         castBarBorderColor = Gladdy:colorOption({
             type = "color",

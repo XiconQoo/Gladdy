@@ -451,10 +451,11 @@ function Gladdy:SetupOptions()
                         name = L["Statusbar border style"],
                         desc = L["This changes the border style of all statusbar frames"],
                         order = 49,
-                        values = Gladdy:GetBorderStyles(),
+                        dialogControl = "LSM30_Border",
+                        values = AceGUIWidgetLSMlists.border,
                         get = function(info)
-                            local a = Gladdy.db.healthBarBorder
-                            local b = Gladdy.db.powerBarBorder
+                            local a = Gladdy.db.healthBarBorderStyle
+                            local b = Gladdy.db.powerBarBorderStyle
                             local c = Gladdy.db.npCastbarsBorderStyle
                             local d = Gladdy.db.castBarBorderStyle
                             if (a == b and a == c and a == d) then
@@ -464,8 +465,8 @@ function Gladdy:SetupOptions()
                             end
                         end,
                         set = function(info, value)
-                            Gladdy.db.healthBarBorder = value
-                            Gladdy.db.powerBarBorder = value
+                            Gladdy.db.healthBarBorderStyle = value
+                            Gladdy.db.powerBarBorderStyle = value
                             Gladdy.db.castBarBorderStyle = value
                             Gladdy.db.npCastbarsBorderStyle = value
                             Gladdy:UpdateFrame()

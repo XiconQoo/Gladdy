@@ -10,7 +10,7 @@ local Powerbar = Gladdy:NewModule("Powerbar", 90, {
     powerBarFont = "DorisPP",
     powerBarHeight = 20,
     powerBarTexture = "Smooth",
-    powerBarBorder = "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade",
+    powerBarBorderStyle = "Gladdy Tooltip round",
     powerBarBorderSize = 9,
     powerBarBorderColor = { r = 0, g = 0, b = 0, a = 1 },
     powerBarFontColor = { r = 1, g = 1, b = 1, a = 1 },
@@ -34,7 +34,7 @@ function Powerbar:CreateFrame(unit)
     local button = Gladdy.buttons[unit]
 
     local powerBar = CreateFrame("Frame", nil, Gladdy.buttons[unit])
-    powerBar:SetBackdrop({ edgeFile = Gladdy.db.powerBarBorder,
+    powerBar:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.powerBarBorderStyle),
                                   edgeSize = Gladdy.db.powerBarBorderSize })
     powerBar:SetBackdropBorderColor(Gladdy.db.powerBarBorderColor.r, Gladdy.db.powerBarBorderColor.g, Gladdy.db.powerBarBorderColor.b, Gladdy.db.powerBarBorderColor.a)
     powerBar:SetFrameLevel(1)
@@ -89,7 +89,7 @@ function Powerbar:UpdateFrame(unit)
     powerBar:ClearAllPoints()
     powerBar:SetPoint("TOPLEFT", healthBar, "BOTTOMLEFT", 0, -1)
 
-    powerBar:SetBackdrop({ edgeFile = Gladdy.db.powerBarBorder,
+    powerBar:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.powerBarBorderStyle),
                                   edgeSize = Gladdy.db.powerBarBorderSize })
     powerBar:SetBackdropBorderColor(Gladdy.db.powerBarBorderColor.r, Gladdy.db.powerBarBorderColor.g, Gladdy.db.powerBarBorderColor.b, Gladdy.db.powerBarBorderColor.a)
 
@@ -293,11 +293,12 @@ function Powerbar:GetOptions()
             name = L["Border"],
             order = 20,
         },
-        powerBarBorder= option({
+        powerBarBorderStyle = option({
             type = "select",
             name = L["Border style"],
             order = 21,
-            values = Gladdy:GetBorderStyles()
+            dialogControl = "LSM30_Border",
+            values = AceGUIWidgetLSMlists.border,
         }),
         powerBarBorderSize = option({
             type = "range",

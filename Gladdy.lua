@@ -112,19 +112,11 @@ function Gladdy:Print(...)
     DEFAULT_CHAT_FRAME:AddMessage(text)
 end
 
-function Gladdy:GetBorderStyles()
-    return
-    {
-        ["Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade"] = L["Statusbar round"],
-        ["Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_square_selfmade"] = L["Statusbar square"],
-    }
-end
-
 function Gladdy:GetIconStyles()
     return
     {
-        ["Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp"] = L["Border round"],
-        ["Interface\\AddOns\\Gladdy\\Images\\Border_squared_blp"] = L["Border square"],
+        ["Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp"] = L["Gladdy Tooltip round"],
+        ["Interface\\AddOns\\Gladdy\\Images\\Border_squared_blp"] = L["Gladdy Tooltip squared"],
         ["Interface\\AddOns\\Gladdy\\Images\\Border_Gloss"] = L["Gloss (black border)"],
     }
 end
@@ -233,8 +225,8 @@ function Gladdy:OnInitialise()
     self.LSM:Register("statusbar", "Smooth", "Interface\\AddOns\\Gladdy\\Images\\Smooth")
     self.LSM:Register("statusbar", "Minimalist", "Interface\\AddOns\\Gladdy\\Images\\Minimalist")
     self.LSM:Register("statusbar", "LiteStep", "Interface\\AddOns\\Gladdy\\Images\\LiteStep.tga")
-    self.LSM:Register("border", "Custom Tooltip round", "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade")
-    self.LSM:Register("border", "Custom Tooltip squared", "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_square_selfmade")
+    self.LSM:Register("border", "Gladdy Tooltip round", "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade")
+    self.LSM:Register("border", "Gladdy Tooltip squared", "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_square_selfmade")
     self.LSM:Register("font", "DorisPP", "Interface\\AddOns\\Gladdy\\Images\\DorisPP.TTF")
 
     L = self.L

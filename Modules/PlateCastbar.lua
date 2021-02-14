@@ -62,7 +62,7 @@ local PlateCastBar = Gladdy:NewModule("PlateCastBar", nil, {
     npCastbarsFontSize = 9,
     npCastbarsTimerFormat = "LEFT",
     --borders
-    npCastbarsBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\UI-Tooltip-Border_round_selfmade",
+    npCastbarsBorderStyle = "Gladdy Tooltip round",
     npCastbarsBorderColor = {r = 0, g = 0, b = 0, a = 1},
     npCastbarsIconStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     npCastbarsIconColor = {r = 0, g = 0, b = 0, a = 1},
@@ -132,7 +132,7 @@ end
 function PlateCastBar:UnitCastBar_Create(unit)
     self.unitCastBars["castbar"..unit] = CreateFrame("Frame", nil)
     local CastBar = self.unitCastBars["castbar"..unit]
-    CastBar:SetBackdrop({ edgeFile = Gladdy.db.npCastbarsBorderStyle,
+    CastBar:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.npCastbarsBorderStyle),
                                  edgeSize = Gladdy.db.npCastbarsBorderSize })
     CastBar:SetBackdropBorderColor(Gladdy.db.npCastbarsBorderColor.r, Gladdy.db.npCastbarsBorderColor.g, Gladdy.db.npCastbarsBorderColor.b, Gladdy.db.npCastbarsBorderColor.a)
     CastBar:SetFrameStrata("MEDIUM")
@@ -220,7 +220,7 @@ local function UpdateFrame(unit)
     --border
     CastBar:SetWidth(Gladdy.db.npCastbarsWidth)
     CastBar:SetHeight(Gladdy.db.npCastbarsHeight)
-    CastBar:SetBackdrop({ edgeFile = Gladdy.db.npCastbarsBorderStyle,
+    CastBar:SetBackdrop({ edgeFile = Gladdy.LSM:Fetch("border", Gladdy.db.npCastbarsBorderStyle),
                                  edgeSize = Gladdy.db.npCastbarsBorderSize })
     CastBar:SetBackdropBorderColor(Gladdy.db.npCastbarsBorderColor.r, Gladdy.db.npCastbarsBorderColor.g, Gladdy.db.npCastbarsBorderColor.b, Gladdy.db.npCastbarsBorderColor.a)
     CastBar:ClearAllPoints()
@@ -687,7 +687,8 @@ function PlateCastBar:GetOptions()
             type = "select",
             name = L["Status Bar border"],
             order = 41,
-            values = Gladdy:GetBorderStyles()
+            dialogControl = "LSM30_Border",
+            values = AceGUIWidgetLSMlists.border,
         }),
         npCastbarsBorderSize = option({
             type = "range",
