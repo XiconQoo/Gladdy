@@ -108,13 +108,12 @@ function Trinket:UpdateFrame(unit)
         return
     end
 
-    local classIcon = Gladdy.modules.Classicon.frames[unit]
-    local width, height = classIcon:GetWidth(), classIcon:GetHeight()
+    local width, height = Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1, Gladdy.db.trinketSize
 
-    trinket:SetWidth(Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1)
-    trinket:SetHeight(Gladdy.db.trinketSize)
-    trinket.cooldown:SetWidth(width - 4)
-    trinket.cooldown:SetHeight(height - 4)
+    trinket:SetWidth(width)
+    trinket:SetHeight(height)
+    trinket.cooldown:SetWidth(width - width/16)
+    trinket.cooldown:SetHeight(height - height/16)
     trinket.cooldown:ClearAllPoints()
     trinket.cooldown:SetPoint("CENTER", trinket, "CENTER")
     trinket.cooldown.noCooldownCount = true -- Gladdy.db.trinketDisableOmniCC
