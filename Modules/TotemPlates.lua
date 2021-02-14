@@ -232,6 +232,13 @@ function TotemPlates:Initialise()
     self.SoHighPlates = IsAddOnLoaded("SoHighPlates")
     self.ElvUI = IsAddOnLoaded("ElvUI")
     self.ShaguPlates = IsAddOnLoaded("ShaguPlates-tbc") or IsAddOnLoaded("ShaguPlates")
+    self:RegisterEvent("PLAYER_ENTERING_WORLD")
+    self:SetScript("OnEvent", function (self, event)
+        if event == "PLAYER_ENTERING_WORLD" then
+            self.numChildren = 0
+            self.knownNameplates = {}
+        end
+    end)
 end
 
 function TotemPlates:Reset()
