@@ -59,7 +59,7 @@ function Highlight:UpdateFrame(unit)
     end
 
     local borderSize = Gladdy.db.highlightBorderSize
-    local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight
+    local iconSize = Gladdy.db.healthBarHeight + Gladdy.db.powerBarHeight + 1
     local width = Gladdy.db.barWidth + borderSize * 2
     local height = iconSize + borderSize * 2
 
