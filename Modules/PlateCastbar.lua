@@ -53,8 +53,6 @@ local PlateCastBar = Gladdy:NewModule("PlateCastBar", nil, {
     npCastbarsIconSize = 14,
     npCastbarsIconPos = "LEFT",
     --flags
-    npCastbarsEnableTest = false,
-    npCastbarsEnablePlayerPet = true,
     npCastbarsEnableIcon = true,
     npCastbarsEnableTimer = true,
     npCastbarsEnableSpell = true,
@@ -159,7 +157,7 @@ function PlateCastBar:UnitCastBar_Create(unit)
     CastBar.Spark = CastBar.border:CreateTexture(nil, "OVERLAY")
     CastBar.Spark:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
     CastBar.Spark:SetBlendMode("ADD")
-    CastBar.Spark:SetWidth(16)
+    CastBar.Spark:SetWidth(8)
     CastBar.Spark:SetHeight(Gladdy.db.npCastbarsHeight * 1.8)
 
     CastBar.spellName = CastBar:CreateFontString(nil)
@@ -495,14 +493,6 @@ local function colorOption(params)
 end
 
 function PlateCastBar:GetOptions()
-    --[[
-    npCastbarsEnableTest = false,
-    npCastbarsEnablePlayerPet = true,
-    npCastbarsEnableIcon = true,
-    npCastbarsEnableTimer = true,
-    npCastbarsEnableSpell = true,
-    --]]
-
     return {
         headerCastbar = {
             type = "header",
@@ -595,11 +585,16 @@ function PlateCastBar:GetOptions()
             name = L["Icon"],
             order = 20,
         },
+        npCastbarsEnableIcon = option({
+            type = "toggle",
+            name = L["Enable icon"],
+            order = 21,
+        }),
         npCastbarsIconSize = option({
             type = "range",
             name = L["Icon size"],
             desc = L["Height of the bar"],
-            order = 21,
+            order = 22,
             min = 1,
             max = 50,
             step = 1,
@@ -607,7 +602,7 @@ function PlateCastBar:GetOptions()
         npCastbarsIconPos = option({
             type = "select",
             name = L["Position"],
-            order = 22,
+            order = 23,
             values = {
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],
@@ -619,32 +614,42 @@ function PlateCastBar:GetOptions()
             name = L["Font"],
             order = 30,
         },
+        npCastbarsEnableSpell = option({
+            type = "toggle",
+            name = L["Enable spell text"],
+            order = 31,
+        }),
+        npCastbarsEnableTimer = option({
+            type = "toggle",
+            name = L["Enable timer text"],
+            order = 32,
+        }),
         npCastbarsFont = option({
             type = "select",
             name = L["Bar font"],
             desc = L["Font of the status text"],
-            order = 31,
+            order = 33,
             dialogControl = "LSM30_Font",
             values = AceGUIWidgetLSMlists.font,
         }),
         npCastbarsFontColor = colorOption({
             type = "color",
             name = L["Font color"],
-            order = 32,
+            order = 34,
             hasAlpha = true,
         }),
         npCastbarsFontSize = option({
             type = "range",
             name = L["Font size"],
             desc = L["Size of the text"],
-            order = 32,
+            order = 35,
             min = 1,
             max = 20,
         }),
         npCastbarsTimerFormat = option({
             type = "select",
             name = L["Position"],
-            order = 33,
+            order = 36,
             values = {
                 ["LEFT"] = L["Left"],
                 ["TOTAL"] = L["Total"],
