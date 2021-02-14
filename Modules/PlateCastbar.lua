@@ -48,7 +48,7 @@ local PlateCastBar = Gladdy:NewModule("PlateCastBar", nil, {
     npCastbarsPointX = 0,
     npCastbarsPointY = -5,
     npCastbarsBarColor = { r = 1, g = 0.8, b = 0.2, a = 1 },
-    npCastbarsBgColor = { r = 0, g = 0, b = 0, a = 1 },
+    npCastbarsBgColor = { r = 0, g = 0, b = 0, a = 0.8 },
     --icon
     npCastbarsIconSize = 20,
     npCastbarsIconPos = "LEFT",
