@@ -10,6 +10,7 @@ Trinket = Gladdy:NewModule("Trinket", nil, {
     trinketFont = "DorisPP",
     trinketFontScale = 1,
     trinketEnabled = true,
+    trinketSize = 60 + 20 + 1,
     --trinketDisableOmniCC = true,
     trinketPos = "RIGHT",
     trinketBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
@@ -110,8 +111,8 @@ function Trinket:UpdateFrame(unit)
     local classIcon = Gladdy.modules.Classicon.frames[unit]
     local width, height = classIcon:GetWidth(), classIcon:GetHeight()
 
-    trinket:SetWidth(Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1)
-    trinket:SetHeight(Gladdy.db.classIconSize)
+    trinket:SetWidth(Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1)
+    trinket:SetHeight(Gladdy.db.trinketSize)
     trinket.cooldown:SetWidth(width - 4)
     trinket.cooldown:SetHeight(height - 4)
     trinket.cooldown:ClearAllPoints()
@@ -218,10 +219,18 @@ function Trinket:GetOptions()
             desc = L["Enable trinket icon"],
             order = 3,
         }),
+        trinketSize = Gladdy:option({
+            type = "range",
+            name = L["Trinket size"],
+            min = 4,
+            max = 100,
+            step = 1,
+            order = 4,
+        }),
         trinketDisableCircle = Gladdy:option({
             type = "toggle",
             name = L["No Cooldown Circle"],
-            order = 4,
+            order = 5,
         }),
         trinketCooldownAlpha = Gladdy:option({
             type = "range",
@@ -229,7 +238,7 @@ function Trinket:GetOptions()
             min = 0,
             max = 1,
             step = 0.1,
-            order = 5,
+            order = 6,
         }),
         headerFont = {
             type = "header",

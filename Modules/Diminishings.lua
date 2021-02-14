@@ -155,16 +155,14 @@ function Diminishings:UpdateFrame(unit)
     local verticalMargin = (Gladdy.db.powerBarHeight)/2
     if (Gladdy.db.drCooldownPos == "LEFT") then
         if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
+            horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
             if (Gladdy.db.classIconPos == "LEFT") then
-                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) * 2 + Gladdy.db.padding*2
-            else
                 horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
             end
         elseif (Gladdy.db.classIconPos == "LEFT") then
+            horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
             if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) * 2 + Gladdy.db.padding*2
-            else
-                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
             end
         end
         if (Gladdy.db.castBarPos == "LEFT") then
@@ -175,16 +173,14 @@ function Diminishings:UpdateFrame(unit)
     end
     if (Gladdy.db.drCooldownPos == "RIGHT") then
         if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
+            horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
             if (Gladdy.db.classIconPos == "RIGHT") then
-                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) * 2 + Gladdy.db.padding*2
-            else
                 horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
             end
         elseif (Gladdy.db.classIconPos == "RIGHT") then
+            horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
             if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
-                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) * 2 + Gladdy.db.padding*2
-            else
-                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
             end
         end
         if (Gladdy.db.castBarPos == "RIGHT") then

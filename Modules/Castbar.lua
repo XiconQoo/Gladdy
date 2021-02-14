@@ -10,7 +10,7 @@ local Castbar = Gladdy:NewModule("Castbar", 70, {
     castBarHeight = 20,
     castBarWidth = 160,
     castBarIconSize = 22,
-    castBarBorderSize = 7,
+    castBarBorderSize = 8,
     castBarFontSize = 12,
     castBarTexture = "Smooth",
     castBarIconStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
@@ -176,16 +176,14 @@ function Castbar:UpdateFrame(unit)
             castBar:SetPoint("BOTTOMRIGHT", button.drFrame, "TOPRIGHT", -leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.padding + Gladdy.db.castBarYOffset)
         else
             if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
+                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
                 if (Gladdy.db.classIconPos == "LEFT") then
-                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) * 2 + Gladdy.db.padding*2
-                else
                     horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
                 end
             elseif (Gladdy.db.classIconPos == "LEFT") then
+                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
                 if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) * 2 + Gladdy.db.padding*2
-                else
-                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+                    horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
                 end
             end
             castBar:SetPoint("RIGHT", button.healthBar, "LEFT", -horizontalMargin - leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset - verticalMargin)
@@ -196,16 +194,14 @@ function Castbar:UpdateFrame(unit)
             castBar:SetPoint("BOTTOMLEFT", button.drFrame, "TOPLEFT", rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.padding + Gladdy.db.castBarYOffset)
         else
             if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
+                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
                 if (Gladdy.db.classIconPos == "RIGHT") then
-                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) * 2 + Gladdy.db.padding*2
-                else
                     horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
                 end
             elseif (Gladdy.db.classIconPos == "RIGHT") then
+                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
                 if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) * 2 + Gladdy.db.padding*2
-                else
-                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+                    horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
                 end
             end
             castBar:SetPoint("LEFT", button.healthBar, "RIGHT", horizontalMargin + rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset - verticalMargin)
@@ -337,34 +333,9 @@ function Castbar:GetOptions()
             type = "range",
             name = L["Border size"],
             order = 5,
-            min = 0,
+            min = 0.5,
             max = Gladdy.db.castBarHeight/2,
-            step = 1,
-        }),
-        castBarPos = option({
-            type = "select",
-            name = L["Position"],
-            order = 6,
-            values = {
-                ["LEFT"] = L["Left"],
-                ["RIGHT"] = L["Right"],
-            },
-        }),
-        castBarXOffset = option({
-            type = "range",
-            name = L["Horizontal offset"],
-            order = 7,
-            min = -300,
-            max = 300,
-            step = 0.1,
-        }),
-        castBarYOffset = option({
-            type = "range",
-            name = L["Vertical offset"],
-            order = 8,
-            min = -300,
-            max = 300,
-            step = 0.1,
+            step = 0.5,
         }),
         castBarTexture = option({
             type = "select",
@@ -388,24 +359,6 @@ function Castbar:GetOptions()
             order = 11,
             hasAlpha = true,
         }),
-        --spark
-        headerSpark = {
-            type = "header",
-            name = L["Spark"],
-            order = 15,
-        },
-        castBarSparkEnabled = option({
-            type = "toggle",
-            name = L["Spark enabled"],
-            order = 16,
-        }),
-        castBarSparkColor = Gladdy:colorOption({
-            type = "color",
-            name = L["Spark color"],
-            desc = L["Color of the cast bar spark"],
-            order = 17,
-            hasAlpha = true,
-        }),
         --Icon
         headerIcon = {
             type = "header",
@@ -420,26 +373,75 @@ function Castbar:GetOptions()
             max = 100,
             step = 1,
         }),
-        castBarIconPos = option( {
-            type = "select",
+        --spark
+        headerSpark = {
+            type = "header",
+            name = L["Spark"],
+            order = 25,
+        },
+        castBarSparkEnabled = option({
+            type = "toggle",
+            name = L["Spark enabled"],
+            order = 26,
+        }),
+        castBarSparkColor = Gladdy:colorOption({
+            type = "color",
+            name = L["Spark color"],
+            desc = L["Color of the cast bar spark"],
+            order = 27,
+            hasAlpha = true,
+        }),
+        --position
+        headerPosition = {
+            type = "header",
             name = L["Position"],
-            order = 22,
+            order = 30,
+        },
+        castBarPos = option({
+            type = "select",
+            name = L["Castbar position"],
+            order = 31,
             values = {
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],
             },
         }),
+        castBarIconPos = option( {
+            type = "select",
+            name = L["Icon position"],
+            order = 32,
+            values = {
+                ["LEFT"] = L["Left"],
+                ["RIGHT"] = L["Right"],
+            },
+        }),
+        castBarXOffset = option({
+            type = "range",
+            name = L["Horizontal offset"],
+            order = 33,
+            min = -300,
+            max = 300,
+            step = 0.1,
+        }),
+        castBarYOffset = option({
+            type = "range",
+            name = L["Vertical offset"],
+            order = 34,
+            min = -300,
+            max = 300,
+            step = 0.1,
+        }),
         --Font
         headerFont = {
             type = "header",
             name = L["Font"],
-            order = 30,
+            order = 40,
         },
         castBarFont = option({
             type = "select",
             name = L["Font"],
             desc = L["Font of the castbar"],
-            order = 31,
+            order = 41,
             dialogControl = "LSM30_Font",
             values = AceGUIWidgetLSMlists.font,
         }),
@@ -447,7 +449,7 @@ function Castbar:GetOptions()
             type = "range",
             name = L["Font size"],
             desc = L["Size of the text"],
-            order = 32,
+            order = 42,
             min = 1,
             max = 20,
         }),
@@ -455,37 +457,37 @@ function Castbar:GetOptions()
             type = "color",
             name = L["Font color"],
             desc = L["Color of the text"],
-            order = 33,
+            order = 43,
             hasAlpha = true,
         }),
         --Borders
         headerBorder = {
             type = "header",
             name = L["Borders"],
-            order = 40,
+            order = 50,
         },
         castBarBorderStyle = option({
             type = "select",
             name = L["Status Bar border"],
-            order = 41,
+            order = 51,
             values = Gladdy:GetBorderStyles()
         }),
         castBarBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Status Bar border color"],
-            order = 42,
+            order = 52,
             hasAlpha = true,
         }),
         castBarIconStyle = option({
             type = "select",
             name = L["Icon border"],
-            order = 43,
+            order = 53,
             values = Gladdy:GetIconStyles(),
         }),
         castBarIconColor = Gladdy:colorOption({
             type = "color",
             name = L["Icon border color"],
-            order = 44,
+            order = 54,
             hasAlpha = true,
         }),
     }

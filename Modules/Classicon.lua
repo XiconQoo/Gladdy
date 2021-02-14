@@ -96,11 +96,16 @@ function Classicon:GetOptions()
             step = 1,
             order = 3,
         }),
+        headerPosition = {
+            type = "header",
+            name = L["Position"],
+            order = 5,
+        },
         classIconPos = Gladdy:option({
             type = "select",
             name = L["Icon position"],
             desc = L["This changes positions with trinket"],
-            order = 4,
+            order = 6,
             values = {
                 ["LEFT"] = L["Left"],
                 ["RIGHT"] = L["Right"],

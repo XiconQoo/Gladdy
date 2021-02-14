@@ -304,9 +304,9 @@ function Powerbar:GetOptions()
             name = L["Border size"],
             desc = L["Size of the border"],
             order = 22,
-            min = 1,
+            min = 0.5,
             max = Gladdy.db.powerBarHeight/2,
-            step = 1,
+            step = 0.5,
         }),
         powerBarBorderColor = Gladdy:colorOption({
             type = "color",
