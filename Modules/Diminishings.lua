@@ -19,7 +19,6 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drYOffset = 0,
     drIconSize = 36,
     drEnabled = true,
-    drEnableCooldown = true,
     drBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_Gloss",
     drBorderColor = { r = 1, g = 1, b = 1, a = 1 },
     drDisableCircle = false,
@@ -31,6 +30,7 @@ local function StyleActionButton(f)
     local button = _G[name]
     local icon = _G[name .. "Icon"]
     local normalTex = _G[name .. "NormalTexture"]
+    local cooldown = _G[name .. "Cooldown"]
 
     normalTex:SetHeight(button:GetHeight())
     normalTex:SetWidth(button:GetWidth())
@@ -38,6 +38,11 @@ local function StyleActionButton(f)
 
     button:SetNormalTexture(Gladdy.db.drBorderStyle)
     normalTex:SetVertexColor(Gladdy.db.drBorderColor.r, Gladdy.db.drBorderColor.g, Gladdy.db.drBorderColor.b, Gladdy.db.drBorderColor.a)
+    if Gladdy.db.drDisableCircle then
+        cooldown:SetAlpha(Gladdy.db.drCooldownAlpha)
+    else
+        cooldown:SetAlpha(0)
+    end
 
     icon:SetTexCoord(.1, .9, .1, .9)
     icon:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
@@ -148,6 +153,8 @@ function Diminishings:UpdateFrame(unit)
     if (Gladdy.db.drEnabled == false) then
         drFrame:Hide()
         return
+    else
+        drFrame:Show()
     end
 
     drFrame:ClearAllPoints()
