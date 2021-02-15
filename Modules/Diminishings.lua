@@ -38,11 +38,6 @@ local function StyleActionButton(f)
 
     button:SetNormalTexture(Gladdy.db.drBorderStyle)
     normalTex:SetVertexColor(Gladdy.db.drBorderColor.r, Gladdy.db.drBorderColor.g, Gladdy.db.drBorderColor.b, Gladdy.db.drBorderColor.a)
-    if Gladdy.db.drDisableCircle then
-        cooldown:SetAlpha(Gladdy.db.drCooldownAlpha)
-    else
-        cooldown:SetAlpha(0)
-    end
 
     icon:SetTexCoord(.1, .9, .1, .9)
     icon:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
@@ -110,7 +105,6 @@ function Diminishings:CreateFrame(unit)
 
         icon.cooldown = CreateFrame("Cooldown", nil, icon, "CooldownFrameTemplate")
         icon.cooldown.noCooldownCount = true --Gladdy.db.trinketDisableOmniCC
-        icon.cooldown:SetAlpha(Gladdy.db.drCooldownAlpha)
 
         icon.cooldownFrame = CreateFrame("Frame", nil, icon)
         icon.cooldownFrame:ClearAllPoints()
@@ -211,6 +205,13 @@ function Diminishings:UpdateFrame(unit)
         icon.timeText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
         icon.timeText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
 
+        if Gladdy.db.drDisableCircle then
+            icon.cooldown:SetAlpha(0)
+        else
+            icon.cooldown:SetAlpha(Gladdy.db.drCooldownAlpha)
+        end
+
+
         icon:ClearAllPoints()
         if (Gladdy.db.drCooldownPos == "LEFT") then
             if (i == 1) then
@@ -270,7 +271,7 @@ function Diminishings:Fade(unit, spell)
         if (not icon.active or (icon.dr and icon.dr == dr)) then
             icon.dr = dr
             icon.timeLeft = drDuration
-            if not Gladdy.db.drDisableCircle then icon.cooldown:SetCooldown(GetTime(), drDuration) end
+            icon.cooldown:SetCooldown(GetTime(), drDuration)
             icon.texture:SetTexture(self.icons[spell])
             icon.active = true
             self:Positionate(unit)
