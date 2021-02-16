@@ -9,7 +9,6 @@ local L = Gladdy.L
 
 ---------------------------------------------------
 
-local totemReplaceRankPattern = "%s[I,V,X]+$"
 local BLIZZ = "BLIZZ"
 local ALOFT = "ALOFT"
 local SOHIGHPLATES = "SOHIGHPLATES"
@@ -18,98 +17,100 @@ local SHAGUPLATES = "SHAGUPLATES"
 local PLATES = "PLATES"
 local totemData = {
     -- Fire
-    ["Searing Totem"] = {id = 3599,texture = select(3, GetSpellInfo(3599)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Searing Totem
-    ["Flametongue Totem"] = {id = 8227,texture = select(3, GetSpellInfo(8227)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Flametongue Totem
-    ["Magma Totem"] = {id = 8190,texture = select(3, GetSpellInfo(8190)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Magma Totem
-    ["Fire Nova Totem"] = {id = 1535,texture = select(3, GetSpellInfo(1535)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Fire Nova Totem
-    ["Totem of Wrath"] = {id = 30706,texture = select(3, GetSpellInfo(30706)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 1}, -- Totem of Wrath
-    ["Fire Elemental Totem"] = {id = 32982,texture = select(3, GetSpellInfo(32982)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Fire Elemental Totem
-    ["Frost Resistance Totem"] = {id = 8181,texture = select(3, GetSpellInfo(8181)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Frost Resistance Totem
+    [string.lower("Searing Totem")] = {id = 3599,texture = select(3, GetSpellInfo(3599)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Searing Totem
+    [string.lower("Flametongue Totem")] = {id = 8227,texture = select(3, GetSpellInfo(8227)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Flametongue Totem
+    [string.lower("Magma Totem")] = {id = 8190,texture = select(3, GetSpellInfo(8190)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Magma Totem
+    [string.lower("Fire Nova Totem")] = {id = 1535,texture = select(3, GetSpellInfo(1535)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Fire Nova Totem
+    [string.lower("Totem of Wrath")] = {id = 30706,texture = select(3, GetSpellInfo(30706)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 1}, -- Totem of Wrath
+    [string.lower("Fire Elemental Totem")] = {id = 32982,texture = select(3, GetSpellInfo(32982)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Fire Elemental Totem
+    [string.lower("Frost Resistance Totem")] = {id = 8181,texture = select(3, GetSpellInfo(8181)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Frost Resistance Totem
     -- Water
-    ["Fire Resistance Totem"] = {id = 8184,texture = select(3, GetSpellInfo(8184)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Fire Resistance Totem
-    ["Poison Cleansing Totem"] = {id = 8166,texture = select(3, GetSpellInfo(8166)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Poison Cleansing Totem
-    ["Disease Cleansing Totem"] = {id = 8170,texture = select(3, GetSpellInfo(8170)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Disease Cleansing Totem
-    ["Healing Stream Totem"] = {id = 5394,texture = select(3, GetSpellInfo(5394)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Healing Stream Totem
-    ["Mana Tide Totem"] = {id = 16190,texture = select(3, GetSpellInfo(16190)), color = {r = 0.078, g = 0.9, b = 0.16, a = 1}, enabled = true, priority = 3}, -- Mana Tide Totem
-    ["Mana Spring Totem"] = {id = 5675,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_ManaRegenTotem_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 1}, -- Mana Spring Totem
+    [string.lower("Fire Resistance Totem")] = {id = 8184,texture = select(3, GetSpellInfo(8184)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Fire Resistance Totem
+    [string.lower("Poison Cleansing Totem")] = {id = 8166,texture = select(3, GetSpellInfo(8166)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Poison Cleansing Totem
+    [string.lower("Disease Cleansing Totem")] = {id = 8170,texture = select(3, GetSpellInfo(8170)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Disease Cleansing Totem
+    [string.lower("Healing Stream Totem")] = {id = 5394,texture = select(3, GetSpellInfo(5394)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Healing Stream Totem
+    [string.lower("Mana Tide Totem")] = {id = 16190,texture = select(3, GetSpellInfo(16190)), color = {r = 0.078, g = 0.9, b = 0.16, a = 1}, enabled = true, priority = 3}, -- Mana Tide Totem
+    [string.lower("Mana Spring Totem")] = {id = 5675,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_ManaRegenTotem_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 1}, -- Mana Spring Totem
     -- Earth
-    ["Earthbind Totem"] = {id = 2484,texture = select(3, GetSpellInfo(2484)), color = {r = 0.5, g = 0.5, b = 0.5, a = 1}, enabled = true, priority = 1}, -- Earthbind Totem
-    ["Stoneclaw Totem"] = {id = 5730,texture = select(3, GetSpellInfo(5730)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Stoneclaw Totem
-    ["Stoneskin Totem"] = {id = 8071,texture = select(3, GetSpellInfo(8071)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Stoneskin Totem
-    ["Strength of Earth Totem"] = {id = 8075,texture = select(3, GetSpellInfo(8075)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Strength of Earth Totem
-    ["Earth Elemental Totem"] = {id = 33663,texture = select(3, GetSpellInfo(33663)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Earth Elemental Totem
-    ["Tremor Totem"] = {id = 8143,texture = select(3, GetSpellInfo(8143)), color = {r = 1, g = 0.9, b = 0.1, a = 1}, enabled = true, priority = 3}, -- Tremor Totem
+    [string.lower("Earthbind Totem")] = {id = 2484,texture = select(3, GetSpellInfo(2484)), color = {r = 0.5, g = 0.5, b = 0.5, a = 1}, enabled = true, priority = 1}, -- Earthbind Totem
+    [string.lower("Stoneclaw Totem")] = {id = 5730,texture = select(3, GetSpellInfo(5730)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Stoneclaw Totem
+    [string.lower("Stoneskin Totem")] = {id = 8071,texture = select(3, GetSpellInfo(8071)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Stoneskin Totem
+    [string.lower("Strength of Earth Totem")] = {id = 8075,texture = select(3, GetSpellInfo(8075)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Strength of Earth Totem
+    [string.lower("Earth Elemental Totem")] = {id = 33663,texture = select(3, GetSpellInfo(33663)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Earth Elemental Totem
+    [string.lower("Tremor Totem")] = {id = 8143,texture = select(3, GetSpellInfo(8143)), color = {r = 1, g = 0.9, b = 0.1, a = 1}, enabled = true, priority = 3}, -- Tremor Totem
     -- Air
-    ["Grounding Totem"] = {id = 8177,texture = select(3, GetSpellInfo(8177)), color = {r = 0, g = 0.53, b = 0.92, a = 1}, enabled = true, priority = 3}, -- Grounding Totem
-    ["Grace of Air Totem"] = {id = 8835,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_InvisibilityTotem_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Grace of Air Totem
-    ["Nature Resistance Totem"] = {id = 10595,texture = select(3, GetSpellInfo(10595)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Nature Resistance Totem
-    ["Windfury Totem"] = {id = 8512,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_Windfury_edit", color = {r = 0.96, g = 0, b = 0.07, a = 1}, enabled = true, priority = 2}, -- Windfury Totem
-    ["Sentry Totem"] = {id = 6495, texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_RemoveCurse_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Sentry Totem
-    ["Windwall Totem"] = {id = 15107,texture = select(3, GetSpellInfo(15107)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Windwall Totem
-    ["Wrath of Air Totem"] = {id = 3738,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_SlowingTotem_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Wrath of Air Totem
-    ["Tranquil Air Totem"] = {id = 25908,texture = "Interface\\Icons\\INV_Staff_07", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Tranquil Air Totem
+    [string.lower("Grounding Totem")] = {id = 8177,texture = select(3, GetSpellInfo(8177)), color = {r = 0, g = 0.53, b = 0.92, a = 1}, enabled = true, priority = 3}, -- Grounding Totem
+    [string.lower("Grace of Air Totem")] = {id = 8835,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_InvisibilityTotem_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Grace of Air Totem
+    [string.lower("Nature Resistance Totem")] = {id = 10595,texture = select(3, GetSpellInfo(10595)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Nature Resistance Totem
+    [string.lower("Windfury Totem")] = {id = 8512,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_Windfury_edit", color = {r = 0.96, g = 0, b = 0.07, a = 1}, enabled = true, priority = 2}, -- Windfury Totem
+    [string.lower("Sentry Totem")] = {id = 6495, texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_RemoveCurse_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Sentry Totem
+    [string.lower("Windwall Totem")] = {id = 15107,texture = select(3, GetSpellInfo(15107)), color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Windwall Totem
+    [string.lower("Wrath of Air Totem")] = {id = 3738,texture = "Interface\\AddOns\\Gladdy\\Images\\Totems\\Spell_Nature_SlowingTotem_edit", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Wrath of Air Totem
+    [string.lower("Tranquil Air Totem")] = {id = 25908,texture = "Interface\\Icons\\INV_Staff_07", color = {r = 0, g = 0, b = 0, a = 1}, enabled = true, priority = 0}, -- Tranquil Air Totem
 }
 local localizedTotemData = {
     ["default"] = {
-        [select(1, GetSpellInfo(3599))] = totemData["Searing Totem"], -- Searing Totem
-        [select(1, GetSpellInfo(8227))] = totemData["Flametongue Totem"], -- Flametongue Totem
-        [select(1, GetSpellInfo(8190))] = totemData["Magma Totem"], -- Magma Totem
-        [select(1, GetSpellInfo(1535))] = totemData["Fire Nova Totem"], -- Fire Nova Totem
-        [select(1, GetSpellInfo(30706))] = totemData["Totem of Wrath"], -- Totem of Wrath
-        [select(1, GetSpellInfo(32982))] = totemData["Fire Elemental Totem"], -- Fire Elemental Totem
-        [select(1, GetSpellInfo(8181))] = totemData["Frost Resistance Totem"], -- Frost Resistance Totem
+        [string.lower(select(1, GetSpellInfo(3599)))] = totemData[string.lower("Searing Totem")], -- Searing Totem
+        [string.lower(select(1, GetSpellInfo(8227)))] = totemData[string.lower("Flametongue Totem")], -- Flametongue Totem
+        [string.lower(select(1, GetSpellInfo(8190)))] = totemData[string.lower("Magma Totem")], -- Magma Totem
+        [string.lower(select(1, GetSpellInfo(1535)))] = totemData[string.lower("Fire Nova Totem")], -- Fire Nova Totem
+        [string.lower(select(1, GetSpellInfo(30706)))] = totemData[string.lower("Totem of Wrath")], -- Totem of Wrath
+        [string.lower(select(1, GetSpellInfo(32982)))] = totemData[string.lower("Fire Elemental Totem")], -- Fire Elemental Totem
+        [string.lower(select(1, GetSpellInfo(8181)))] = totemData[string.lower("Frost Resistance Totem")], -- Frost Resistance Totem
         -- Water
-        [select(1, GetSpellInfo(8184))] = totemData["Fire Resistance Totem"], -- Fire Resistance Totem
-        [select(1, GetSpellInfo(8166))] = totemData["Poison Cleansing Totem"], -- Poison Cleansing Totem
-        [select(1, GetSpellInfo(8170))] = totemData["Disease Cleansing Totem"], -- Disease Cleansing Totem
-        [select(1, GetSpellInfo(5394))] = totemData["Healing Stream Totem"], -- Healing Stream Totem
-        [select(1, GetSpellInfo(16190))] = totemData["Mana Tide Totem"], -- Mana Tide Totem
-        [select(1, GetSpellInfo(5675))] = totemData["Mana Spring Totem"], -- Mana Spring Totem
+        [string.lower(select(1, GetSpellInfo(8184)))] = totemData[string.lower("Fire Resistance Totem")], -- Fire Resistance Totem
+        [string.lower(select(1, GetSpellInfo(8166)))] = totemData[string.lower("Poison Cleansing Totem")], -- Poison Cleansing Totem
+        [string.lower(select(1, GetSpellInfo(8170)))] = totemData[string.lower("Disease Cleansing Totem")], -- Disease Cleansing Totem
+        [string.lower(select(1, GetSpellInfo(5394)))] = totemData[string.lower("Healing Stream Totem")], -- Healing Stream Totem
+        [string.lower(select(1, GetSpellInfo(16190)))] = totemData[string.lower("Mana Tide Totem")], -- Mana Tide Totem
+        [string.lower(select(1, GetSpellInfo(5675)))] = totemData[string.lower("Mana Spring Totem")], -- Mana Spring Totem
         -- Earth
-        [select(1, GetSpellInfo(2484))] = totemData["Earthbind Totem"], -- Earthbind Totem
-        [select(1, GetSpellInfo(5730))] = totemData["Stoneclaw Totem"], -- Stoneclaw Totem
-        [select(1, GetSpellInfo(8071))] = totemData["Stoneskin Totem"], -- Stoneskin Totem
-        [select(1, GetSpellInfo(8075))] = totemData["Strength of Earth Totem"], -- Strength of Earth Totem
-        [select(1, GetSpellInfo(33663))] = totemData["Earth Elemental Totem"], -- Earth Elemental Totem
-        [select(1, GetSpellInfo(8143))] = totemData["Tremor Totem"], -- Tremor Totem
+        [string.lower(select(1, GetSpellInfo(2484)))] = totemData[string.lower("Earthbind Totem")], -- Earthbind Totem
+        [string.lower(select(1, GetSpellInfo(5730)))] = totemData[string.lower("Stoneclaw Totem")], -- Stoneclaw Totem
+        [string.lower(select(1, GetSpellInfo(8071)))] = totemData[string.lower("Stoneskin Totem")], -- Stoneskin Totem
+        [string.lower(select(1, GetSpellInfo(8075)))] = totemData[string.lower("Strength of Earth Totem")], -- Strength of Earth Totem
+        [string.lower(select(1, GetSpellInfo(33663)))] = totemData[string.lower("Earth Elemental Totem")], -- Earth Elemental Totem
+        [string.lower(select(1, GetSpellInfo(8143)))] = totemData[string.lower("Tremor Totem")], -- Tremor Totem
         -- Air
-        [select(1, GetSpellInfo(8177))] = totemData["Grounding Totem"], -- Grounding Totem
-        [select(1, GetSpellInfo(8835))] = totemData["Grace of Air Totem"], -- Grace of Air Totem
-        [select(1, GetSpellInfo(10595))] = totemData["Nature Resistance Totem"], -- Nature Resistance Totem
-        [select(1, GetSpellInfo(8512))] = totemData["Windfury Totem"], -- Windfury Totem
-        [select(1, GetSpellInfo(6495))] = totemData["Sentry Totem"], -- Sentry Totem
-        [select(1, GetSpellInfo(15107))] = totemData["Windwall Totem"], -- Windwall Totem
-        [select(1, GetSpellInfo(3738))] = totemData["Wrath of Air Totem"], -- Wrath of Air Totem
-        [select(1, GetSpellInfo(25908))] = totemData["Tranquil Air Totem"], -- Tranquil Air Totem
+        [string.lower(select(1, GetSpellInfo(8177)))] = totemData[string.lower("Grounding Totem")], -- Grounding Totem
+        [string.lower(select(1, GetSpellInfo(8835)))] = totemData[string.lower("Grace of Air Totem")], -- Grace of Air Totem
+        [string.lower(select(1, GetSpellInfo(10595)))] = totemData[string.lower("Nature Resistance Totem")], -- Nature Resistance Totem
+        [string.lower(select(1, GetSpellInfo(8512)))] = totemData[string.lower("Windfury Totem")], -- Windfury Totem
+        [string.lower(select(1, GetSpellInfo(6495)))] = totemData[string.lower("Sentry Totem")], -- Sentry Totem
+        [string.lower(select(1, GetSpellInfo(15107)))] = totemData[string.lower("Windwall Totem")], -- Windwall Totem
+        [string.lower(select(1, GetSpellInfo(3738)))] = totemData[string.lower("Wrath of Air Totem")], -- Wrath of Air Totem
+        [string.lower(select(1, GetSpellInfo(25908)))] = totemData[string.lower("Tranquil Air Totem")], -- Tranquil Air Totem
     },
     ["frFR"] = {
-        ["Totem incendiaire"] = totemData["Searing Totem"],
-        ["Totem Langue de feu"] = totemData["Flametongue Totem"],
-        ["Totem de lien terrestre"] = totemData["Earthbind Totem"],
-        ["Totem de Griffes de pierre"] = totemData["Stoneclaw Totem"],
-        ["Totem Nova de feu"] = totemData["Fire Nova Totem"],
-        ["Totem de Magma"] = totemData["Magma Totem"],
-        ["Totem de courroux"] = totemData["Totem of Wrath"],
-        ["Totem d'\195\169lementaire de feu"] = totemData["Fire Elemental Totem"],
-        ["Totem de Peau de pierre"] = totemData["Stoneskin Totem"],
-        ["Totem d'\195\169lementaire de terre"] = totemData["Earth Elemental Totem"],
-        ["Totem de Force de la Terre"] = totemData["Strength of Earth Totem"],
-        ["Totem de r\195\169sistance au Givre"] = totemData["Frost Resistance Totem"],
-        ["Totem de r\195\169sistance au Feu"] = totemData["Fire Resistance Totem"],
-        ["Totem de Gl\195\168be"] = totemData["Grounding Totem"],
-        ["Totem de Gr\195\162ce a\195\169rienne"] = totemData["Grace of Air Totem"],
-        ["Totem de R\195\169sistance \195\160 la Nature"] = totemData["Nature Resistance Totem"],
-        ["Totem Furie-des-vents"] = totemData["Windfury Totem"],
-        ["Totem Sentinelle"] = totemData["Sentry Totem"],
-        ["Totem de Mur des vents"] = totemData["Windwall Totem"],
-        ["Totem de courroux de l'air"] = totemData["Wrath of Air Totem"],
-        ["Totem de S\195\169isme"] = totemData["Tremor Totem"],
-        ["Totem gu\195\169risseur"] = totemData["Healing Stream Totem"],
-        ["Totem de Purification du poison"] = totemData["Poison Cleansing Totem"],
-        ["Totem Fontaine de mana"] = totemData["Mana Spring Totem"],
-        ["Totem de Purification des maladies"] = totemData["Disease Cleansing Totem"],
-        ["Totem de Vague de mana"] = totemData["Mana Tide Totem"],
-        ["Totem de Tranquillit\195\169 de l'air"] = totemData["Tranquil Air Totem"],
+        [string.lower("Totem incendiaire")] = totemData[string.lower("Searing Totem")],
+        [string.lower("Totem Langue de feu")] = totemData[string.lower("Flametongue Totem")],
+        [string.lower("Totem de lien terrestre")] = totemData[string.lower("Earthbind Totem")],
+        [string.lower("Totem de Griffes de pierre")] = totemData[string.lower("Stoneclaw Totem")],
+        [string.lower("Totem Nova de feu")] = totemData[string.lower("Fire Nova Totem")],
+        [string.lower("Totem de Magma")] = totemData[string.lower("Magma Totem")],
+        [string.lower("Totem de courroux")] = totemData[string.lower("Totem of Wrath")],
+        [string.lower("Totem d'\195\169lementaire de feu")] = totemData[string.lower("Fire Elemental Totem")],
+		[string.lower("Totem d'\195\169l\195\169mentaire de feu")] = totemData[string.lower("Fire Elemental Totem")],
+        [string.lower("Totem de Peau de pierre")] = totemData[string.lower("Stoneskin Totem")],
+        [string.lower("Totem d'\195\169lementaire de terre")] = totemData[string.lower("Earth Elemental Totem")],
+		[string.lower("Totem d'\195\169l\195\169mentaire de terre")] = totemData[string.lower("Earth Elemental Totem")],
+        [string.lower("Totem de Force de la Terre")] = totemData[string.lower("Strength of Earth Totem")],
+        [string.lower("Totem de r\195\169sistance au Givre")] = totemData[string.lower("Frost Resistance Totem")],
+        [string.lower("Totem de r\195\169sistance au Feu")] = totemData[string.lower("Fire Resistance Totem")],
+        [string.lower("Totem de Gl\195\168be")] = totemData[string.lower("Grounding Totem")],
+        [string.lower("Totem de Gr\195\162ce a\195\169rienne")] = totemData[string.lower("Grace of Air Totem")],
+        [string.lower("Totem de R\195\169sistance \195\160 la Nature")] = totemData[string.lower("Nature Resistance Totem")],
+        [string.lower("Totem Furie-des-vents")] = totemData[string.lower("Windfury Totem")],
+        [string.lower("Totem Sentinelle")] = totemData[string.lower("Sentry Totem")],
+        [string.lower("Totem de Mur des vents")] = totemData[string.lower("Windwall Totem")],
+        [string.lower("Totem de courroux de l'air")] = totemData[string.lower("Wrath of Air Totem")],
+        [string.lower("Totem de S\195\169isme")] = totemData[string.lower("Tremor Totem")],
+        [string.lower("Totem gu\195\169risseur")] = totemData[string.lower("Healing Stream Totem")],
+        [string.lower("Totem de Purification du poison")] = totemData[string.lower("Poison Cleansing Totem")],
+        [string.lower("Totem Fontaine de mana")] = totemData[string.lower("Mana Spring Totem")],
+        [string.lower("Totem de Purification des maladies")] = totemData[string.lower("Disease Cleansing Totem")],
+        [string.lower("Totem de Vague de mana")] = totemData[string.lower("Mana Tide Totem")],
+        [string.lower("Totem de Tranquillit\195\169 de l'air")] = totemData[string.lower("Tranquil Air Totem")],
     }
 }
 
@@ -398,7 +399,10 @@ end
 
 local totemPlateCache = {}
 function TotemPlates:SkinTotem(nameplate, nameplateName, addonName)
-    local totemName = string.gsub(nameplateName, totemReplaceRankPattern, "")
+    local totemName = string.gsub(nameplateName, "^%s+", "")
+    totemName = string.gsub(totemName, "%s+$", "")
+    totemName = string.gsub(totemName, "%s+[I,V,X]+$", "")
+    totemName = string.lower(totemName)
     local totemDataEntry = totemData[totemName] or localizedTotemData["default"][totemName] or localizedTotemData["frFR"][totemName]
     if (addonName == BLIZZ
             or addonName == ALOFT
