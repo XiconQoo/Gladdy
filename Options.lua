@@ -292,6 +292,7 @@ function Gladdy:SetupOptions()
                             Gladdy.db.drCooldownAlpha = value
                             Gladdy.db.auraCooldownAlpha = value
                             Gladdy.db.trinketCooldownAlpha = value
+                            Gladdy:UpdateFrame()
                         end
                     },
                     headerFont = {
