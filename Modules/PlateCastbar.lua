@@ -286,7 +286,9 @@ local function keepCastbar(unit)
 
     if (Gladdy.db.npCastbarGuess == false) then
         CastBar.castTime = nil
-        CastBar.parent.CastBarEnabled = nil
+        if CastBar.parent then
+            CastBar.parent.CastBarEnabled = nil
+        end
         CastBar:SetAlpha(0)
         CastBar:Hide()
         return

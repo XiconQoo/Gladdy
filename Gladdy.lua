@@ -621,7 +621,7 @@ function Gladdy:UNIT_SPELLCAST_DELAYED(event, uid)
     local castBar = Gladdy.modules.Castbar.frames[button.unit]
     castBar.value = value
     castBar.maxValue = (endTime - startTime) / 1000
-    castBar:SetMinMaxValues(0, castBar.maxValue)
+    castBar.bar:SetMinMaxValues(0, castBar.maxValue)
 end
 
 function Gladdy:UNIT_SPELLCAST_STOP(event, uid)
