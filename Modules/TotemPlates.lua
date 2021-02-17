@@ -109,6 +109,7 @@ local localizedTotemData = {
         [string.lower("Totem de Purification du poison")] = totemData[string.lower("Poison Cleansing Totem")],
         [string.lower("Totem Fontaine de mana")] = totemData[string.lower("Mana Spring Totem")],
         [string.lower("Totem de Purification des maladies")] = totemData[string.lower("Disease Cleansing Totem")],
+        [string.lower("Totem de purification")] = totemData[string.lower("Disease Cleansing Totem")],
         [string.lower("Totem de Vague de mana")] = totemData[string.lower("Mana Tide Totem")],
         [string.lower("Totem de Tranquillit\195\169 de l'air")] = totemData[string.lower("Tranquil Air Totem")],
     }
