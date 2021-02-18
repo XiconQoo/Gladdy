@@ -271,7 +271,7 @@ function ArenaIdentify:Scoreboard()
                 return
             end
             local guid = Gladdy.db.guidsByName[GetRealmName()][name]
-            if not alreadyFound[guid] and instanceType == "arena" and self:GuidInParty(guid) == 0 and UnitGUID("player") ~= guid then
+            if guid and not alreadyFound[guid] and instanceType == "arena" and self:GuidInParty(guid) == 0 and UnitGUID("player") ~= guid then
                 alreadyFound[guid] = true
                 local msg = Gladdy.db.guidsByName[GetRealmName()][guid]
                 self:SendGladdyMessage(msg)

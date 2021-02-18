@@ -259,6 +259,7 @@ function Gladdy:UpdateFrame()
                 if (icon.active) then
                     icon.active = false
                     icon.cooldown:SetCooldown(GetTime(), 0)
+                    icon.cooldownFont:SetText("")
                     icon:SetScript("OnUpdate", nil)
                 end
                 icon.spellId = nil
