@@ -1278,12 +1278,14 @@ function Gladdy:CooldownReady(button, spellId, frame)
             if (frame.spellId == spellId) then
                 frame.active = false
                 frame.cooldown:Hide()
+                frame.cooldownFont:SetText("")
                 frame:SetScript("OnUpdate", nil)
             end
         end
     else
         frame.active = false
         frame.cooldown:Hide()
+        frame.cooldownFont:SetText("")
         frame:SetScript("OnUpdate", nil)
     end
 end
