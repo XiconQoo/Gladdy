@@ -146,8 +146,13 @@ function Gladdy:UpdateFrame()
     extraBarHeight = extraBarHeight + self.db.powerBarHeight
 
     -- Cooldown
-    margin = margin + self.db.cooldownSize + self.db.padding + self.db.highlightBorderSize
-    height = height + self.db.cooldownSize * teamSize
+    margin = margin + self.db.padding + self.db.highlightBorderSize
+    height = height
+
+    if self.db.cooldownYPos == "TOP" or self.db.cooldownYPos == "BOTTOM" then
+        margin = margin + self.db.cooldownSize
+        height = height + self.db.cooldownSize * teamSize
+    end
 
     -- Classicon
     width = width + iconSize
@@ -223,11 +228,91 @@ function Gladdy:UpdateFrame()
                 else
                     button.spellCooldownFrame:SetPoint("BOTTOMLEFT", button.healthBar, "TOPLEFT", Gladdy.db.cooldownXOffset, self.db.highlightBorderSize + Gladdy.db.cooldownYOffset)
                 end
-            else
+            elseif self.db.cooldownYPos == "BOTTOM" then
                 if self.db.cooldownXPos == "RIGHT" then
                     button.spellCooldownFrame:SetPoint("TOPRIGHT", button.powerBar, "BOTTOMRIGHT", Gladdy.db.cooldownXOffset, -self.db.highlightBorderSize + Gladdy.db.cooldownYOffset) -- needs to be properly anchored after trinket
                 else
                     button.spellCooldownFrame:SetPoint("TOPLEFT", button.powerBar, "BOTTOMLEFT", Gladdy.db.cooldownXOffset, -self.db.highlightBorderSize + Gladdy.db.cooldownYOffset)
+                end
+            elseif self.db.cooldownYPos == "LEFT" then
+                local parent
+                if self.db.drCooldownPos == "LEFT" then
+                    if self.db.castBarPos == "LEFT" then
+                        if self.db.castBarIconPos == "RIGHT" then
+                            parent = button.castBar.icon
+                        else
+                            parent = button.castBar
+                        end
+                    else
+                        parent = button.drFrame
+                    end
+                else
+                    if self.db.castBarPos == "LEFT" then
+                        if self.db.castBarIconPos == "RIGHT" then
+                            parent = button.castBar.icon
+                        else
+                            parent = button.castBar
+                        end
+                    end
+                end
+                if parent then
+                    button.spellCooldownFrame:SetPoint("BOTTOMRIGHT", parent, "TOPRIGHT", Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset + Gladdy.db.padding)
+                else
+                    local verticalMargin = (Gladdy.db.powerBarHeight)/2
+                    local horizontalMargin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
+                    if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
+                        horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+                        if (Gladdy.db.classIconPos == "LEFT") then
+                            horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+                        end
+                    elseif (Gladdy.db.classIconPos == "LEFT") then
+                        horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+                        if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
+                            horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+                        end
+                    end
+                    button.spellCooldownFrame:SetPoint("RIGHT", button.healthBar, "LEFT", -horizontalMargin + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset - verticalMargin)
+                end
+            elseif self.db.cooldownYPos == "RIGHT" then
+                self.db.cooldownXPos = "LEFT"
+                LibStub("AceConfigDialog-3.0"):ConfigTableChanged(nil, "Gladdy")
+                local parent
+                if self.db.drCooldownPos == "RIGHT" then
+                    if self.db.castBarPos == "RIGHT" then
+                        if self.db.castBarIconPos == "LEFT" then
+                            parent = button.castBar.icon
+                        else
+                            parent = button.castBar
+                        end
+                    else
+                        parent = button.drFrame
+                    end
+                else
+                    if self.db.castBarPos == "RIGHT" then
+                        if self.db.castBarIconPos == "LEFT" then
+                            parent = button.castBar.icon
+                        else
+                            parent = button.castBar
+                        end
+                    end
+                end
+                if parent then
+                    button.spellCooldownFrame:SetPoint("BOTTOMLEFT", parent, "TOPLEFT", Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset + Gladdy.db.padding)
+                else
+                    local verticalMargin = (Gladdy.db.powerBarHeight)/2
+                    local horizontalMargin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
+                    if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
+                        horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+                        if (Gladdy.db.classIconPos == "RIGHT") then
+                            horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+                        end
+                    elseif (Gladdy.db.classIconPos == "RIGHT") then
+                        horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+                        if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
+                            horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+                        end
+                    end
+                    button.spellCooldownFrame:SetPoint("LEFT", button.healthBar, "RIGHT", horizontalMargin + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset - verticalMargin)
                 end
             end
             button.spellCooldownFrame:SetHeight(self.db.cooldownSize)
@@ -243,14 +328,14 @@ function Gladdy:UpdateFrame()
                 icon:ClearAllPoints()
                 if (self.db.cooldownXPos == "RIGHT") then
                     if (i == 1) then
-                        icon:SetPoint("TOPRIGHT", button.spellCooldownFrame, 0, 0)
+                        icon:SetPoint("RIGHT", button.spellCooldownFrame, "RIGHT", 0, 0)
                     else
                         icon:SetPoint("RIGHT", button.spellCooldownFrame["icon" .. i - 1], "LEFT", -1, 0)
                     end
                 end
                 if (self.db.cooldownXPos == "LEFT") then
                     if (i == 1) then
-                        icon:SetPoint("TOPLEFT", button.spellCooldownFrame, 0, 0)
+                        icon:SetPoint("LEFT", button.spellCooldownFrame, "LEFT", 0, 0)
                     else
                         icon:SetPoint("LEFT", button.spellCooldownFrame["icon" .. i - 1], "RIGHT", 1, 0)
                     end

@@ -158,6 +158,7 @@ local function GetTotemColorDefaultOptions()
                     desc = L["Color of the border"],
                     order = 2,
                     hasAlpha = true,
+                    width = "0.8",
                     get = function(info)
                         local key = info.arg or info[#info]
                         return Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].color.r,
@@ -181,12 +182,20 @@ local function GetTotemColorDefaultOptions()
                     min = 0,
                     max = 1,
                     step = 0.1,
+                    width = "0.8",
                     get = function(info)
                         return Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].alpha
                     end,
                     set = function(info, value)
                         Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].alpha = value
                     end
+                },
+                customText = {
+                  type = "input",
+                  name = L["Custom totem name"],
+                  order = 4,
+                  get = function(info) return Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].customText end,
+                  set = function(info, value) Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].customText = value end
                 },
             }
         }
@@ -217,6 +226,10 @@ local TotemPlates = Gladdy:NewModule("TotemPlates", nil, {
     npTotems = true,
     npTotemPlatesBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     npTotemPlatesSize = 40,
+    npTremorFont = "DorisPP",
+    npTremorFontSize = 10,
+    npTremorFontXOffset = 0,
+    npTremorFontYOffset = 0,
     npTotemPlatesAlpha = 0.6,
     npTotemPlatesAlphaAlways = false,
     npTotemPlatesAlphaAlwaysTargeted = false,
@@ -422,7 +435,9 @@ function TotemPlates:SkinTotem(nameplate, nameplateName, addonName)
                     nameplate.gladdyTotemFrame = CreateFrame("Frame", nil)
                     nameplate.gladdyTotemFrame.totemIcon = nameplate.gladdyTotemFrame:CreateTexture(nil, "BACKGROUND")
                     nameplate.gladdyTotemFrame.totemBorder = nameplate.gladdyTotemFrame:CreateTexture(nil, "BORDER")
+                    nameplate.gladdyTotemFrame.totemName = nameplate.gladdyTotemFrame:CreateFontString(nil, "OVERLAY")
                 end
+                --Gladdy.dbi.profile.npTotemColors["totem" .. indexedList[i].id].enabledName
                 nameplate.gladdyTotemFrame:SetFrameStrata("BACKGROUND")
                 nameplate.gladdyTotemFrame.parent = nameplate
                 nameplate.gladdyTotemFrame:ClearAllPoints()
@@ -471,6 +486,9 @@ function TotemPlates:SkinTotem(nameplate, nameplateName, addonName)
                     Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.g,
                     Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.b,
                     Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].color.a)
+            nameplate.gladdyTotemFrame.totemName:SetPoint("TOP", nameplate.gladdyTotemFrame, "BOTTOM", Gladdy.db.npTremorFontXOffset, Gladdy.db.npTremorFontYOffset)
+            nameplate.gladdyTotemFrame.totemName:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npTremorFont), Gladdy.db.npTremorFontSize, "OUTLINE")
+            nameplate.gladdyTotemFrame.totemName:SetText(Gladdy.db.npTotemColors["totem" .. totemDataEntry.id].customText or "")
         else
             nameplateSetAlpha(nameplate, 1, addonName)
             if nameplate.gladdyTotemFrame then
@@ -496,7 +514,7 @@ end
 
 function TotemPlates:GetOptions()
     return {
-        headerCastbar = {
+        headerTotems = {
             type = "header",
             name = L["Totem General"],
             order = 2,
@@ -505,39 +523,94 @@ function TotemPlates:GetOptions()
             type = "toggle",
             name = L["Totem icons on/off"],
             desc = L["Turns totem icons instead of nameplates on or off. (Requires reload)"],
-            order = 9,
+            order = 3,
         }),
         npTotemPlatesSize = Gladdy:option({
             type = "range",
             name = L["Totem size"],
             desc = L["Size of totem icons"],
-            order = 10,
+            order = 4,
             min = 20,
             max = 100,
             step = 1,
         }),
+        --nameplate.gladdyTotemFrame.totemName:SetPoint("TOP", nameplate.gladdyTotemFrame, "BOTTOM", Gladdy.db.npTremorFontXOffset, Gladdy.db.npTremorFontYOffset)
+        --nameplate.gladdyTotemFrame.totemName:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.npTremorFont), Gladdy.db.npTremorFontSize, "OUTLINE")
+        headerFont = {
+            type = "header",
+            name = L["Font"],
+            order = 10,
+        },
+        npTremorFont = Gladdy:option({
+            type = "select",
+            name = L["Font"],
+            desc = L["Font of the custom totem name"],
+            order = 11,
+            dialogControl = "LSM30_Font",
+            values = AceGUIWidgetLSMlists.font,
+        }),
+        npTremorFontSize = Gladdy:option({
+            type = "range",
+            name = L["Size"],
+            desc = L["Scale of the font"],
+            order = 12,
+            min = 1,
+            max = 50,
+            step = 0.1,
+        }),
+        npTremorFontXOffset = Gladdy:option({
+            type = "range",
+            name = L["Horizontal offset"],
+            desc = L["Scale of the font"],
+            order = 13,
+            min = -200,
+            max = 200,
+            step = 1,
+        }),
+        npTremorFontYOffset = Gladdy:option({
+            type = "range",
+            name = L["Vertical offset"],
+            desc = L["Scale of the font"],
+            order = 14,
+            min = -200,
+            max = 200,
+            step = 1,
+        }),
+
+
+        headerAlpha = {
+            type = "header",
+            name = L["Alpha"],
+            order = 20,
+        },
         npTotemPlatesAlphaAlways = Gladdy:option({
             type = "toggle",
             name = L["Apply alpha when no target"],
             desc = L["Always applies alpha, even when you don't have a target. Else it is 1."],
-            order = 12,
+            order = 21,
         }),
         npTotemPlatesAlphaAlwaysTargeted = Gladdy:option({
             type = "toggle",
             name = L["Apply alpha when targeted, else it is 1"],
             desc = L["Always applies alpha, even when you target the totem. Else it is 1."],
-            order = 13,
+            order = 22,
         }),
+        --border
+        headerBorder = {
+            type = "header",
+            name = L["Border"],
+            order = 40,
+        },
         npTotemPlatesBorderStyle = Gladdy:option({
             type = "select",
             name = L["Totem icon border style"],
-            order = 15,
+            order = 41,
             values = Gladdy:GetIconStyles()
         }),
         npAllTotemColors = {
             type = "color",
             name = L["All totem border color"],
-            order = 16,
+            order = 42,
             hasAlpha = true,
             get = function(info)
                 local colors = GetTotemOptions()
@@ -565,7 +638,7 @@ function TotemPlates:GetOptions()
             min = 0,
             max = 1,
             step = 0.1,
-            order = 14,
+            order = 43,
             get = function(info)
                 local alphas = GetTotemOptions()
                 for i=2, #alphas do
@@ -583,7 +656,7 @@ function TotemPlates:GetOptions()
             end,
         },
         npTotemColors = {
-            order = 15,
+            order = 50,
             name = "Customize Totems",
             type = "group",
             childGroups = "simple",

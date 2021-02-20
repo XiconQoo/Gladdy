@@ -65,7 +65,7 @@ function Castbar:CreateFrame(unit)
             else
                 self.value = self.value + elapsed
                 self.bar:SetValue(self.value)
-                self.timeText:SetFormattedText("%.1f", self.value)
+                self.timeText:SetFormattedText("%.1f", self.maxValue - self.value)
             end
         elseif (self.isChanneling) then
             if (self.value <= 0) then
@@ -121,6 +121,7 @@ function Castbar:CreateFrame(unit)
     castBar.timeText:SetJustifyH("CENTER")
     castBar.timeText:SetPoint("RIGHT", -4, 0) -- text of cast timer
 
+    Gladdy.buttons[unit].castBar = castBar
     self.frames[unit] = castBar
     self:ResetUnit(unit)
 end

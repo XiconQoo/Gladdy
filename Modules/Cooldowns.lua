@@ -23,6 +23,31 @@ function Cooldown:Test(unit)
     button.lastCooldownSpell = 1
 end
 
+local function option(params)
+    local defaults = {
+        get = function(info)
+            local key = info.arg or info[#info]
+            return Gladdy.dbi.profile[key]
+        end,
+        set = function(info, value)
+            local key = info.arg or info[#info]
+            Gladdy.dbi.profile[key] = value
+            if Gladdy.db.cooldownYPos == "LEFT" then
+                Gladdy.db.cooldownXPos = "RIGHT"
+            elseif Gladdy.db.cooldownYPos == "RIGHT" then
+                Gladdy.db.cooldownXPos = "LEFT"
+            end
+            Gladdy:UpdateFrame()
+        end,
+    }
+
+    for k, v in pairs(params) do
+        defaults[k] = v
+    end
+
+    return defaults
+end
+
 function Cooldown:GetOptions()
     return {
         headerCooldown = {
@@ -91,7 +116,7 @@ function Cooldown:GetOptions()
             name = L["Position"],
             order = 10,
         },
-        cooldownYPos = Gladdy:option({
+        cooldownYPos = option({
             type = "select",
             name = L["Position"],
             desc = L["Position of the cooldown icons"],
@@ -99,6 +124,8 @@ function Cooldown:GetOptions()
             values = {
                 ["TOP"] = L["Top"],
                 ["BOTTOM"] = L["Bottom"],
+                ["LEFT"] = L["Left"],
+                ["RIGHT"] = L["Right"],
             },
         }),
         cooldownXPos = Gladdy:option({

@@ -311,7 +311,12 @@ local function keepCastbar(unit)
     if CastBar.castTime and CastBar.castTime < CastBar.maxCastTime then
 
         local total = string.format("%.2f", CastBar.maxCastTime)
-        local left = string.format("%.1f", CastBar.castTime)
+        local left
+        if CastBar.isChannelling then
+            left = string.format("%.1f", CastBar.castTime)
+        else
+            left = string.format("%.1f", CastBar.maxCastTime - CastBar.castTime)
+        end
 
         if (Gladdy.db.npCastbarsTimerFormat == "LEFT") then
             CastBar.spellTime:SetText(left)
@@ -415,7 +420,12 @@ local function createCastbars()
                             CastBar.parent = frame
 
                             local total = string.format("%.2f", CastBar.maxCastTime)
-                            local left = string.format("%.1f", CastBar.castTime)
+                            local left
+                            if CastBar.isChannelling then
+                                left = string.format("%.1f", CastBar.castTime)
+                            else
+                                left = string.format("%.1f", CastBar.maxCastTime - CastBar.castTime)
+                            end
                             if (Gladdy.db.npCastbarsTimerFormat == "LEFT") then
                                 CastBar.spellTime:SetText(left)
                             elseif (Gladdy.db.npCastbarsTimerFormat == "TOTAL") then
