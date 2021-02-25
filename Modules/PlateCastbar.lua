@@ -89,6 +89,11 @@ function PlateCastBar:Initialise()
             knownNameplates = {}
         end
     end)
+    if Gladdy.db.npCastbarsEnable then
+        pcall(SetCVar, "ShowVKeyCastbar", 0)
+    else
+        pcall(SetCVar, "ShowVKeyCastbar", 1)
+    end
 end
 
 ---------------------------------------------------
