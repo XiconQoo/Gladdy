@@ -138,6 +138,10 @@ function ACDFrame:Test()
     self.countdown = 30
 end
 
+function ACDFrame:Reset()
+    self.countdown = 0
+end
+
 function ACDFrame:GetOptions()
     return {
         headerArenaCountdown = {
