@@ -166,11 +166,13 @@ function Diminishings:UpdateFrame(unit)
                 horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
             end
         end
-        if (Gladdy.db.castBarPos == "LEFT") then
-            drFrame:SetPoint("BOTTOMRIGHT", Gladdy.buttons[unit].powerBar, "BOTTOMLEFT", -horizontalMargin + Gladdy.db.drXOffset, Gladdy.db.drYOffset)
-        else
-            drFrame:SetPoint("RIGHT", Gladdy.buttons[unit].healthBar, "LEFT", -horizontalMargin + Gladdy.db.drXOffset, Gladdy.db.drYOffset - verticalMargin)
+        if (Gladdy.db.castBarPos == "RIGHT") then
+            verticalMargin = verticalMargin + (Gladdy.db.castBarHeight > Gladdy.db.castBarIconSize and Gladdy.db.castBarHeight or Gladdy.db.castBarIconSize)/2
         end
+        if (Gladdy.db.cooldownYPos == "RIGHT") then
+            verticalMargin = verticalMargin + Gladdy.db.cooldownSize/2
+        end
+        drFrame:SetPoint("RIGHT", Gladdy.buttons[unit].healthBar, "LEFT", -horizontalMargin + Gladdy.db.drXOffset, Gladdy.db.drYOffset - verticalMargin)
     end
     if (Gladdy.db.drCooldownPos == "RIGHT") then
         if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
@@ -185,10 +187,12 @@ function Diminishings:UpdateFrame(unit)
             end
         end
         if (Gladdy.db.castBarPos == "RIGHT") then
-            drFrame:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].powerBar, "BOTTOMRIGHT", horizontalMargin + Gladdy.db.drXOffset, Gladdy.db.drYOffset)
-        else
-            drFrame:SetPoint("LEFT", Gladdy.buttons[unit].healthBar, "RIGHT", horizontalMargin + Gladdy.db.drXOffset, Gladdy.db.drYOffset - verticalMargin)
+            verticalMargin = verticalMargin + (Gladdy.db.castBarHeight > Gladdy.db.castBarIconSize and Gladdy.db.castBarHeight or Gladdy.db.castBarIconSize)/2
         end
+        if (Gladdy.db.cooldownYPos == "RIGHT") then
+            verticalMargin = verticalMargin + Gladdy.db.cooldownSize/2
+        end
+        drFrame:SetPoint("LEFT", Gladdy.buttons[unit].healthBar, "RIGHT", horizontalMargin + Gladdy.db.drXOffset, Gladdy.db.drYOffset - verticalMargin)
     end
 
     drFrame:SetWidth(Gladdy.db.drIconSize * 16)
