@@ -171,10 +171,14 @@ function Castbar:UpdateFrame(unit)
 
     castBar:ClearAllPoints()
     local horizontalMargin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
-    local verticalMargin = (Gladdy.db.powerBarHeight)/2
+    local verticalMargin = -(Gladdy.db.powerBarHeight)/2
     if (Gladdy.db.castBarPos == "LEFT") then
-        if (Gladdy.db.drCooldownPos == "LEFT" and Gladdy.db.drEnabled) then
-            castBar:SetPoint("BOTTOMRIGHT", button.drFrame, "TOPRIGHT", -leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.padding + Gladdy.db.castBarYOffset)
+        if (false and Gladdy.db.drCooldownPos == "LEFT" and Gladdy.db.drEnabled) then
+            verticalMargin = 0
+            if (Gladdy.db.castBarIconPos == "RIGHT" and Gladdy.db.castBarHeight < Gladdy.db.castBarIconSize) then
+                verticalMargin = (Gladdy.db.castBarIconSize - Gladdy.db.castBarHeight)/2
+            end
+            castBar:SetPoint("BOTTOMRIGHT", button.drFrame, "TOPRIGHT", -leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.padding + Gladdy.db.castBarYOffset + verticalMargin)
         else
             if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
                 horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
@@ -187,12 +191,22 @@ function Castbar:UpdateFrame(unit)
                     horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
                 end
             end
-            castBar:SetPoint("RIGHT", button.healthBar, "LEFT", -horizontalMargin - leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset - verticalMargin)
+            if (Gladdy.db.cooldownYPos == "LEFT" and Gladdy.db.cooldown) then
+                verticalMargin = verticalMargin - Gladdy.db.cooldownSize/2 - Gladdy.db.padding/2
+            end
+            if (Gladdy.db.drCooldownPos == "LEFT" and Gladdy.db.drEnabled) then
+                verticalMargin = verticalMargin + (Gladdy.db.drIconSize/2 + Gladdy.db.padding/2)
+            end
+            castBar:SetPoint("RIGHT", button.healthBar, "LEFT", -horizontalMargin - leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset + verticalMargin)
         end
     end
     if (Gladdy.db.castBarPos == "RIGHT") then
-        if (Gladdy.db.drCooldownPos == "RIGHT" and Gladdy.db.drEnabled) then
-            castBar:SetPoint("BOTTOMLEFT", button.drFrame, "TOPLEFT", rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.padding + Gladdy.db.castBarYOffset)
+        if (false and Gladdy.db.drCooldownPos == "RIGHT" and Gladdy.db.drEnabled) then
+            verticalMargin = 0
+            if (Gladdy.db.castBarIconPos == "LEFT" and Gladdy.db.castBarHeight < Gladdy.db.castBarIconSize) then
+                verticalMargin = (Gladdy.db.castBarIconSize - Gladdy.db.castBarHeight)/2
+            end
+            castBar:SetPoint("BOTTOMLEFT", button.drFrame, "TOPLEFT", rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.padding + Gladdy.db.castBarYOffset + verticalMargin)
         else
             if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
                 horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
@@ -205,7 +219,13 @@ function Castbar:UpdateFrame(unit)
                     horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
                 end
             end
-            castBar:SetPoint("LEFT", button.healthBar, "RIGHT", horizontalMargin + rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset - verticalMargin)
+            if (Gladdy.db.cooldownYPos == "RIGHT" and Gladdy.db.cooldown) then
+                verticalMargin = verticalMargin - Gladdy.db.cooldownSize/2 - Gladdy.db.padding/2
+            end
+            if (Gladdy.db.drCooldownPos == "RIGHT" and Gladdy.db.drEnabled) then
+                verticalMargin = verticalMargin + (Gladdy.db.drIconSize/2 + Gladdy.db.padding/2)
+            end
+            castBar:SetPoint("LEFT", button.healthBar, "RIGHT", horizontalMargin + rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset + verticalMargin)
         end
     end
 
