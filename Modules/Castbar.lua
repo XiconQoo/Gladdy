@@ -26,6 +26,7 @@ local Castbar = Gladdy:NewModule("Castbar", 70, {
     castBarYOffset = 0,
     castBarIconPos = "LEFT",
     castBarFont = "DorisPP",
+    castBarTimerFormat = "LEFT",
     castBarSparkEnabled = true,
     castBarSparkColor = { r = 1, g = 1, b = 1, a = 1 },
 })
@@ -65,7 +66,13 @@ function Castbar:CreateFrame(unit)
             else
                 self.value = self.value + elapsed
                 self.bar:SetValue(self.value)
-                self.timeText:SetFormattedText("%.1f", self.value)
+                if (Gladdy.db.castBarTimerFormat == "LEFT") then
+                    self.timeText:SetFormattedText("%.1f", self.maxValue - self.value)
+                elseif (Gladdy.db.castBarTimerFormat == "TOTAL") then
+                    self.timeText:SetFormattedText("%.1f", self.maxValue)
+                elseif (Gladdy.db.castBarTimerFormat == "BOTH") then
+                    self.timeText:SetFormattedText("%.1f / %.1f", self.maxValue - self.value, self.maxValue)
+                end
             end
         elseif (self.isChanneling) then
             if (self.value <= 0) then
@@ -73,7 +80,13 @@ function Castbar:CreateFrame(unit)
             else
                 self.value = self.value - elapsed
                 self.bar:SetValue(self.value)
-                self.timeText:SetFormattedText("%.1f", self.value)
+                if (Gladdy.db.castBarTimerFormat == "LEFT") then
+                    self.timeText:SetFormattedText("%.1f", self.value)
+                elseif (Gladdy.db.castBarTimerFormat == "TOTAL") then
+                    self.timeText:SetFormattedText("%.1f", self.maxValue)
+                elseif (Gladdy.db.castBarTimerFormat == "BOTH") then
+                    self.timeText:SetFormattedText("%.1f / %.1f", self.value, self.maxValue)
+                end
             end
         end
         if self.isCasting or self.isChanneling then
@@ -121,6 +134,7 @@ function Castbar:CreateFrame(unit)
     castBar.timeText:SetJustifyH("CENTER")
     castBar.timeText:SetPoint("RIGHT", -4, 0) -- text of cast timer
 
+    Gladdy.buttons[unit].castBar = castBar
     self.frames[unit] = castBar
     self:ResetUnit(unit)
 end
@@ -170,42 +184,46 @@ function Castbar:UpdateFrame(unit)
 
     castBar:ClearAllPoints()
     local horizontalMargin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
-    local verticalMargin = (Gladdy.db.powerBarHeight)/2
+    local verticalMargin = -(Gladdy.db.powerBarHeight)/2
     if (Gladdy.db.castBarPos == "LEFT") then
-        if (Gladdy.db.drCooldownPos == "LEFT" and Gladdy.db.drEnabled) then
-            castBar:SetPoint("BOTTOMRIGHT", button.drFrame, "TOPRIGHT", -leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.padding + Gladdy.db.castBarYOffset)
-        else
+        if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
+            horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+            if (Gladdy.db.classIconPos == "LEFT") then
+                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+            end
+        elseif (Gladdy.db.classIconPos == "LEFT") then
+            horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
             if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
                 horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
-                if (Gladdy.db.classIconPos == "LEFT") then
-                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
-                end
-            elseif (Gladdy.db.classIconPos == "LEFT") then
-                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
-                if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-                    horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
-                end
             end
-            castBar:SetPoint("RIGHT", button.healthBar, "LEFT", -horizontalMargin - leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset - verticalMargin)
         end
+        if (Gladdy.db.cooldownYPos == "LEFT" and Gladdy.db.cooldown) then
+            verticalMargin = verticalMargin - Gladdy.db.cooldownSize/2 - Gladdy.db.padding/2
+        end
+        if (Gladdy.db.drCooldownPos == "LEFT" and Gladdy.db.drEnabled) then
+            verticalMargin = verticalMargin + (Gladdy.db.drIconSize/2 + Gladdy.db.padding/2)
+        end
+        castBar:SetPoint("RIGHT", button.healthBar, "LEFT", -horizontalMargin - leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset + verticalMargin)
     end
     if (Gladdy.db.castBarPos == "RIGHT") then
-        if (Gladdy.db.drCooldownPos == "RIGHT" and Gladdy.db.drEnabled) then
-            castBar:SetPoint("BOTTOMLEFT", button.drFrame, "TOPLEFT", rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.padding + Gladdy.db.castBarYOffset)
-        else
-            if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
-                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
-                if (Gladdy.db.classIconPos == "RIGHT") then
-                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
-                end
-            elseif (Gladdy.db.classIconPos == "RIGHT") then
+        if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
+            horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+            if (Gladdy.db.classIconPos == "RIGHT") then
                 horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
-                if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-                    horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
-                end
             end
-            castBar:SetPoint("LEFT", button.healthBar, "RIGHT", horizontalMargin + rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset - verticalMargin)
+        elseif (Gladdy.db.classIconPos == "RIGHT") then
+            horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+            if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
+                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+            end
         end
+        if (Gladdy.db.cooldownYPos == "RIGHT" and Gladdy.db.cooldown) then
+            verticalMargin = verticalMargin - Gladdy.db.cooldownSize/2 - Gladdy.db.padding/2
+        end
+        if (Gladdy.db.drCooldownPos == "RIGHT" and Gladdy.db.drEnabled) then
+            verticalMargin = verticalMargin + (Gladdy.db.drIconSize/2 + Gladdy.db.padding/2)
+        end
+        castBar:SetPoint("LEFT", button.healthBar, "RIGHT", horizontalMargin + rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset + verticalMargin)
     end
 
     castBar.spellText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.auraFont), Gladdy.db.castBarFontSize)
@@ -445,21 +463,32 @@ function Castbar:GetOptions()
             dialogControl = "LSM30_Font",
             values = AceGUIWidgetLSMlists.font,
         }),
-        castBarFontSize = option({
-            type = "range",
-            name = L["Font size"],
-            desc = L["Size of the text"],
-            order = 42,
-            min = 1,
-            max = 20,
-        }),
         castBarFontColor = Gladdy:colorOption({
             type = "color",
             name = L["Font color"],
             desc = L["Color of the text"],
-            order = 43,
+            order = 42,
             hasAlpha = true,
         }),
+        castBarFontSize = option({
+            type = "range",
+            name = L["Font size"],
+            desc = L["Size of the text"],
+            order = 43,
+            min = 1,
+            max = 20,
+        }),
+        castBarTimerFormat = option({
+            type = "select",
+            name = L["Timer Format"],
+            order = 44,
+            values = {
+                ["LEFT"] = L["Remaining"],
+                ["TOTAL"] = L["Total"],
+                ["BOTH"] = L["Both"],
+            },
+        }),
+
         --Borders
         headerBorder = {
             type = "header",

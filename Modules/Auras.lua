@@ -35,6 +35,7 @@ function Auras:CreateFrame(unit)
     auraFrame.cooldown.noCooldownCount = true
     auraFrame.cooldown:SetFrameStrata("MEDIUM")
     auraFrame.cooldown:SetFrameLevel(4)
+    auraFrame.cooldown:SetReverse(true)
 
     auraFrame.cooldownFrame = CreateFrame("Frame", nil, auraFrame)
     auraFrame.cooldownFrame:ClearAllPoints()
@@ -200,7 +201,10 @@ function Auras:AURA_GAIN(unit, aura, icon, duration, priority)
     else
         auraFrame.icon.overlay:SetVertexColor(Gladdy.db.frameBorderColor.r, Gladdy.db.frameBorderColor.g, Gladdy.db.frameBorderColor.b, Gladdy.db.frameBorderColor.a)
     end
-    if not Gladdy.db.auraDisableCircle then auraFrame.cooldown:SetCooldown(auraFrame.startTime, auraFrame.endTime - auraFrame.startTime) end
+    if not Gladdy.db.auraDisableCircle then
+        auraFrame.cooldown:Show()
+        auraFrame.cooldown:SetCooldown(auraFrame.startTime, auraFrame.endTime - auraFrame.startTime)
+    end
 end
 
 function Auras:AURA_FADE(unit)
@@ -211,6 +215,7 @@ function Auras:AURA_FADE(unit)
     if auraFrame.active then
         auraFrame.cooldown:SetCooldown(GetTime(), 0)
     end
+    auraFrame.cooldown:Hide()
     auraFrame.active = false
     auraFrame.name = nil
     auraFrame.timeLeft = 0

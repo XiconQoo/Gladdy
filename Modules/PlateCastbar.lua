@@ -89,6 +89,11 @@ function PlateCastBar:Initialise()
             knownNameplates = {}
         end
     end)
+    if Gladdy.db.npCastbarsEnable then
+        pcall(SetCVar, "ShowVKeyCastbar", 0)
+    else
+        pcall(SetCVar, "ShowVKeyCastbar", 1)
+    end
 end
 
 ---------------------------------------------------
@@ -286,7 +291,9 @@ local function keepCastbar(unit)
 
     if (Gladdy.db.npCastbarGuess == false) then
         CastBar.castTime = nil
-        CastBar.parent.CastBarEnabled = nil
+        if CastBar.parent then
+            CastBar.parent.CastBarEnabled = nil
+        end
         CastBar:SetAlpha(0)
         CastBar:Hide()
         return
@@ -309,7 +316,12 @@ local function keepCastbar(unit)
     if CastBar.castTime and CastBar.castTime < CastBar.maxCastTime then
 
         local total = string.format("%.2f", CastBar.maxCastTime)
-        local left = string.format("%.1f", CastBar.castTime)
+        local left
+        if CastBar.isChannelling then
+            left = string.format("%.1f", CastBar.castTime)
+        else
+            left = string.format("%.1f", CastBar.maxCastTime - CastBar.castTime)
+        end
 
         if (Gladdy.db.npCastbarsTimerFormat == "LEFT") then
             CastBar.spellTime:SetText(left)
@@ -413,7 +425,12 @@ local function createCastbars()
                             CastBar.parent = frame
 
                             local total = string.format("%.2f", CastBar.maxCastTime)
-                            local left = string.format("%.1f", CastBar.castTime)
+                            local left
+                            if CastBar.isChannelling then
+                                left = string.format("%.1f", CastBar.castTime)
+                            else
+                                left = string.format("%.1f", CastBar.maxCastTime - CastBar.castTime)
+                            end
                             if (Gladdy.db.npCastbarsTimerFormat == "LEFT") then
                                 CastBar.spellTime:SetText(left)
                             elseif (Gladdy.db.npCastbarsTimerFormat == "TOTAL") then
@@ -669,10 +686,10 @@ function PlateCastBar:GetOptions()
         }),
         npCastbarsTimerFormat = option({
             type = "select",
-            name = L["Position"],
+            name = L["Timer Format"],
             order = 36,
             values = {
-                ["LEFT"] = L["Left"],
+                ["LEFT"] = L["Remaining"],
                 ["TOTAL"] = L["Total"],
                 ["BOTH"] = L["Both"],
             },

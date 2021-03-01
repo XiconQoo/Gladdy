@@ -88,7 +88,7 @@ local unitsToCheck = {
     ["raid4targettarget"] = true,
 }
 
-local MAJOR, MINOR = "Gladdy", 3
+local MAJOR, MINOR = "Gladdy", 4
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 
@@ -621,7 +621,7 @@ function Gladdy:UNIT_SPELLCAST_DELAYED(event, uid)
     local castBar = Gladdy.modules.Castbar.frames[button.unit]
     castBar.value = value
     castBar.maxValue = (endTime - startTime) / 1000
-    castBar:SetMinMaxValues(0, castBar.maxValue)
+    castBar.bar:SetMinMaxValues(0, castBar.maxValue)
 end
 
 function Gladdy:UNIT_SPELLCAST_STOP(event, uid)
