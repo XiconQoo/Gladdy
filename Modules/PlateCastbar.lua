@@ -686,10 +686,10 @@ function PlateCastBar:GetOptions()
         }),
         npCastbarsTimerFormat = option({
             type = "select",
-            name = L["Position"],
+            name = L["Timer Format"],
             order = 36,
             values = {
-                ["LEFT"] = L["Left"],
+                ["LEFT"] = L["Remaining"],
                 ["TOTAL"] = L["Total"],
                 ["BOTH"] = L["Both"],
             },
