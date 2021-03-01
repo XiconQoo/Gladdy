@@ -88,7 +88,7 @@ local unitsToCheck = {
     ["raid4targettarget"] = true,
 }
 
-local MAJOR, MINOR = "Gladdy", 3
+local MAJOR, MINOR = "Gladdy", 4
 local Gladdy = LibStub:NewLibrary(MAJOR, MINOR)
 local L
 
