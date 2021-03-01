@@ -1,7 +1,7 @@
 # Gladdy - Macumba / XiCoN Edit
 
 ### The most powerful arena addon for WoW TBC 2.4.3
-## [v1.1.2-Release Download Here](https://github.com/XiconQoo/Gladdy/releases/download/v1.1.2-Release/Gladdy-MX-Edit-v1.1.2-Release.zip)
+## [v1.2-Release Download Here](https://github.com/XiconQoo/Gladdy/releases/download/v1.2-Release/Gladdy-MX-Edit-v1.2-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="../readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -37,6 +37,13 @@ Based on https://github.com/Schaka/gladdy
 ```
 
 ### Changes
+
+v1.2-Release
+- fixed castbar timer formats
+- added option to show timeleft, total or both to castbars
+- option to add a custom TotemName that appears on the totemicons
+- cooldowns can be positioned LEFT or RIGHT now as well
+- option cooldowns max icons per row added
 
 v1.1.2
 
