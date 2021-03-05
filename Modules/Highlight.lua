@@ -161,18 +161,21 @@ function Highlight:GetOptions()
             name = L["Target border color"],
             desc = L["Color of the selected targets border"],
             order = 4,
+            hasAlpha = true,
         }),
         focusBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Focus border color"],
             desc = L["Color of the focus border"],
             order = 5,
+            hasAlpha = true,
         }),
         leaderBorderColor = Gladdy:colorOption({
             type = "color",
             name = L["Raid leader border color"],
             desc = L["Color of the raid leader border"],
             order = 6,
+            hasAlpha = true,
         }),
         headerEnable = {
             type = "header",
