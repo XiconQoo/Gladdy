@@ -32,3 +32,4 @@ Modules\Cooldowns.lua
 Modules\ArenaIdentify.lua
 Modules\ArenaCountDown.lua
 Modules\VersionCheck.lua
+Modules\BuffsDebuffs.lua
