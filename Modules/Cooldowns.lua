@@ -212,13 +212,14 @@ function Gladdy:GetCooldownList()
         -- Mage
         ["MAGE"] = {
             [1953] = 15, -- Blink
-            --[122] 	= 25,    -- Frost Nova
+            --[122] 	= 22,    -- Frost Nova
+			--[12051] = 480, --Evocation
             [2139] = 24, -- Counterspell
-            [45438] = 300, -- Ice Block
+            [45438] = { cd = 300, [L["Frost"]] = 240, }, -- Ice Block
             [12472] = { cd = 180, spec = L["Frost"], }, -- Icy Veins
             [31687] = { cd = 180, spec = L["Frost"], }, -- Summon Water Elemental
-            [12043] = { cd = 120, spec = L["Arcane"], }, -- Presence of Mind
-            [11129] = { cd = 120, spec = L["Fire"] }, -- Combustion
+            [12043] = { cd = 180, spec = L["Arcane"], }, -- Presence of Mind
+            [11129] = { cd = 180, spec = L["Fire"] }, -- Combustion
             [120] = { cd = 10,
                       sharedCD = {
                           [31661] = true, -- Cone of Cold
@@ -227,8 +228,8 @@ function Gladdy:GetCooldownList()
                         sharedCD = {
                             [120] = true, -- Cone of Cold
                         }, spec = L["Fire"] }, -- Dragon's Breath
-            [12042] = { cd = 120, spec = L["Arcane"], }, -- Arcane Power
-            [11958] = { cd = 480, spec = L["Frost"], -- Coldsnap
+            [12042] = { cd = 180, spec = L["Arcane"], }, -- Arcane Power
+            [11958] = { cd = 384, spec = L["Frost"], -- Coldsnap
                         resetCD = {
                             [12472] = true,
                             [45438] = true,
@@ -240,10 +241,10 @@ function Gladdy:GetCooldownList()
         -- Priest
         ["PRIEST"] = {
             [10890] = { cd = 27, [L["Shadow"]] = 23, }, -- Psychic Scream
-            [34433] = { cd = 300, [L["Shadow"]] = 180, }, -- Shadowfiend
             [15487] = { cd = 45, spec = L["Shadow"], }, -- Silence
-            [10060] = { cd = 120, spec = L["Discipline"], }, -- Power Infusion
-            [33206] = { cd = 180, spec = L["Discipline"], }, -- Pain Suppression
+            [10060] = { cd = 180, spec = L["Discipline"], }, -- Power Infusion
+            [33206] = { cd = 120, spec = L["Discipline"], }, -- Pain Suppression
+			[34433] = 300, -- Shadowfiend
         },
 
         -- Druid
@@ -252,7 +253,7 @@ function Gladdy:GetCooldownList()
             [29166] = 360, -- Innervate
             [8983] = 60, -- Bash
             [16689] = 60, -- Natures Grasp
-            [17116] = { cd = 120, spec = L["Restoration"], }, -- Natures Swiftness
+            [17116] = { cd = 180, spec = L["Restoration"], }, -- Natures Swiftness
             [33831] = { cd = 180, spec = L["Balance"], }, -- Force of Nature
         },
 
@@ -264,9 +265,9 @@ function Gladdy:GetCooldownList()
                            [8050] = true, -- Flame Shock
                        },
             },
-            [30823] = { cd = 60, spec = L["Enhancement"], }, -- Shamanistic Rage
+            [30823] = { cd = 120, spec = L["Enhancement"], }, -- Shamanistic Rage
             [16166] = { cd = 180, spec = L["Elemental"], }, -- Elemental Mastery
-            [16188] = { cd = 120, spec = L["Restoration"], }, -- Natures Swiftness
+            [16188] = { cd = 180, spec = L["Restoration"], }, -- Natures Swiftness
             [16190] = { cd = 300, spec = L["Restoration"], }, -- Mana Tide Totem
         },
 
@@ -318,10 +319,10 @@ function Gladdy:GetCooldownList()
             --[23920] 	= 10,    -- Spell Reflection
             [3411] = 30, -- Intervene
             [676] = 60, -- Disarm
-            [5246] = 120, -- Intimidating Shout
+            [5246] = 180, -- Intimidating Shout
             --[2565] 	= 60,    -- Shield Block
             [12292] = { cd = 180, spec = L["Arms"], }, -- Death Wish
-            [12975] = { cd = 180, }, -- Last Stand
+            [12975] = { cd = 180, spec = L["Protection"], }, -- Last Stand
             [12809] = { cd = 30, spec = L["Protection"], }, -- Concussion Blow
 
         },
@@ -358,13 +359,13 @@ function Gladdy:GetCooldownList()
         ["ROGUE"] = {
             --[1766] 	= 10,    -- Kick
             --[8643] 	= 20,    -- Kidney Shot
-            [26669] = { cd = 300, [L["Combat"]] = 180, }, -- Evasion
             [31224] = 60, -- Cloak of Shadow
             [26889] = { cd = 300, [L["Subtlety"]] = 180, }, -- Vanish
             [2094] = { cd = 180, [L["Subtlety"]] = 90, }, -- Blind
-            --[11305] 	= 180,   -- Sprint
+            [11305] = { cd = 300, [L["Combat"]] = 180, }, -- Sprint
+            [26669] = { cd = 300, [L["Combat"]] = 180, }, -- Evasion
             [14177] = { cd = 180, spec = L["Assassination"], }, -- Cold Blood
-            [13750] = { cd = 180, spec = L["Combat"], }, -- Adrenaline Rush
+            [13750] = { cd = 300, spec = L["Combat"], }, -- Adrenaline Rush
             [13877] = { cd = 120, spec = L["Combat"], }, -- Blade Flurry
             [36554] = { cd = 30, spec = L["Subtlety"], }, -- Shadowstep
             [14185] = { cd = 600, spec = L["Subtlety"], -- Preparation
