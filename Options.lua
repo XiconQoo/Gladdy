@@ -7,6 +7,7 @@ local tsort = table.sort
 local InterfaceOptionsFrame_OpenToFrame = InterfaceOptionsFrame_OpenToFrame
 
 local Gladdy = LibStub("Gladdy")
+local LibAuraDurations = LibStub("LibAuraDurations-1.0")
 local L = Gladdy.L
 
 Gladdy.defaults = {
@@ -528,4 +529,120 @@ end
 
 function Gladdy:ShowOptions()
     InterfaceOptionsFrame_OpenToFrame("Gladdy")
+end
+
+function Gladdy:GetDebuffs()
+    local spells = {
+        ckeckAll = {
+            order = 1,
+            width = "0.7",
+            name = "Check All",
+            type = "execute",
+            func = function(info)
+                for k,v in pairs(Gladdy.dbi.profile.trackedDebuffs) do
+                    Gladdy.dbi.profile.trackedDebuffs[k] = true
+                end
+            end,
+        },
+        uncheckAll = {
+            order = 2,
+            width = "0.7",
+            name = "Uncheck All",
+            type = "execute",
+            func = function(info)
+                for k,v in pairs(Gladdy.dbi.profile.trackedDebuffs) do
+                    Gladdy.dbi.profile.trackedDebuffs[k] = false
+                end
+            end,
+        },
+        druid = {
+            order = 3,
+            type = "group",
+            name = "Druid",
+            args = {},
+        },
+        hunter = {
+            order = 4,
+            type = "group",
+            name = "Hunter",
+            args = {},
+        },
+        mage = {
+            order = 5,
+            type = "group",
+            name = "Mage",
+            args = {},
+        },
+        paladin = {
+            order = 6,
+            type = "group",
+            name = "Paladin",
+            args = {},
+        },
+        priest = {
+            order = 7,
+            type = "group",
+            name = "Priest",
+            args = {},
+        },
+        rogue = {
+            order = 8,
+            type = "group",
+            name = "Rogue",
+            args = {},
+        },
+        shaman = {
+            order = 9,
+            type = "group",
+            name = "Shaman",
+            args = {},
+        },
+        warlock = {
+            order = 10,
+            type = "group",
+            name = "Warlock",
+            args = {},
+        },
+        warrior = {
+            order = 10,
+            type = "group",
+            name = "Warrior",
+            args = {},
+        },
+    }
+    local defaultDebuffs = {}
+    local assignForClass = function(class)
+        local args = {}
+        local classSpells = LibAuraDurations.GetClassSpells(class)
+        table.sort(classSpells, function(a, b)
+            return a.name:upper() < b.name:upper()
+        end)
+        for i=1, #classSpells do
+            local spellName, _, texture = GetSpellInfo(classSpells[i].id[#classSpells[i].id])
+            if classSpells[i].texture then
+                texture = classSpells[i].texture
+            end
+            args[tostring(classSpells[i].id[#classSpells[i].id])] = {
+                order = i,
+                name = spellName,
+                type = "toggle",
+                image = texture,
+                width = "2",
+                --desc = format("Duration: %ds", druidSpells[i].duration),
+                arg = tostring(classSpells[i].id[#classSpells[i].id]),
+            }
+            defaultDebuffs[tostring(classSpells[i].id[#classSpells[i].id])] = true
+        end
+        return args
+    end
+    spells.druid.args = assignForClass("DRUID")
+    spells.hunter.args = assignForClass("HUNTER")
+    spells.mage.args = assignForClass("MAGE")
+    spells.paladin.args = assignForClass("PALADIN")
+    spells.priest.args = assignForClass("PRIEST")
+    spells.rogue.args = assignForClass("ROGUE")
+    spells.shaman.args = assignForClass("SHAMAN")
+    spells.warlock.args = assignForClass("WARLOCK")
+    spells.warrior.args = assignForClass("WARRIOR")
+    return spells, defaultDebuffs
 end
