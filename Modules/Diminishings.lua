@@ -9,6 +9,7 @@ local CreateFrame = CreateFrame
 local GetTime = GetTime
 
 local Gladdy = LibStub("Gladdy")
+local DRData = LibStub("DRData-1.0")
 local L = Gladdy.L
 local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drFont = "DorisPP",
@@ -50,16 +51,6 @@ end
 
 function Diminishings:Initialise()
     self.frames = {}
-    self.spells = {}
-    self.icons = {}
-
-    local spells = self:GetDRList()
-    for k, v in pairs(spells) do
-        local name, _, icon = GetSpellInfo(k)
-        self.spells[name] = v
-        self.icons[name] = icon
-    end
-
     self:RegisterMessage("UNIT_DEATH", "ResetUnit")
     self:SetScript("OnEvent", Diminishings.OnEvent)
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -68,8 +59,8 @@ end
 function Diminishings:COMBAT_LOG_EVENT_UNFILTERED(...)
     local timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, spellID, spellName, spellSchool, auraType = select(1, ...);
     local destUnit = Gladdy.guids[destGUID]
-    if eventType == "SPELL_AURA_REMOVED" and destUnit then
-        self:Fade(destUnit, spellName)
+    if eventType == "SPELL_AURA_REMOVED" or eventType == "SPELL_AURA_REFRESH" and destUnit then
+        self:Fade(destUnit, spellName, spellID)
     end
 end
 
@@ -91,14 +82,21 @@ function Diminishings:CreateFrame(unit)
 
                     self.active = false
                     self.dr = nil
+                    self.diminishing = 1
                     self.texture:SetTexture("")
                     self.text:SetText("")
+                    self.diminishingText:SetText("")
                     self:SetAlpha(0)
-
                     Diminishings:Positionate(unit)
                 else
                     self.timeLeft = self.timeLeft - elapsed
-                    self.timeText:SetFormattedText("%d", self.timeLeft + 1)
+                    if self.timeLeft >=5 then
+                        self.timeText:SetFormattedText("%d", self.timeLeft)
+                    else
+                        self.timeText:SetFormattedText("%.1f", self.timeLeft)
+                    end
+
+                    self.diminishingText:SetText(self.diminishing == 0.5 and "1/2" or self.diminishing == 0.25 and "1/4" or self.diminishing == 0 and "0")
                 end
             end
         end)
@@ -127,7 +125,18 @@ function Diminishings:CreateFrame(unit)
         icon.timeText:SetShadowOffset(1, -1)
         icon.timeText:SetShadowColor(0, 0, 0, 1)
         icon.timeText:SetJustifyH("CENTER")
-        icon.timeText:SetPoint("CENTER")
+        icon.timeText:SetPoint("CENTER", icon, "CENTER", 0, 2)
+
+        icon.diminishingText = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
+        icon.diminishingText:SetDrawLayer("OVERLAY")
+        icon.diminishingText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), 8, "OUTLINE")
+        icon.diminishingText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
+        icon.diminishingText:SetShadowOffset(1, -1)
+        icon.diminishingText:SetShadowColor(0, 0, 0, 1)
+        icon.diminishingText:SetJustifyH("CENTER")
+        icon.diminishingText:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", -1, 3)
+
+        icon.diminishing = 1
 
         drFrame["icon" .. i] = icon
     end
@@ -210,6 +219,8 @@ function Diminishings:UpdateFrame(unit)
 
         icon.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
         icon.text:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
+        icon.diminishingText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), (Gladdy.db.drIconSize/3 - 1) * Gladdy.db.drFontScale, "OUTLINE")
+        icon.diminishingText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
         icon.timeText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
         icon.timeText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
 
@@ -263,34 +274,34 @@ function Diminishings:Test(unit)
 
     for i = 1, 4 do
         local spell = GetSpellInfo(spells[i])
-        self:Fade(unit, spell)
+        self:Fade(unit, spell, spells[i])
+        self:Fade(unit, spell, spells[i])
     end
 end
 
-function Diminishings:Fade(unit, spell)
+function Diminishings:Fade(unit, spell, spellID)
     local drFrame = self.frames[unit]
-    local dr = self.spells[spell]
-    if (not drFrame or not dr) then
-        return
+    local drCat = DRData:GetSpellCategory(spellID)
+    if (not drFrame or not drCat or DRData:IsPVE(drCat)) then
+        return nil
     end
 
     for i = 1, 16 do
         local icon = drFrame["icon" .. i]
-        if (not icon.active or (icon.dr and icon.dr == dr)) then
-            icon.dr = dr
+        if (not icon.active or (icon.dr and icon.dr == drCat)) then
+            icon.dr = drCat
             icon.timeLeft = drDuration
+            local dr = icon.diminishing
+            icon.diminishing = DRData:NextDR(icon.diminishing)
             icon.cooldown:SetCooldown(GetTime(), drDuration)
-            icon.texture:SetTexture(self.icons[spell])
+            icon.texture:SetTexture(select(3, GetSpellInfo(spellID)))
             icon.active = true
             self:Positionate(unit)
             icon:SetAlpha(1)
-            break
+            return dr
         end
     end
-end
-
-function Positionate()
-    Diminishings:Positionate("arena1")
+    return nil
 end
 
 function Diminishings:Positionate(unit)
@@ -438,60 +449,5 @@ function Diminishings:GetOptions()
             order = 32,
             hasAlpha = true,
         }),
-    }
-end
-
-function Diminishings:GetDRList()
-    return {
-        -- DRUID
-        [33786] = "cycloneblind", -- Cyclone
-        [18658] = "sleep", -- Hibernate
-        [26989] = "root", -- Entangling roots
-        [8983] = "stun", -- Bash
-        [9005] = "stun", -- Pounce
-        [22570] = "disorient", -- Maim
-
-        -- HUNTER
-        [14309] = "freezingtrap", -- Freezing Trap
-        [19386] = "sleep", -- Wyvern Sting
-        [19503] = "scattershot", -- Scatter Shot
-        [19577] = "stun", -- Intimidation
-
-        -- MAGE
-        [12826] = "disorient", -- Polymorph
-        [31661] = "dragonsbreath", -- Dragon's Breath
-        [27088] = "root", -- Frost Nova
-        [33395] = "root", -- Freeze (Water Elemental)
-
-        -- PALADIN
-        [10308] = "stun", -- Hammer of Justice
-        [20066] = "repentance", -- Repentance
-
-        -- PRIEST
-        [8122] = "fear", -- Phychic Scream
-        [44047] = "root", -- Chastise
-        [605] = "charm", -- Mind Control
-
-        -- ROGUE
-        [6770] = "disorient", -- Sap
-        [2094] = "cycloneblind", -- Blind
-        [1833] = "stun", -- Cheap Shot
-        [8643] = "kidneyshot", -- Kidney Shot
-        [1776] = "disorient", -- Gouge
-
-        -- WARLOCK
-        [5782] = "fear", -- Fear
-        [27223] = "horror", -- Death Coil
-        [30283] = "stun", -- Shadowfury
-        [6358] = "fear", -- Seduction (Succubus)
-        [5484] = "fear", -- Howl of Terror
-
-        -- WARRIOR
-        [12809] = "stun", -- Concussion Blow
-        [25274] = "stun", -- Intercept Stun
-        [5246] = "fear", -- Intimidating Shout
-
-        -- TAUREN
-        [20549] = "stun", -- War Stomp
     }
 end
