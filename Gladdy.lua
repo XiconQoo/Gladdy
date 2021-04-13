@@ -94,6 +94,7 @@ local L
 
 LibStub("AceTimer-3.0"):Embed(Gladdy)
 LibStub("AceComm-3.0"):Embed(Gladdy)
+local DRData = LibStub("DRData-1.0")
 Gladdy.modules = {}
 setmetatable(Gladdy, {
     __tostring = function()
@@ -300,6 +301,10 @@ end
 function Gladdy:OnEnable()
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
 
+    if IsAddOnLoaded("BuffLib") then
+        self.bufflibEnabled = true
+    end
+
     if (IsAddOnLoaded("Clique")) then
         for i = 1, 5 do
             self:CreateButton(i)
@@ -489,7 +494,7 @@ function Gladdy:UNIT_AURA(event, uid)
         if (Auras.auras[name] and Auras.auras[name].priority >= (Auras.frames[button.unit].priority or 0)) then
             auraName = name
             auraIcon = icon
-            auraExpTime = expTime or 0
+            auraExpTime = expTime or nil
             priority = Auras.auras[name].priority
         end
 
@@ -498,7 +503,7 @@ function Gladdy:UNIT_AURA(event, uid)
 
     index = 1
     while (true) do
-        local name, _, icon, _, _, _, expTime = UnitDebuff(uid, index)
+        local name, rank, icon, _, _, _, expTime = UnitDebuff(uid, index)
         if (not name) then
             break
         end
@@ -508,7 +513,7 @@ function Gladdy:UNIT_AURA(event, uid)
         if (Auras.auras[name] and Auras.auras[name].priority >= (Auras.frames[button.unit].priority or 0)) then
             auraName = name
             auraIcon = icon
-            auraExpTime = expTime or 0
+            auraExpTime = expTime or nil
             priority = Auras.auras[name].priority
         end
 
@@ -520,7 +525,10 @@ function Gladdy:UNIT_AURA(event, uid)
             if (auraName == Auras.frames[button.unit].name) then
                 auraExpTime = Auras.frames[button.unit].timeLeft
             else
-                auraExpTime = Auras.auras[name].duration
+                auraExpTime = Auras.auras[auraName].duration
+                if button[DRData:GetSpellCategory(Auras.auras[auraName].spellID)] then
+                    auraExpTime = Auras.auras[auraName].duration * button[DRData:GetSpellCategory(Auras.auras[auraName].spellID)].diminished
+                end
             end
         end
 
@@ -632,64 +640,68 @@ function Gladdy:UNIT_SPELLCAST_STOP(event, uid)
     self:SendMessage("CAST_STOP", button.unit)
 end
 
-function Gladdy:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, spellID, spellName, ...)
+function Gladdy:UNIT_SPELLCAST_FAILED(event, uid)
+    local button = self:GetButton(uid)
+    if (not button) then
+        return
+    end
+    self:SendMessage("CAST_STOP", button.unit)
+end
+
+Gladdy.eventGrps = {
+    ["PARTY_KILL"] = "DEATH",
+    ["UNIT_DIED"] = "DEATH",
+    ["UNIT_DESTROYED"] = "DEATH",
+    ["SWING_DAMAGE"] = "DAMAGE",
+    ["RANGE_DAMAGE"] = "DAMAGE",
+    ["SPELL_DAMAGE"] = "DAMAGE",
+    ["SPELL_PERIODIC_DAMAGE"] = "DAMAGE",
+    ["ENVIRONMENTAL_DAMAGE"] = "DAMAGE",
+    ["DAMAGE_SHIELD"] = "DAMAGE",
+    ["DAMAGE_SPLIT"] = "DAMAGE",
+    ["SPELL_AURA_APPLIED"] = "BUFF",
+    ["SPELL_PERIODIC_AURA_APPLIED"] = "BUFF",
+    ["SPELL_AURA_APPLIED_DOSE"] = "BUFF",
+    ["SPELL_PERIODIC_AURA_APPLIED_DOSE"] = "BUFF",
+    ["SPELL_AURA_REFRESH"] = "REFRESH",
+    ["SPELL_AURA_REMOVED"] = "FADE",
+    ["SPELL_PERIODIC_AURA_REMOVED"] = "FADE",
+    ["SPELL_AURA_REMOVED_DOSE"] = "FADE",
+    ["SPELL_PERIODIC_AURA_REMOVED_DOSE"] = "FADE",
+    ["SPELL_CAST_START"] = "CASTSTART",
+    ["SPELL_SUMMON"] = "CASTSTART",
+    ["SPELL_CREATE"] = "CASTSTART",
+    ["SPELL_CAST_SUCCESS"] = "CASTSUCCESS",
+    ["SPELL_CAST_FAILED"] = "CASTEND",
+    ["SPELL_INTERRUPT"] = "INTERRUPT",
+}
+
+function Gladdy:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, spellID, spellName, spellSchool, auraType, amount, ...)
+    if (not self.eventGrps[eventType]) then
+        return
+    end
+
     local srcUnit = self.guids[sourceGUID]
     local destUnit = self.guids[destGUID]
-    if (not srcUnit and not destUnit) then
-        return
-    end
-
-    local events = {
-        ["PARTY_KILL"] = "DEATH",
-        ["UNIT_DIED"] = "DEATH",
-        ["UNIT_DESTROYED"] = "DEATH",
-        ["SWING_DAMAGE"] = "DAMAGE",
-        ["RANGE_DAMAGE"] = "DAMAGE",
-        ["SPELL_DAMAGE"] = "DAMAGE",
-        ["SPELL_PERIODIC_DAMAGE"] = "DAMAGE",
-        ["ENVIRONMENTAL_DAMAGE"] = "DAMAGE",
-        ["DAMAGE_SHIELD"] = "DAMAGE",
-        ["DAMAGE_SPLIT"] = "DAMAGE",
-        ["SPELL_AURA_APPLIED"] = "BUFF",
-        ["SPELL_PERIODIC_AURA_APPLIED"] = "BUFF",
-        ["SPELL_AURA_APPLIED_DOSE"] = "BUFF",
-        ["SPELL_PERIODIC_AURA_APPLIED_DOSE"] = "BUFF",
-        ["SPELL_AURA_REFRESH"] = "REFRESH",
-        ["SPELL_AURA_REMOVED"] = "FADE",
-        ["SPELL_PERIODIC_AURA_REMOVED"] = "FADE",
-        ["SPELL_AURA_REMOVED_DOSE"] = "FADE",
-        ["SPELL_PERIODIC_AURA_REMOVED_DOSE"] = "FADE",
-        ["SPELL_CAST_START"] = "CASTSTART",
-        ["SPELL_SUMMON"] = "CASTSTART",
-        ["SPELL_CREATE"] = "CASTSTART",
-        ["SPELL_CAST_SUCCESS"] = "CASTSUCCESS",
-        ["SPELL_CAST_FAILED"] = "CASTEND",
-        ["SPELL_INTERRUPT"] = "INTERRUPT",
-    }
-
-    eventType = events[eventType]
-    if (not eventType) then
-        return
-    end
 
     local t = ("%.1f"):format(GetTime())
 
-    if (events[eventType] == "DEATH" and destUnit) then
+    if (self.eventGrps[eventType] == "DEATH" and destUnit) then
         self:SendMessage("UNIT_DEATH", destUnit)
-    elseif (events[eventType] == "DAMAGE") then
+    elseif (self.events[eventType] == "DAMAGE") then
         local button = self.buttons[destUnit]
         if (not button) then
             return
         end
 
         button.damaged = t
-    elseif (eventType == "BUFF" and destUnit) then
+    elseif (self.eventGrps[eventType] == "BUFF" and destUnit) then
         local button = self.buttons[destUnit]
         if (not button) then
             return
         end
 
-        self:AuraGain(destUnit, spellName)
+        self:AuraGain(destUnit, spellName, spellID, auraType)
 
         local Auras = Gladdy.modules.Auras
         local aura = Auras.auras[spellName]
@@ -697,18 +709,35 @@ function Gladdy:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceG
         if (aura and aura.priority >= (Auras.frames[destUnit].priority or 0)) then
             local auraIcon = select(3, GetSpellInfo(spellID))
             local auraExpTime = aura.duration
+            if button[DRData:GetSpellCategory(spellID)] then
+                auraExpTime = aura.duration * button[DRData:GetSpellCategory(spellID)].diminished
+            end
 
             self:SendMessage("AURA_GAIN", destUnit, spellName, auraIcon, auraExpTime, aura.priority)
             button.spells[spellName] = t
         end
-    elseif (eventType == "REFRESH" and destUnit) then
+    elseif (self.eventGrps[eventType] == "REFRESH" and destUnit) then
         local button = self.buttons[destUnit]
         if (not button) then
             return
         end
+        if auraType == AURA_TYPE_DEBUFF then
+            local drCat = DRData:GetSpellCategory(spellID)
+            if drCat then
+                if( not button[drCat] ) then
+                    button[drCat] = { reset = 0, diminished = 1.0 }
+                end
+
+                local time = GetTime()
+                local tracked = button[drCat]
+
+                tracked.reset = time + DRData:GetResetTime()
+                tracked.diminished = DRData:NextDR(tracked.diminished)
+            end
+        end
 
         if (button.spells[spellName] and t > button.spells[spellName]) then
-            self:AuraGain(destUnit, spellName)
+            self:AuraGain(destUnit, spellName, spellID, auraType)
 
             local Auras = Gladdy.modules.Auras
             local aura = Auras.auras[spellName]
@@ -716,25 +745,28 @@ function Gladdy:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceG
             if (aura and aura.priority >= (Auras.frames[destUnit].priority or 0)) then
                 local auraIcon = select(3, GetSpellInfo(spellID))
                 local auraExpTime = aura.duration
+                if button[DRData:GetSpellCategory(spellID)] then
+                    auraExpTime = aura.duration * button[DRData:GetSpellCategory(spellID)].diminished
+                end
 
                 self:SendMessage("AURA_GAIN", destUnit, spellName, auraIcon, auraExpTime, aura.priority)
                 button.spells[spellName] = t
             end
         end
-    elseif (eventType == "FADE" and destUnit) then
+    elseif (self.eventGrps[eventType] == "FADE" and destUnit) then
         local button = self.buttons[destUnit]
         if (not button) then
             return
         end
 
-        self:AuraFade(destUnit, spellName)
+        self:AuraFade(destUnit, spellName, spellID, auraType)
 
         local Auras = Gladdy.modules.Auras
         if (spellName == Auras.frames[destUnit].name) then
             self:SendMessage("AURA_FADE", destUnit)
             button.spells[spellName] = nil
         end
-    elseif (eventType == "CASTSTART" and srcUnit) then
+    elseif (self.eventGrps[eventType] == "CASTSTART" and srcUnit) then
         local fromTarget = CombatLog_Object_IsA(sourceFlags, COMBATLOG_OBJECT_TARGET)
         local fromFocus = CombatLog_Object_IsA(sourceFlags, COMBATLOG_OBJECT_FOCUS)
 
@@ -743,21 +775,22 @@ function Gladdy:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceG
             local castTime = self.CAST_TIMES[spellName] or select(7, GetSpellInfo(spellID)) / 1000
             self:CastStart(srcUnit, spellName, icon, 0, castTime, "cast")
         end
-    elseif (eventType == "CASTSUCCESS" and srcUnit) then
+    elseif (self.eventGrps[eventType] == "CASTSUCCESS" and srcUnit) then
         self:CastSuccess(srcUnit, spellName)
-    elseif (eventType == "CASTEND" and srcUnit) then
+        self:SendMessage("CAST_STOP", srcUnit)
+    elseif (self.eventGrps[eventType] == "CASTEND" and srcUnit) then
         local fromTarget = CombatLog_Object_IsA(sourceFlags, COMBATLOG_OBJECT_TARGET)
         local fromFocus = CombatLog_Object_IsA(sourceFlags, COMBATLOG_OBJECT_FOCUS)
 
         if (not fromTarget and not fromFocus) then
             self:SendMessage("CAST_STOP", srcUnit)
         end
-    elseif (eventType == "INTERRUPT" and srcUnit) then
+    elseif (self.eventGrps[eventType] == "INTERRUPT" and srcUnit) then
         self:SendMessage("CAST_STOP", srcUnit)
     end
 
     -- cooldown tracker
-    if self.cooldownSpellIds[spellName] then
+    if self.cooldownSpellIds[spellName] and srcUnit then
         local unit = srcUnit
         if self.buttons[unit] then
             local unitClass
@@ -913,12 +946,22 @@ function Gladdy:GetButton(uid)
     return self.buttons[unit]
 end
 
-function Gladdy:AuraGain(unit, aura)
+function Gladdy:AuraGain(unit, aura, spellID, auraType)
     local button = self.buttons[unit]
     if (not button) then
         return
     end
 
+    if auraType == AURA_TYPE_DEBUFF then
+        local drCat = DRData:GetSpellCategory(spellID)
+        if drCat then
+            -- See if we should reset it back to undiminished
+            local tracked = button[drCat]
+            if( tracked and tracked.reset <= GetTime() ) then
+                tracked.diminished = 1.0
+            end
+        end
+    end
     if (aura == self.NS) then
         button.ns = true
     elseif (aura == self.NF) then
@@ -933,10 +976,25 @@ function Gladdy:AuraGain(unit, aura)
     self:DetectSpec(unit, self.specBuffs[aura])
 end
 
-function Gladdy:AuraFade(unit, aura)
+function Gladdy:AuraFade(unit, aura, spellID, auraType)
     local button = self.buttons[unit]
     if (not button) then
         return
+    end
+
+    if auraType == AURA_TYPE_DEBUFF then
+        local drCat = DRData:GetSpellCategory(spellID)
+        if drCat then
+            if( not button[drCat] ) then
+                button[drCat] = { reset = 0, diminished = 1.0 }
+            end
+
+            local time = GetTime()
+            local tracked = button[drCat]
+
+            tracked.reset = time + DRData:GetResetTime()
+            tracked.diminished = DRData:NextDR(tracked.diminished)
+        end
     end
 
     if (aura == self.NS) then

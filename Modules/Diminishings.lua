@@ -26,6 +26,18 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drCooldownAlpha = 1
 })
 
+local diminishing = {
+    [0.5] = {1, 1, 0, 1 },
+    [0.25] = {1, 0.7, 0, 1 },
+    [0] = {1, 0, 0, 1 }
+}
+
+local function setDiminishColor(icon)
+    local normalTex = _G[icon:GetName() .. "NormalTexture"]
+    icon.border:SetVertexColor(unpack(diminishing[icon.diminishing]))
+    icon.timeText:SetTextColor(unpack(diminishing[icon.diminishing]))
+end
+
 local function StyleActionButton(f)
     local name = f:GetName()
     local button = _G[name]
@@ -37,6 +49,7 @@ local function StyleActionButton(f)
     normalTex:SetWidth(button:GetWidth())
     normalTex:SetPoint("CENTER")
 
+    --f.border:SetTexture(Gladdy.db.drBorderStyle)
     button:SetNormalTexture(Gladdy.db.drBorderStyle)
     normalTex:SetVertexColor(Gladdy.db.drBorderColor.r, Gladdy.db.drBorderColor.g, Gladdy.db.drBorderColor.b, Gladdy.db.drBorderColor.a)
 
@@ -85,7 +98,6 @@ function Diminishings:CreateFrame(unit)
                     self.diminishing = 1
                     self.texture:SetTexture("")
                     self.text:SetText("")
-                    self.diminishingText:SetText("")
                     self:SetAlpha(0)
                     Diminishings:Positionate(unit)
                 else
@@ -95,8 +107,6 @@ function Diminishings:CreateFrame(unit)
                     else
                         self.timeText:SetFormattedText("%.1f", self.timeLeft)
                     end
-
-                    self.diminishingText:SetText(self.diminishing == 0.5 and "1/2" or self.diminishing == 0.25 and "1/4" or self.diminishing == 0 and "0")
                 end
             end
         end)
@@ -108,6 +118,12 @@ function Diminishings:CreateFrame(unit)
         icon.cooldownFrame:ClearAllPoints()
         icon.cooldownFrame:SetPoint("TOPLEFT", icon, "TOPLEFT")
         icon.cooldownFrame:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT")
+
+        --icon.overlay = CreateFrame("Frame", nil, icon)
+        --icon.overlay:SetAllPoints(icon)
+        icon.border = icon.cooldownFrame:CreateTexture(nil, "OVERLAY")
+        icon.border:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
+        icon.border:SetAllPoints(icon)
 
         icon.text = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
         icon.text:SetDrawLayer("OVERLAY")
@@ -125,16 +141,7 @@ function Diminishings:CreateFrame(unit)
         icon.timeText:SetShadowOffset(1, -1)
         icon.timeText:SetShadowColor(0, 0, 0, 1)
         icon.timeText:SetJustifyH("CENTER")
-        icon.timeText:SetPoint("CENTER", icon, "CENTER", 0, 2)
-
-        icon.diminishingText = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
-        icon.diminishingText:SetDrawLayer("OVERLAY")
-        icon.diminishingText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), 8, "OUTLINE")
-        icon.diminishingText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
-        icon.diminishingText:SetShadowOffset(1, -1)
-        icon.diminishingText:SetShadowColor(0, 0, 0, 1)
-        icon.diminishingText:SetJustifyH("CENTER")
-        icon.diminishingText:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", -1, 3)
+        icon.timeText:SetPoint("CENTER", icon, "CENTER", 0, 1)
 
         icon.diminishing = 1
 
@@ -165,14 +172,14 @@ function Diminishings:UpdateFrame(unit)
     local verticalMargin = (Gladdy.db.powerBarHeight)/2
     if (Gladdy.db.drCooldownPos == "LEFT") then
         if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-            horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+            horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
             if (Gladdy.db.classIconPos == "LEFT") then
-                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
             end
         elseif (Gladdy.db.classIconPos == "LEFT") then
-            horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+            horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
             if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
             end
         end
         if (Gladdy.db.castBarPos == "LEFT") then
@@ -187,14 +194,14 @@ function Diminishings:UpdateFrame(unit)
     end
     if (Gladdy.db.drCooldownPos == "RIGHT") then
         if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
-            horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+            horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
             if (Gladdy.db.classIconPos == "RIGHT") then
-                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+                horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
             end
         elseif (Gladdy.db.classIconPos == "RIGHT") then
-            horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+            horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
             if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
-                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+                horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
             end
         end
         if (Gladdy.db.castBarPos == "RIGHT") then
@@ -219,8 +226,6 @@ function Diminishings:UpdateFrame(unit)
 
         icon.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
         icon.text:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
-        icon.diminishingText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), (Gladdy.db.drIconSize/3 - 1) * Gladdy.db.drFontScale, "OUTLINE")
-        icon.diminishingText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
         icon.timeText:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
         icon.timeText:SetTextColor(Gladdy.db.drFontColor.r, Gladdy.db.drFontColor.g, Gladdy.db.drFontColor.b, Gladdy.db.drFontColor.a)
 
@@ -282,25 +287,30 @@ end
 function Diminishings:Fade(unit, spell, spellID)
     local drFrame = self.frames[unit]
     local drCat = DRData:GetSpellCategory(spellID)
-    if (not drFrame or not drCat or DRData:IsPVE(drCat)) then
+    if (not drFrame or not drCat) then
         return nil
     end
 
+    local lastIcon
     for i = 1, 16 do
         local icon = drFrame["icon" .. i]
-        if (not icon.active or (icon.dr and icon.dr == drCat)) then
-            icon.dr = drCat
-            icon.timeLeft = drDuration
-            local dr = icon.diminishing
-            icon.diminishing = DRData:NextDR(icon.diminishing)
-            icon.cooldown:SetCooldown(GetTime(), drDuration)
-            icon.texture:SetTexture(select(3, GetSpellInfo(spellID)))
-            icon.active = true
-            self:Positionate(unit)
-            icon:SetAlpha(1)
-            return dr
+        if (icon.active and icon.dr and icon.dr == drCat) then
+            lastIcon = icon
+            break
+        elseif not icon.active and not lastIcon then
+            lastIcon = icon
         end
     end
+    lastIcon.dr = drCat
+    lastIcon.timeLeft = drDuration
+    local dr = lastIcon.diminishing
+    lastIcon.diminishing = DRData:NextDR(lastIcon.diminishing)
+    setDiminishColor(lastIcon)
+    lastIcon.cooldown:SetCooldown(GetTime(), drDuration)
+    lastIcon.texture:SetTexture(select(3, GetSpellInfo(spellID)))
+    lastIcon.active = true
+    self:Positionate(unit)
+    lastIcon:SetAlpha(1)
     return nil
 end
 
