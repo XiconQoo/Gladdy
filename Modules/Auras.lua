@@ -39,8 +39,7 @@ function Auras:CreateFrame(unit)
 
     auraFrame.cooldownFrame = CreateFrame("Frame", nil, auraFrame)
     auraFrame.cooldownFrame:ClearAllPoints()
-    auraFrame.cooldownFrame:SetPoint("TOPLEFT", auraFrame, "TOPLEFT")
-    auraFrame.cooldownFrame:SetPoint("BOTTOMRIGHT", auraFrame, "BOTTOMRIGHT")
+    auraFrame.cooldownFrame:SetAllPoints(auraFrame)
     auraFrame.cooldownFrame:SetFrameStrata("MEDIUM")
     auraFrame.cooldownFrame:SetFrameLevel(5)
 

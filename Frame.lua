@@ -146,12 +146,22 @@ function Gladdy:UpdateFrame()
     extraBarHeight = extraBarHeight + self.db.powerBarHeight
 
     -- Cooldown
-    margin = margin + self.db.padding + self.db.highlightBorderSize
-    height = height
+    margin = margin + self.db.padding + self.db.highlightBorderSize * 2 + 1 -- + 1 space between health and power bar
+    height = height + self.db.highlightBorderSize * teamSize
 
     if self.db.cooldownYPos == "TOP" or self.db.cooldownYPos == "BOTTOM" then
         margin = margin + self.db.cooldownSize
         height = height + self.db.cooldownSize * teamSize
+    end
+    if self.db.buffsCooldownPos == "TOP" or self.db.buffsCooldownPos == "BOTTOM" then
+        margin = margin + self.db.buffsIconSize
+        height = height + self.db.buffsIconSize * teamSize
+    end
+    if self.db.buffsCooldownPos == "TOP" and self.db.cooldownYPos == "TOP" then
+        margin = margin + 1
+    end
+    if self.db.buffsCooldownPos == "BOTTOM" and self.db.cooldownYPos == "BOTTOM" then
+        margin = margin + 1
     end
 
     -- Classicon
@@ -238,14 +248,14 @@ function Gladdy:UpdateFrame()
             elseif self.db.cooldownYPos == "LEFT" then
                 local horizontalMargin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
                 if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-                    horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+                    horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
                     if (Gladdy.db.classIconPos == "LEFT") then
-                        horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+                        horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
                     end
                 elseif (Gladdy.db.classIconPos == "LEFT") then
-                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
                     if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
-                        horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+                        horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
                     end
                 end
                 if (Gladdy.db.drCooldownPos == "LEFT" and Gladdy.db.drEnabled) then
@@ -261,14 +271,14 @@ function Gladdy:UpdateFrame()
                 verticalMargin = -(Gladdy.db.powerBarHeight)/2
                 local horizontalMargin = Gladdy.db.highlightBorderSize + Gladdy.db.padding
                 if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
-                    horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+                    horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
                     if (Gladdy.db.classIconPos == "RIGHT") then
-                        horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+                        horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
                     end
                 elseif (Gladdy.db.classIconPos == "RIGHT") then
-                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1) + Gladdy.db.padding
+                    horizontalMargin = horizontalMargin + (Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor) + Gladdy.db.padding
                     if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
-                        horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize - Gladdy.db.trinketSize * 0.1) + Gladdy.db.padding
+                        horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
                     end
                 end
                 if (Gladdy.db.drCooldownPos == "RIGHT" and Gladdy.db.drEnabled) then

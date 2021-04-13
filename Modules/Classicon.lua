@@ -3,6 +3,7 @@ local L = Gladdy.L
 local Classicon = Gladdy:NewModule("Classicon", 80, {
     classIconPos = "LEFT",
     classIconSize = 60 + 20 + 1,
+    classIconWidthFactor = 0.9,
     classIconBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     classIconBorderColor = { r = 0, g = 0, b = 0, a = 1 },
 })
@@ -45,7 +46,7 @@ function Classicon:UpdateFrame(unit)
         return
     end
 
-    classIcon:SetWidth(Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1)
+    classIcon:SetWidth(Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor)
     classIcon:SetHeight(Gladdy.db.classIconSize)
 
     classIcon:ClearAllPoints()
@@ -90,6 +91,14 @@ function Classicon:GetOptions()
             max = 100,
             step = 1,
             order = 3,
+        }),
+        classIconWidthFactor = Gladdy:option({
+            type = "range",
+            name = L["Icon width factor"],
+            min = 0.1,
+            max = 1,
+            step = 0.05,
+            order = 4,
         }),
         headerPosition = {
             type = "header",
