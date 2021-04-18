@@ -737,7 +737,7 @@ function Auras:GetAuraList()
         [GetSpellInfo(18498)] = {
             track = "debuff",
             duration = 3,
-            priority = 10,
+            priority = 15,
             spellSchool = "magic",
             id = 18498,
         },
