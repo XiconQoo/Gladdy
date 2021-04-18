@@ -1,6 +1,7 @@
 local spells = {}
 local spellNameToID = {}
-local INFINITY = math.huge
+local INFINITY, type, ipairs, pairs, tinsert, tremove = math.huge, type, ipairs, pairs, tinsert, tremove
+local GetSpellInfo = GetSpellInfo
 
 local LibAuraDurations = LibStub:NewLibrary("LibAuraDurations-1.0", 1)
 LibAuraDurations.INFINITY = INFINITY
@@ -167,7 +168,8 @@ Spell({ 772, 6546, 6547, 6548, 11572, 11573, 11574, 25208 }, {
     end,
     preEvent = "SPELL_CAST_SUCCESS"
 }, "WARRIOR") -- Rend
-Spell({ 12721 }, { duration = 12, stacking = true, buffType = "physical", preEvent = "SWING_DAMAGE" }, "WARRIOR") -- Deep Wounds
+Spell({ 12721, 43104 }, { duration = 12, stacking = true, buffType = "physical", preEvent = "SWING_DAMAGE" }, "WARRIOR") -- Deep Wounds
+Spell({ 12323 }, {duration = 6, buffType = "physical"}, "WARRIOR") -- Piercing Howl
 Spell({ 1715, 7372, 7373, 25212 }, { duration = 15, pvpduration = 10, buffType = "physical" }, "WARRIOR") -- Hamstring
 Spell({ 23694 } , { duration = 5, buffType = "physical" }, "WARRIOR") -- Improved Hamstring
 Spell({ 6343, 8198, 8204, 8205, 11580, 11581, 25264 }, {
@@ -186,7 +188,7 @@ Spell({ 1161 } ,{ duration = 6, buffType = "physical", }, "WARRIOR") -- Challeng
 Spell({ 355 } ,{ duration = 3, stacking = true, buffType = "physical", preEvent = "SPELL_CAST_SUCCESS" }, "WARRIOR") -- Taunt
 Spell({ 1160, 6190, 11554, 11555, 11556, 25202, 25203 }, { duration = 45, buffType = "physical" }, "WARRIOR") -- Demoralizing Shout, varies
 Spell({ 5246 }, { duration = 8, buffType = "physical" }, "WARRIOR") -- Intimidating Shout Fear
-Spell({ 676 } ,{ duration = 10, buffType = "physical" }, "WARRIOR") -- Disarm, varies
+Spell({ 676 } ,{ duration = 10, buffType = "physical" }, "WARRIOR") -- Disarm
 Spell({ 12798 } , { duration = 3, buffType = "physical" }, "WARRIOR") -- Imp Revenge Stun
 Spell({ 7386, 7405, 8380, 11596, 11597, 25225, buffType = "physical" }, { duration = 30 }, "WARRIOR") -- Sunder Armor
 Spell({ 12809 } ,{ duration = 5, buffType = "physical" }, "WARRIOR") -- Concussion Blow
@@ -199,7 +201,7 @@ Spell({ 5530 }, { duration = 3, buffType = "physical"}, "WARRIOR") -- Mace Stun 
 
 Spell({ 16511, 17347, 17348, 26864 }, { duration = 15, buffType = "physical" }, "ROGUE") -- Hemorrhage
 Spell({ 3409, 11201 }, { duration = 12, buffType = "poison" }, "ROGUE") -- Crippling Poison
-Spell({ 13218, 13222, 13223, 13224, 27189 }, { duration = 15, buffType = "poison" }, "ROGUE") -- Wound Poison 43461(R5),27189(R5),27188(R5),13227(R4),13224(R4),13226(R3),13223(R3),13225(R2),13222(R2),13220(R1),13219(R1),13218(R1),39665,36974,30984
+Spell({ 13218, 13222, 13223, 13224, 27189 }, { duration = 15, buffType = "poison" }, "ROGUE") -- Wound Poison
 Spell({ 2818, 2819, 11353, 11354, 25349, 26968, 27187 }, { duration = 12, stacking = true, buffType = "poison", preEvent = { "SWING_DAMAGE", "SPELL_DAMAGE"} }, "ROGUE") -- Deadly Poison
 Spell({ 5760, 8692, 11398 }, {
     duration = function(spellID)
@@ -272,7 +274,7 @@ Spell({ 710, 18647 } ,{
 }, "WARLOCK") -- Banish
 Spell( {348, 707, 1094, 2941, 11665, 11667, 11668, 25309, 27215 }, {duration = 15, buffType = "magic", stacking = true, preEvent = "SPELL_DAMAGE"}, "WARLOCK") -- Immolate
 Spell({ 24259 } ,{ duration = 3, buffType = "magic" }, "WARLOCK") -- Spell Lock Silence
-Spell({ 27243 } ,{ duration = 18, buffType = "magic", stacking = true }, "WARLOCK") -- Seed of Corruption
+Spell({ 27243 } ,{ duration = 18, buffType = "magic", stacking = true, preEvent = "SPELL_CAST_START" }, "WARLOCK") -- Seed of Corruption
 Spell( {689, 699, 709, 7651, 11699, 11700, 27219, 27220 }, {duration = 5, buffType = "magic", stacking = true, preEvent = "SPELL_CAST_SUCCESS"}, "WARLOCK") -- Drain Life
 Spell( {5138, 6226, 11703, 11704, 27221, 30908 }, {duration = 5, buffType = "magic", stacking = true, preEvent = "SPELL_CAST_SUCCESS"}, "WARLOCK") -- Drain Mana
 Spell( {1120, 8288, 8289, 11675, 27217 }, {duration = 15, buffType = "magic", stacking = true, preEvent = "SPELL_CAST_SUCCESS"}, "WARLOCK") -- Drain Soul
@@ -284,10 +286,10 @@ Spell( {172, 6222, 6223, 7648, 11671, 11672, 25311, 27216 }, {
         if spellID == 172 then return 12
         elseif spellID == 6222 then return 15
         else return 18 end
-    end, preEvent = "SPELL_CAST_SUCCESS"
+    end, preEvent = {"SPELL_CAST_START", "SPELL_CAST_SUCCESS"}
 }, "WARLOCK") -- Corruption
 Spell( {980, 1014, 6217, 11711, 11712, 11713, 27218 }, {duration = 24, buffType = "curse", stacking = true, preEvent = "SPELL_CAST_SUCCESS"}, "WARLOCK") -- Curse of Agony
-Spell( 18223, {duration = 12, buffType = "curse"}) -- Curse of Exhaustion
+Spell({ 18223, 29539, 46434 }, {duration = 12, buffType = "curse"}, "WARLOCK") -- Curse of Exhaustion
 Spell( {704, 7658, 7659, 11717, 27226 }, {duration = 120, buffType = "curse"}, "WARLOCK") -- Curse of Recklessness
 Spell( {1490, 11721, 11722, 27228 }, {duration = 120, buffType = "curse"}, "WARLOCK") -- Curse of the Elements
 Spell( {1714, 11719 }, {duration = 30, pvpduration = 12, buffType = "curse"}, "WARLOCK") -- Curse of Tongues
@@ -323,13 +325,14 @@ Spell({ 17877, 18867, 18868, 18869, 18870, 18871, 27263, 30546 }, { duration = 5
 Spell({ 17364 } ,{ duration = 12, buffType = "magic" }, "SHAMAN") -- Stormstrike
 Spell({ 8056, 8058, 10472, 10473, 25464 }, { duration = 8, buffType = "magic" }, "SHAMAN") -- Frost Shock
 Spell({ 8050, 8052, 8053, 10447, 10448, 29228, 25457 }, { duration = 12, stacking = true, buffType = "magic", preEvent = "SPELL_CAST_SUCCESS" }, "SHAMAN") -- Flame Shock
-Spell({ 8034, 8037, 10458, 16352, 16353, 25501 }, { duration = 8, buffType = "magic" }, "SHAMAN") -- Frostbrand Attack
+Spell({ 8034, 8037, 10458, 16352, 16353, 25501 }, { duration = 8, buffType = "magic" }, "SHAMAN") -- Frostbrand Attack Frostbrand Attack - 25501(R6),16353(R5),16352(R4),10458(R3),8037(R2),8034(R1),38617
 Spell({ 3600 } ,{ duration = 5, buffType = "magic" }, "SHAMAN") -- Earthbind Totem
 
 --------------
 -- PALADIN
 --------------
 
+Spell( { 25771 }, {duration = 60, buffType = "immune"}, "PALADIN") -- Forbearance
 Spell({ 20066 }, { duration = 6, buffType = "magic" }, "PALADIN") -- Repentance
 Spell({ 2878, 5627, 5627 }, {
     pvpduration = 10,
@@ -402,7 +405,7 @@ Spell({ 1513, 14326, 14327 }, {
 
 Spell({ 19229 }, { duration = 5, buffType = "physical", }, "HUNTER") -- Wing Clip Root
 Spell({ 19306, 20909, 20910 }, { duration = 5, buffType = "physical"}, "HUNTER") -- Counterattack
-Spell({ 13812, 14314, 14315, 27026 }, { duration = 20, stacking = true, buffType = "magic", preEvent = "SPELL_CAST_SUCCESS" }, "HUNTER") -- Explosive Trap
+Spell({ 13812, 14314, 14315, 27026 }, { duration = 20, stacking = true, buffType = "physical", preEvent = "SPELL_CAST_SUCCESS" }, "HUNTER") -- Explosive Trap
 Spell({ 13797, 14298, 14299, 14300, 14301, 27024 }, { duration = 15, stacking = true, buffType = "magic", preEvent = "SPELL_CAST_SUCCESS" }, "HUNTER") -- Immolation Trap
 Spell({ 3355, 14308, 14309 }, {
     pvpduration = 12, -- with clever traps
