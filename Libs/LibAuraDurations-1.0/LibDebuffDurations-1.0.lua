@@ -21,7 +21,11 @@ local function Spell(id, opts, class)
     if not spellName then
         return
     end
-    spellNameToID[spellName] = {id = id , class = class}
+    if opts.altName then
+        spellNameToID[opts.altName] = {id = id , class = class}
+    else
+        spellNameToID[spellName] = {id = id , class = class}
+    end
 
     if type(id) == "table" then
         for _, spellID in ipairs(id) do
@@ -307,8 +311,8 @@ Spell( {5484, 17928 }, {
     end
 }, "WARLOCK") -- Howl of Terror
 Spell({ 6358 }, { pvpduration = 10, duration = 15, buffType = "magic" }, "WARLOCK") -- Seduction
-Spell({ 30108, 30404, 30405 }, { duration = 18, buffType = "magic", stacking = true, preEvent = "SPELL_CAST_SUCCESS" }, "WARLOCK") -- Unstable Affliction
-Spell({ 31117, 43523 }, { duration = 5, buffType = "magic" }, "WARLOCK") -- Unstable Affliction Silence
+Spell({ 30108, 30404, 30405 }, { duration = 18, buffType = "magic", stacking = true, preEvent = "SPELL_CAST_START" }, "WARLOCK") -- Unstable Affliction
+Spell({ 31117, 43523 }, { duration = 5, buffType = "magic", altName = "Unstable Affliction Silence" }, "WARLOCK") -- Unstable Affliction Silence
 Spell({ 18093 } ,{ duration = 3, buffType = "physical" }, "WARLOCK") -- Pyroclasm
 Spell({ 17877, 18867, 18868, 18869, 18870, 18871, 27263, 30546 }, { duration = 5, buffType = "None", stacking = true, preEvent = "SPELL_CAST_SUCCESS" }, "WARLOCK") -- Shadowburn Debuff
 

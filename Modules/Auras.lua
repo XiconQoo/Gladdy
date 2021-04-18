@@ -693,8 +693,8 @@ function Auras:GetAuraList()
             magic = true,
             spellID = 24259,
         },
-        -- Unstable Affliction
-        [GetSpellInfo(31117)] = {
+        -- Unstable Affliction Silence
+        ["Unstable Affliction Silence"] = { -- GetSpellInfo returns "Unstable Affliction"
             track = "debuff",
             duration = 5,
             priority = 15,

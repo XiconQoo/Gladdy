@@ -80,6 +80,7 @@ function BuffsDebuffs:COMBAT_LOG_EVENT_UNFILTERED(timestamp, eventType, sourceGU
     if not destUnit or srcUnit then return end
 
     local Auras = Gladdy.modules.Auras
+    spellName = (spellID == 31117 or spellID ==  43523) and "Unstable Affliction Silence" or spellName
     local aura = Auras.auras[spellName]
 
     if eventType == "SPELL_CAST_SUCCESS" or eventType == "SPELL_HEAL" then

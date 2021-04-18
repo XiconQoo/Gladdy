@@ -507,6 +507,9 @@ function Gladdy:UNIT_AURA(event, uid)
         if (not name) then
             break
         end
+        if name == GetSpellInfo(30405) then
+            name = "Unstable Affliction Silence"
+        end
 
         self:AuraGain(button.unit, name)
 
@@ -521,6 +524,9 @@ function Gladdy:UNIT_AURA(event, uid)
     end
 
     if (auraName) then
+        if auraName == "Unstable Affliction Silence" then
+            return -- we trust the CLOG here
+        end
         if (not auraExpTime) then
             if (auraName == Auras.frames[button.unit].name) then
                 auraExpTime = Auras.frames[button.unit].timeLeft
@@ -700,6 +706,7 @@ function Gladdy:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceG
         if (not button) then
             return
         end
+        spellName = (spellID == 31117 or spellID == 43523) and "Unstable Affliction Silence" or spellName
 
         self:AuraGain(destUnit, spellName, spellID, auraType)
 
@@ -758,6 +765,7 @@ function Gladdy:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceG
         if (not button) then
             return
         end
+        spellName = (spellID == 31117 or spellID == 43523) and "Unstable Affliction Silence" or spellName
 
         self:AuraFade(destUnit, spellName, spellID, auraType)
 
