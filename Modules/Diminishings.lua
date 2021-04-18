@@ -23,7 +23,10 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_Gloss",
     drBorderColor = { r = 1, g = 1, b = 1, a = 1 },
     drDisableCircle = false,
-    drCooldownAlpha = 1
+    drCooldownAlpha = 1,
+    drHalfColor = {1, 1, 0, 1 },
+    drQuarterColor = {1, 0.7, 0, 1 },
+    drNullColor = {1, 0, 0, 1 }, --TODO
 })
 
 local diminishing = {
@@ -33,7 +36,6 @@ local diminishing = {
 }
 
 local function setDiminishColor(icon)
-    local normalTex = _G[icon:GetName() .. "NormalTexture"]
     icon.border:SetVertexColor(unpack(diminishing[icon.diminishing]))
     icon.timeText:SetTextColor(unpack(diminishing[icon.diminishing]))
 end
@@ -95,7 +97,7 @@ function Diminishings:CreateFrame(unit)
 
                     self.active = false
                     self.dr = nil
-                    self.diminishing = 1
+                    self.diminishing = 1.0
                     self.texture:SetTexture("")
                     self.text:SetText("")
                     self:SetAlpha(0)
@@ -281,6 +283,7 @@ function Diminishings:Test(unit)
         local spell = GetSpellInfo(spells[i])
         self:Fade(unit, spell, spells[i])
         self:Fade(unit, spell, spells[i])
+        self:Fade(unit, spell, spells[i])
     end
 end
 
@@ -299,11 +302,11 @@ function Diminishings:Fade(unit, spell, spellID)
             break
         elseif not icon.active and not lastIcon then
             lastIcon = icon
+            lastIcon.diminishing = 1.0
         end
     end
     lastIcon.dr = drCat
     lastIcon.timeLeft = drDuration
-    local dr = lastIcon.diminishing
     lastIcon.diminishing = DRData:NextDR(lastIcon.diminishing)
     setDiminishColor(lastIcon)
     lastIcon.cooldown:SetCooldown(GetTime(), drDuration)
