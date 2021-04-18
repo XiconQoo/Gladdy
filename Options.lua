@@ -237,7 +237,7 @@ function Gladdy:SetupOptions()
                         name = L["Bottom margin"],
                         desc = L["Margin between each button"],
                         order = 7,
-                        min = 0,
+                        min = -50,
                         max = 50,
                         step = 1,
                     },
@@ -619,19 +619,20 @@ function Gladdy:GetDebuffs()
         end)
         for i=1, #classSpells do
             local spellName, _, texture = GetSpellInfo(classSpells[i].id[#classSpells[i].id])
+            spellName = (classSpells[i].id[#classSpells[i].id] == 31117 or classSpells[i].id[#classSpells[i].id] ==  43523) and "Unstable Affliction Silence" or spellName
             if classSpells[i].texture then
                 texture = classSpells[i].texture
             end
-            args[tostring(classSpells[i].id[#classSpells[i].id])] = {
+            args[spellName] = {
                 order = i,
                 name = spellName,
                 type = "toggle",
                 image = texture,
                 width = "2",
                 --desc = format("Duration: %ds", druidSpells[i].duration),
-                arg = tostring(classSpells[i].id[#classSpells[i].id]),
+                arg = spellName
             }
-            defaultDebuffs[tostring(classSpells[i].id[#classSpells[i].id])] = true
+            defaultDebuffs[spellName] = true
         end
         return args
     end
