@@ -5,7 +5,7 @@
 ## Author: Mikhail "miraage" Osher / Schaka / Knall / Macumba
 ## X-Email: miraage.wow@gmail.com / schakaqt@gmail.com / https://discord.gg/5qVu56M
 ## SavedVariables: GladdyXZ
-## OptionalDeps: SharedMedia
+## OptionalDeps: SharedMedia, Blizzard_CombatLog
 
 embeds.xml
 
