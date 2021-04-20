@@ -237,8 +237,8 @@ function Gladdy:SetupOptions()
                         name = L["Bottom margin"],
                         desc = L["Margin between each button"],
                         order = 7,
-                        min = -50,
-                        max = 50,
+                        min = -100,
+                        max = 100,
                         step = 1,
                     },
                     headerCooldown = {
@@ -522,9 +522,28 @@ function Gladdy:SetupOptions()
         order = order + 1
     end
 
+    local options = {
+        name = "Gladdy",
+        type = "group",
+        args = {
+            load = {
+                name = "Load configuration",
+                desc = "Load configuration options",
+                type = "execute",
+                func = function()
+                    HideUIPanel(InterfaceOptionsFrame)
+                    HideUIPanel(GameMenuFrame)
+                    LibStub("AceConfigDialog-3.0"):Open("Gladdy")
+                end,
+            },
+        },
+    }
+
     self.options.plugins.profiles = { profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.dbi) }
+    LibStub("AceConfig-3.0"):RegisterOptionsTable("Gladdy_blizz", options)
+    LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Gladdy_blizz", "Gladdy")
     LibStub("AceConfig-3.0"):RegisterOptionsTable("Gladdy", self.options)
-    LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Gladdy", "Gladdy")
+
 end
 
 function Gladdy:ShowOptions()
