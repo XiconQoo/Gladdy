@@ -3,15 +3,19 @@ local L = Gladdy.L
 local AceGUIWidgetLSMlists = AceGUIWidgetLSMlists
 local WorldFrame = WorldFrame
 local select = select
-local pairs = pairs
+local pairs, strmatch, GetTime, string_format, string_len, string_sub = pairs, strmatch, GetTime, string.format, string.len, string.sub
+local UnitChannelInfo, UnitCastingInfo, UnitName, CreateFrame = UnitChannelInfo, UnitCastingInfo, UnitName, CreateFrame
+local MAX_BATTLEFIELD_QUEUES = MAX_BATTLEFIELD_QUEUES
+local IsInInstance, GetBattlefieldStatus, GetNumPartyMembers, GetNumRaidMembers = IsInInstance, GetBattlefieldStatus, GetNumPartyMembers, GetNumRaidMembers
 
 local knownNameplates = {}
 local unitsToCheck = {}
-local function generateUnitsToCheck()
+local function generateUnitsToCheck(partySize)
+    unitsToCheck = {}
     local function targettarget(unit, max)
         for i=1, max do
             local index
-            if max == 1 then index = "" else index = i end
+            if max == 1 and unit ~= "party" and unit ~= "raid" then index = "" else index = i end
             unitsToCheck[unit .. index] = true
             unitsToCheck[unit .. index .. "pet"] = true
             unitsToCheck[unit .. index .. "pettarget"] = true
@@ -23,8 +27,12 @@ local function generateUnitsToCheck()
             unitsToCheck[unit .. index .. "targettargetpettarget"] = true
         end
     end
-    targettarget("raid", 15) -- typical BG size
-    targettarget("party", 4)
+    if partySize ~= 0 and partySize > 4 then
+        targettarget("raid", 15) -- typical BG size
+        targettarget("party", 4)
+    elseif partySize ~= 0 and partySize <= 4 then
+        targettarget("party", partySize)
+    end
     targettarget("target", 1)
     targettarget("focus", 1)
     targettarget("mouseover", 1)
@@ -73,7 +81,7 @@ LibStub("AceHook-3.0"):Embed(PlateCastBar)
 LibStub("AceTimer-3.0"):Embed(PlateCastBar)
 
 function PlateCastBar:Initialise()
-    generateUnitsToCheck()
+    generateUnitsToCheck(15)
     self.unitCastBars = {}
     self.numChildren = 0
     self:CastBars_Create()
@@ -83,10 +91,31 @@ function PlateCastBar:Initialise()
     self.ElvUI = IsAddOnLoaded("ElvUI")
     self.ShaguPlates = IsAddOnLoaded("ShaguPlates-tbc") or IsAddOnLoaded("ShaguPlates")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
+    self:RegisterEvent("RAID_ROSTER_UPDATE")
+    self:RegisterEvent("PARTY_MEMBERS_CHANGED")
     self:SetScript("OnEvent", function (self, event)
         if event == "PLAYER_ENTERING_WORLD" then
             self.numChildren = 0
             knownNameplates = {}
+            local instance = select(2, IsInInstance())
+            if instance == "pvp" then
+                generateUnitsToCheck(15)
+            elseif instance == "arena" then
+                for i = 1, MAX_BATTLEFIELD_QUEUES do
+                    local status, _, _, _, _, teamSize = GetBattlefieldStatus(i)
+                    if teamSize > 5 then
+                        teamSize = 3
+                    end
+                    if (status == "active" and teamSize > 0) then
+                        generateUnitsToCheck(teamSize)
+                        break
+                    end
+                end
+            end
+        elseif event == "PARTY_MEMBERS_CHANGED" then
+            generateUnitsToCheck(GetNumPartyMembers())
+        elseif event == "RAID_ROSTER_UPDATE" then
+            generateUnitsToCheck(GetNumRaidMembers())
         end
     end)
     if Gladdy.db.npCastbarsEnable then
@@ -315,12 +344,12 @@ local function keepCastbar(unit)
 
     if CastBar.castTime and CastBar.castTime < CastBar.maxCastTime then
 
-        local total = string.format("%.2f", CastBar.maxCastTime)
+        local total = string_format("%.2f", CastBar.maxCastTime)
         local left
         if CastBar.isChannelling then
-            left = string.format("%.1f", CastBar.castTime)
+            left = string_format("%.1f", CastBar.castTime)
         else
-            left = string.format("%.1f", CastBar.maxCastTime - CastBar.castTime)
+            left = string_format("%.1f", CastBar.maxCastTime - CastBar.castTime)
         end
 
         if (Gladdy.db.npCastbarsTimerFormat == "LEFT") then
@@ -367,93 +396,104 @@ local function keepCastbars()
     end
 end
 
+local name, parent, nameSubtext, text, texture, startTime, endTime, isTradeSkill, total, left, sparkPosition, CastBar
+local function checkUnit(unit, frame)
+    name,parent = getName(frame)
+    CastBar = PlateCastBar.unitCastBars["castbar"..unit]
+
+    -- cast detected, display castbar
+    if (name and name == UnitName(unit) and (UnitCastingInfo(unit) or UnitChannelInfo(unit))) then
+        if (not frame.CastBarEnabled or frame.CastBarEnabled == CastBar) then --prevent double castbars
+            if (UnitChannelInfo(unit)) then
+                CastBar.isChannelling = true
+                name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo(unit)
+            else
+                CastBar.isChannelling = false
+                name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitCastingInfo(unit)
+            end
+
+            if (string_len(name) > 12) then
+                name = (string_sub(name, 1, 12) .. ".. ")
+            end
+
+            CastBar.spellName:SetText(name)
+            CastBar.icon:SetTexture(texture)
+
+            if endTime / 1000 ~= CastBar.endTime then
+                CastBar.startTime = startTime/1000
+                CastBar.endTime = endTime/1000
+                CastBar.maxCastTime = CastBar.endTime - CastBar.startTime
+                if CastBar.isChannelling then
+                    CastBar.castTime = CastBar.endTime - GetTime()
+                else
+                    CastBar.castTime = 0
+                end
+                CastBar.bar:SetMinMaxValues(0, CastBar.maxCastTime)
+            end
+            if CastBar.isChannelling then
+                CastBar.castTime = CastBar.endTime - GetTime()
+            else
+                CastBar.castTime = GetTime() - CastBar.startTime
+            end
+            CastBar.bar:SetValue(CastBar.castTime)
+            sparkPosition = ((CastBar.castTime) / (CastBar.maxCastTime)) * (Gladdy.db.npCastbarsWidth - (Gladdy.db.npCastbarsBorderSize/Gladdy.db.statusbarBorderOffset)*2);
+            if ( sparkPosition < 0 ) then
+                sparkPosition = 0
+            end
+            CastBar.Spark:SetPoint("CENTER", CastBar.bar, "LEFT", sparkPosition, 0)
+
+            CastBar.name = UnitName(unit)
+            CastBar:SetAlpha(1)
+            CastBar:SetPoint("TOP", parent, "BOTTOM", Gladdy.db.npCastbarsPointX, Gladdy.db.npCastbarsPointY)
+            CastBar:Show()
+            CastBar.parent = frame
+
+            total = string_format("%.2f", CastBar.maxCastTime)
+            if CastBar.isChannelling then
+                left = string_format("%.1f", CastBar.castTime)
+            else
+                left = string_format("%.1f", CastBar.maxCastTime - CastBar.castTime)
+            end
+            if (Gladdy.db.npCastbarsTimerFormat == "LEFT") then
+                CastBar.spellTime:SetText(left)
+            elseif (Gladdy.db.npCastbarsTimerFormat == "TOTAL") then
+                CastBar.spellTime:SetText(total)
+            elseif (Gladdy.db.npCastbarsTimerFormat == "BOTH") then
+                CastBar.spellTime:SetText(left .. " / " .. total)
+            end
+            frame.CastBarEnabled = CastBar
+        end
+        -- hide castbar if unit stops casting
+    elseif (name == UnitName(unit) and (not UnitCastingInfo(unit) or not UnitChannelInfo(unit))) then
+        frame.CastBarEnabled = nil
+        CastBar.castTime = nil
+        CastBar:SetAlpha(0)
+        CastBar:Hide()
+    end
+end
+
+local isEnabled = true
 local function createCastbars()
     -- decide whether castbar should be showing or not
     if Gladdy.db.npCastbarsEnable then
         for frame, _ in pairs(knownNameplates) do
             if frame:IsVisible() then
                 for unit, _ in pairs(unitsToCheck) do
-                    local name,parent = getName(frame)
-                    local CastBar = PlateCastBar.unitCastBars["castbar"..unit]
-
-                    -- cast detected, display castbar
-                    if (name and name == UnitName(unit) and (UnitCastingInfo(unit) or UnitChannelInfo(unit))) then
-                        if (not frame.CastBarEnabled or frame.CastBarEnabled == CastBar) then --prevent double castbars
-                            local name, nameSubtext, text, texture, startTime, endTime, isTradeSkill
-                            if (UnitChannelInfo(unit)) then
-                                CastBar.isChannelling = true
-                                name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitChannelInfo(unit)
-                            else
-                                CastBar.isChannelling = false
-                                name, nameSubtext, text, texture, startTime, endTime, isTradeSkill = UnitCastingInfo(unit)
-                            end
-
-                            if (string.len(name) > 12) then
-                                name = (string.sub(name, 1, 12) .. ".. ")
-                            end
-
-                            CastBar.spellName:SetText(name)
-                            CastBar.icon:SetTexture(texture)
-
-                            if endTime / 1000 ~= CastBar.endTime then
-                                CastBar.startTime = startTime/1000
-                                CastBar.endTime = endTime/1000
-                                CastBar.maxCastTime = CastBar.endTime - CastBar.startTime
-                                if CastBar.isChannelling then
-                                    CastBar.castTime = CastBar.endTime - GetTime()
-                                else
-                                    CastBar.castTime = 0
-                                end
-                                CastBar.bar:SetMinMaxValues(0, CastBar.maxCastTime)
-                            end
-                            if CastBar.isChannelling then
-                                CastBar.castTime = CastBar.endTime - GetTime()
-                            else
-                                CastBar.castTime = GetTime() - CastBar.startTime
-                            end
-                            CastBar.bar:SetValue(CastBar.castTime)
-                            local sparkPosition = ((CastBar.castTime) / (CastBar.maxCastTime)) * (Gladdy.db.npCastbarsWidth - (Gladdy.db.npCastbarsBorderSize/Gladdy.db.statusbarBorderOffset)*2);
-                            if ( sparkPosition < 0 ) then
-                                sparkPosition = 0
-                            end
-                            CastBar.Spark:SetPoint("CENTER", CastBar.bar, "LEFT", sparkPosition, 0)
-
-                            CastBar.name = UnitName(unit)
-                            CastBar:SetAlpha(1)
-                            CastBar:SetPoint("TOP", parent, "BOTTOM", Gladdy.db.npCastbarsPointX, Gladdy.db.npCastbarsPointY)
-                            CastBar:Show()
-                            CastBar.parent = frame
-
-                            local total = string.format("%.2f", CastBar.maxCastTime)
-                            local left
-                            if CastBar.isChannelling then
-                                left = string.format("%.1f", CastBar.castTime)
-                            else
-                                left = string.format("%.1f", CastBar.maxCastTime - CastBar.castTime)
-                            end
-                            if (Gladdy.db.npCastbarsTimerFormat == "LEFT") then
-                                CastBar.spellTime:SetText(left)
-                            elseif (Gladdy.db.npCastbarsTimerFormat == "TOTAL") then
-                                CastBar.spellTime:SetText(total)
-                            elseif (Gladdy.db.npCastbarsTimerFormat == "BOTH") then
-                                CastBar.spellTime:SetText(left .. " / " .. total)
-                            end
-                            frame.CastBarEnabled = CastBar
-                        end
-                        -- hide castbar if unit stops casting
-                    elseif (name == UnitName(unit) and (not UnitCastingInfo(unit) or not UnitChannelInfo(unit))) then
-                        frame.CastBarEnabled = nil
-                        CastBar:SetAlpha(0)
-                        CastBar:Hide()
-                    end
+                    checkUnit(unit, frame)
                 end
             end
         end
         --fallback function in case no casting information was found but we still want to display progress on the bar
         keepCastbars()
+        if not isEnabled then
+            isEnabled = true
+        end
     else
-        for unit, v in pairs(unitsToCheck) do
-            PlateCastBar.unitCastBars["castbar"..unit]:Hide()
+        if (isEnabled) then
+            for unit, v in pairs(unitsToCheck) do
+                PlateCastBar.unitCastBars["castbar"..unit]:Hide()
+            end
+            isEnabled = false
         end
     end
 end

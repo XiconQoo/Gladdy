@@ -1,4 +1,4 @@
-local pairs = pairs
+local pairs, ceil, floor, string_lower, string_format, tonumber = pairs, ceil, floor, string.lower, string.format, tonumber
 
 local CreateFrame = CreateFrame
 local GetSpellInfo = GetSpellInfo
@@ -6,7 +6,7 @@ local GetTime = GetTime
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
-Trinket = Gladdy:NewModule("Trinket", nil, {
+local Trinket = Gladdy:NewModule("Trinket", nil, {
     trinketFont = "DorisPP",
     trinketFontScale = 1,
     trinketEnabled = true,
@@ -54,7 +54,7 @@ function Trinket:CreateFrame(unit)
     trinket.texture.overlay:SetTexture(Gladdy.db.trinketBorderStyle)
 
     local function formatTimer(num, numDecimalPlaces)
-        return tonumber(string.format("%." .. (numDecimalPlaces or 0) .. "f", num))
+        return tonumber(string_format("%." .. (numDecimalPlaces or 0) .. "f", num))
     end
 
     trinket:SetScript("OnUpdate", function(self, elapsed)
@@ -72,7 +72,7 @@ function Trinket:CreateFrame(unit)
             if timeLeft >= 60 then
                 -- more than 1 minute
                 self.cooldownFont:SetTextColor(1, 1, 0)
-                self.cooldownFont:SetText(floor(timeLeft / 60) .. ":" .. string.format("%02.f", floor(timeLeft - floor(timeLeft / 60) * 60)))
+                self.cooldownFont:SetText(floor(timeLeft / 60) .. ":" .. string_format("%02.f", floor(timeLeft - floor(timeLeft / 60) * 60)))
                 self.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.trinketFont), (trinket:GetWidth()/2 - 0.15*trinket:GetWidth()) * Gladdy.db.trinketFontScale, "OUTLINE")
             elseif timeLeft < 60 and timeLeft >= 21 then
                 -- between 60s and 21s (green)
@@ -181,10 +181,10 @@ function Trinket:JOINED_ARENA()
 end
 
 function Trinket:OnCommReceived(prefix, guid)
-    guid = string.lower(guid)
+    guid = string_lower(guid)
     if (prefix == "GladdyTrinketUsed") then
         for k, v in pairs(Gladdy.buttons) do
-            local vguid = string.lower(v.guid)
+            local vguid = string_lower(v.guid)
             if (vguid == guid) then
                 self:Used(k)
                 break
@@ -219,10 +219,15 @@ function Trinket:GetOptions()
             desc = L["Enable trinket icon"],
             order = 3,
         }),
+        headerTrinketFrame = {
+            type = "header",
+            name = L["Frame"],
+            order = 4,
+        },
         trinketSize = Gladdy:option({
             type = "range",
             name = L["Trinket size"],
-            min = 4,
+            min = 5,
             max = 100,
             step = 1,
             order = 4,
@@ -233,12 +238,12 @@ function Trinket:GetOptions()
             min = 0.1,
             max = 1,
             step = 0.05,
-            order = 5,
+            order = 6,
         }),
         trinketDisableCircle = Gladdy:option({
             type = "toggle",
             name = L["No Cooldown Circle"],
-            order = 6,
+            order = 7,
         }),
         trinketCooldownAlpha = Gladdy:option({
             type = "range",
@@ -246,7 +251,7 @@ function Trinket:GetOptions()
             min = 0,
             max = 1,
             step = 0.1,
-            order = 7,
+            order = 8,
         }),
         headerFont = {
             type = "header",

@@ -1,4 +1,5 @@
 local Gladdy = LibStub("Gladdy")
+local CreateFrame = CreateFrame
 local L = Gladdy.L
 local Classicon = Gladdy:NewModule("Classicon", 80, {
     classIconPos = "LEFT",

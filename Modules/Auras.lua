@@ -1,7 +1,7 @@
 local pairs = pairs
 
 local GetSpellInfo = GetSpellInfo
-local CreateFrame = CreateFrame
+local CreateFrame, GetTime = CreateFrame, GetTime
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
@@ -82,7 +82,7 @@ function Auras:UpdateFrame(unit)
         return
     end
 
-    local width, height = Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1, Gladdy.db.classIconSize
+    local width, height = Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor, Gladdy.db.classIconSize
 
     auraFrame:SetWidth(width)
     auraFrame:SetHeight(height)
