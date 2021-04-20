@@ -19,9 +19,11 @@ local Cooldown = Gladdy:NewModule("Cooldown", nil, {
 })
 
 function Cooldown:Test(unit)
-    local button = Gladdy.buttons[unit]
-    button.spellCooldownFrame:Show()
-    button.lastCooldownSpell = 1
+    if Gladdy.db.cooldown then
+        local button = Gladdy.buttons[unit]
+        button.spellCooldownFrame:Show()
+        button.lastCooldownSpell = 1
+    end
 end
 
 local function option(params)
@@ -62,18 +64,23 @@ function Cooldown:GetOptions()
             desc = L["Enabled cooldown module"],
             order = 2,
         }),
+        headerCooldownFrame = {
+            type = "header",
+            name = L["Frame"],
+            order = 3,
+        },
         cooldownSize = Gladdy:option({
             type = "range",
             name = L["Cooldown size"],
             desc = L["Size of each cd icon"],
-            order = 3,
+            order = 4,
             min = 5,
             max = (Gladdy.db.healthBarHeight + Gladdy.db.castBarHeight + Gladdy.db.powerBarHeight + Gladdy.db.bottomMargin) / 2,
         }),
         cooldownMaxIconsPerLine = Gladdy:option({
             type = "range",
             name = L["Max Icons per row"],
-            order = 4,
+            order = 5,
             min = 3,
             max = 14,
             step = 1,
@@ -81,7 +88,7 @@ function Cooldown:GetOptions()
         cooldownDisableCircle = Gladdy:option({
             type = "toggle",
             name = L["No Cooldown Circle"],
-            order = 4,
+            order = 6,
         }),
         cooldownCooldownAlpha = Gladdy:option({
             type = "range",
@@ -89,7 +96,7 @@ function Cooldown:GetOptions()
             min = 0,
             max = 1,
             step = 0.1,
-            order = 5,
+            order = 7,
         }),
         headerFont = {
             type = "header",
@@ -151,16 +158,16 @@ function Cooldown:GetOptions()
             type = "range",
             name = L["Horizontal offset"],
             order = 23,
-            min = -300,
-            max = 300,
+            min = -400,
+            max = 400,
             step = 0.1,
         }),
         cooldownYOffset = Gladdy:option({
             type = "range",
             name = L["Vertical offset"],
             order = 24,
-            min = -300,
-            max = 300,
+            min = -400,
+            max = 400,
             step = 0.1,
         }),
         headerBorder = {

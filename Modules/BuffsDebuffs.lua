@@ -18,7 +18,7 @@ auraTypeColor[""] = auraTypeColor["none"]
 ---------------------------
 -- Queue implementation
 ---------------------------
-local MAX_CL_BUFFER_TIME = 2000.0
+local MAX_CL_BUFFER_TIME = 1.2
 local Queue = {}
 function Queue.new(name)
     return {first = 0, last = -1, name = name}
@@ -100,6 +100,7 @@ local BuffsDebuffs = Gladdy:NewModule("BuffsDebuffs", nil, {
     buffsFont = "DorisPP",
     buffsFontScale = 1,
     buffsFontColor = {r = 1, g = 1, b = 0, a = 1},
+    buffsDynamicColor = true,
     buffsCooldownPos = "TOP",
     buffsCooldownGrowDirection = "RIGHT",
     buffsXOffset = 0,
@@ -162,15 +163,17 @@ function BuffsDebuffs:Reset()
 end
 
 function BuffsDebuffs:Test(unit)
-    if unit == "arena1" or unit == "arena3" then
-        self:AddOrRefreshAura(unit, 1943, AURA_TYPE_DEBUFF, 10, 10, 1,"physical")
-        self:AddOrRefreshAura(unit, 18647, AURA_TYPE_DEBUFF, 10, 10,1, "immune")
-        self:AddOrRefreshAura(unit, 27218, AURA_TYPE_DEBUFF, 24, 20,1, "curse")
-        self:AddOrRefreshAura(unit, 27216, AURA_TYPE_DEBUFF, 18, 18,1, "magic")
-        self:AddOrRefreshAura(unit, 27189, AURA_TYPE_DEBUFF, 12, 12,5, "poison")
-    elseif unit == "arena2" then
-        self:AddOrRefreshAura(unit, 1943, AURA_TYPE_DEBUFF, 10, 10, 1, "physical")
-        self:AddOrRefreshAura(unit, 1, AURA_TYPE_DEBUFF, 20, 20,5, "poison")
+    if Gladdy.db.buffsEnabled then
+        if unit == "arena1" or unit == "arena3" then
+            self:AddOrRefreshAura(unit, 1943, AURA_TYPE_DEBUFF, 10, 10, 1,"physical")
+            self:AddOrRefreshAura(unit, 18647, AURA_TYPE_DEBUFF, 10, 10,1, "immune")
+            self:AddOrRefreshAura(unit, 27218, AURA_TYPE_DEBUFF, 24, 20,1, "curse")
+            self:AddOrRefreshAura(unit, 27216, AURA_TYPE_DEBUFF, 18, 18,1, "magic")
+            self:AddOrRefreshAura(unit, 27189, AURA_TYPE_DEBUFF, 12, 12,5, "poison")
+        elseif unit == "arena2" then
+            self:AddOrRefreshAura(unit, 1943, AURA_TYPE_DEBUFF, 10, 10, 1, "physical")
+            self:AddOrRefreshAura(unit, 1, AURA_TYPE_DEBUFF, 20, 20,5, "poison")
+        end
     end
 end
 
@@ -223,7 +226,6 @@ local CAST_SUCCESS_queue = Queue.new("CAST_SUCCESS")
 local SPELL_DAMAGE_queue = Queue.new("SPELL_DAMAGE")
 local SWING_DAMAGE_queue = Queue.new("SWING_DAMAGE")
 local function findSourceGUID(event, spellid, destGUID)
-    --Gladdy:Print("findSourceGUID params: ", event, spellid, destGUID)
     local list
     if event == "SPELL_CAST_SUCCESS" or event == "SPELL_CAST_START" then -- "SPELL_CAST_START" is fired on Corruption, although it's an instant cast when skilled
         list = CAST_SUCCESS_queue
@@ -259,7 +261,12 @@ local function getSourceGUID(spellID, destinationGUID)
             local sourceGUID
             if (type(spellDurations[spellID].preEvent) == "table") then
                 for i=1,#spellDurations[spellID].preEvent do
-                    sourceGUID = findSourceGUID(spellDurations[spellID].preEvent[i], spellID, destinationGUID)
+                    if (type(spellDurations[spellID].preEvent[i]) == "table") then
+                        sourceGUID = findSourceGUID(spellDurations[spellID].preEvent[i].event, spellDurations[spellID].preEvent[i].spellID, destinationGUID)
+                    else
+                        sourceGUID = findSourceGUID(spellDurations[spellID].preEvent[i], spellID, destinationGUID)
+                    end
+
                     if sourceGUID then
                         return sourceGUID
                     end
@@ -283,7 +290,7 @@ function BuffsDebuffs:COMBAT_LOG_EVENT_UNFILTERED(timestamp, eventType, sourceGU
     if (eventType == "SPELL_CAST_SUCCESS" or "SPELL_CAST_START") and isFriendlyUnit and spellDurations[spellID] then
         Queue.reduce(CAST_SUCCESS_queue, timestamp, MAX_CL_BUFFER_TIME)
         Queue.pushright(CAST_SUCCESS_queue, { spellName = spellName, spellID = spellID, timestamp = timestamp, srcGUID = sourceGUID, destGUID = destinationGUID})
-    elseif eventType == "SPELL_DAMAGE" and isFriendlyUnit and spellDurations[spellID] then
+    elseif eventType == "SPELL_DAMAGE" and isFriendlyUnit and (spellDurations[spellID] or spellID == 5940) then -- Shiv deadly poison
         Queue.reduce(SPELL_DAMAGE_queue, timestamp, MAX_CL_BUFFER_TIME)
         Queue.pushright(SPELL_DAMAGE_queue, { spellName = spellName, spellID = spellID, timestamp = timestamp, srcGUID = sourceGUID, destGUID = destinationGUID})
     elseif eventType == "SWING_DAMAGE" and isFriendlyUnit then
@@ -321,7 +328,7 @@ function BuffsDebuffs:COMBAT_LOG_EVENT_UNFILTERED(timestamp, eventType, sourceGU
         local auraSourceGUID = getSourceGUID(spellID, destinationGUID)
         if auraType == AURA_TYPE_DEBUFF then
             self:DiminishAuraFade(spellID, destUnit)
-            self:DEBUFF_FADE(eventType, destUnit, spellID, amount, auraSourceGUID == "NONE" and "NONE" or sourceGUID)
+            self:DEBUFF_FADE(eventType, destUnit, spellID, spellName, amount, auraSourceGUID == "NONE" and "NONE" or sourceGUID)
         else
             self:BUFF_FADE(eventType, destUnit, spellID, amount, sourceGUID)
         end
@@ -378,7 +385,7 @@ end
 
 function BuffsDebuffs:CreateFrame(unit)
     local buffFrame = CreateFrame("Frame", nil, Gladdy.buttons[unit])
-    buffFrame:SetHeight(1)
+    buffFrame:SetHeight(Gladdy.db.buffsIconSize)
     buffFrame:SetWidth(1)
     buffFrame:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].healthBar, "TOPLEFT", 0, Gladdy.db.highlightBorderSize + Gladdy.db.padding)
     self.frames[unit] = buffFrame
@@ -397,13 +404,14 @@ local function styleIcon(aura)
 end
 
 function BuffsDebuffs:UpdateFrame(unit)
+    self.frames[unit]:SetHeight(Gladdy.db.buffsIconSize)
     self.frames[unit]:ClearAllPoints()
     local horizontalMargin = Gladdy.db.highlightBorderSize
-    local verticalMargin = (Gladdy.db.powerBarHeight)/2
+    local verticalMargin = -(Gladdy.db.powerBarHeight)/2
     if Gladdy.db.buffsCooldownPos == "TOP" then
-        verticalMargin = horizontalMargin + Gladdy.db.buffsIconSize/2
-        if Gladdy.db.cooldownYPos == "TOP" then
-            verticalMargin = verticalMargin + Gladdy.db.cooldownSize + 1
+        verticalMargin = horizontalMargin + 1
+        if Gladdy.db.cooldownYPos == "TOP" and Gladdy.db.cooldown then
+            verticalMargin = verticalMargin + Gladdy.db.cooldownSize
         end
         if Gladdy.db.buffsCooldownGrowDirection == "LEFT" then
             self.frames[unit]:SetPoint("BOTTOMLEFT", Gladdy.buttons[unit].healthBar, "TOPRIGHT", Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset + verticalMargin)
@@ -411,9 +419,9 @@ function BuffsDebuffs:UpdateFrame(unit)
             self.frames[unit]:SetPoint("BOTTOMRIGHT", Gladdy.buttons[unit].healthBar, "TOPLEFT", Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset + verticalMargin)
         end
     elseif Gladdy.db.buffsCooldownPos == "BOTTOM" then
-        verticalMargin = horizontalMargin +  Gladdy.db.buffsIconSize/2
-        if Gladdy.db.cooldownYPos == "BOTTOM" then
-            verticalMargin = verticalMargin + Gladdy.db.cooldownSize + 1
+        verticalMargin = horizontalMargin + 1
+        if Gladdy.db.cooldownYPos == "BOTTOM" and Gladdy.db.cooldown then
+            verticalMargin = verticalMargin + Gladdy.db.cooldownSize
         end
         if Gladdy.db.buffsCooldownGrowDirection == "LEFT" then
             self.frames[unit]:SetPoint("TOPLEFT", Gladdy.buttons[unit].powerBar, "BOTTOMRIGHT", Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset -verticalMargin)
@@ -421,7 +429,7 @@ function BuffsDebuffs:UpdateFrame(unit)
             self.frames[unit]:SetPoint("TOPRIGHT", Gladdy.buttons[unit].powerBar, "BOTTOMLEFT", Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset -verticalMargin)
         end
     elseif Gladdy.db.buffsCooldownPos == "LEFT" then
-        horizontalMargin = horizontalMargin - 1
+        horizontalMargin = horizontalMargin - 1 + Gladdy.db.padding
         if (Gladdy.db.trinketPos == "LEFT" and Gladdy.db.trinketEnabled) then
             horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
             if (Gladdy.db.classIconPos == "LEFT") then
@@ -433,17 +441,20 @@ function BuffsDebuffs:UpdateFrame(unit)
                 horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
             end
         end
+        if (Gladdy.db.drCooldownPos == "LEFT" and Gladdy.db.drEnabled) then
+            verticalMargin = verticalMargin + Gladdy.db.drIconSize/2 + Gladdy.db.padding/2
+        end
         if (Gladdy.db.castBarPos == "LEFT") then
-            verticalMargin = verticalMargin +
-                    ((Gladdy.db.castBarHeight < Gladdy.db.castBarIconSize and Gladdy.db.castBarIconPos == "RIGHT") and Gladdy.db.castBarIconSize
-                            or Gladdy.db.castBarHeight)/2 + Gladdy.db.padding/2
+            verticalMargin = verticalMargin -
+                    (((Gladdy.db.castBarHeight < Gladdy.db.castBarIconSize) and Gladdy.db.castBarIconSize
+                            or Gladdy.db.castBarHeight)/2 + Gladdy.db.padding/2)
         end
-        if (Gladdy.db.cooldownYPos == "LEFT") then
-            verticalMargin = verticalMargin + Gladdy.db.cooldownSize/2 + Gladdy.db.padding/2
+        if (Gladdy.db.cooldownYPos == "LEFT" and Gladdy.db.cooldown) then
+            verticalMargin = verticalMargin + (Gladdy.db.buffsIconSize/2 + Gladdy.db.padding/2)
         end
-        self.frames[unit]:SetPoint("RIGHT", Gladdy.buttons[unit].healthBar, "LEFT", -horizontalMargin + Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset -verticalMargin)
+        self.frames[unit]:SetPoint("RIGHT", Gladdy.buttons[unit].healthBar, "LEFT", -horizontalMargin + Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset + verticalMargin)
     elseif Gladdy.db.buffsCooldownPos == "RIGHT" then
-        horizontalMargin = horizontalMargin - 1
+        horizontalMargin = horizontalMargin - 1 + Gladdy.db.padding
         if (Gladdy.db.trinketPos == "RIGHT" and Gladdy.db.trinketEnabled) then
             horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
             if (Gladdy.db.classIconPos == "RIGHT") then
@@ -455,15 +466,18 @@ function BuffsDebuffs:UpdateFrame(unit)
                 horizontalMargin = horizontalMargin + (Gladdy.db.trinketSize * Gladdy.db.trinketWidthFactor) + Gladdy.db.padding
             end
         end
+        if (Gladdy.db.drCooldownPos == "RIGHT" and Gladdy.db.drEnabled) then
+            verticalMargin = verticalMargin + Gladdy.db.drIconSize/2 + Gladdy.db.padding/2
+        end
         if (Gladdy.db.castBarPos == "RIGHT") then
-            verticalMargin = verticalMargin +
-                    ((Gladdy.db.castBarHeight < Gladdy.db.castBarIconSize and Gladdy.db.castBarIconPos == "LEFT") and Gladdy.db.castBarIconSize
-                            or Gladdy.db.castBarHeight)/2 + Gladdy.db.padding/2
+            verticalMargin = verticalMargin -
+                    (((Gladdy.db.castBarHeight < Gladdy.db.castBarIconSize) and Gladdy.db.castBarIconSize
+                            or Gladdy.db.castBarHeight)/2 + Gladdy.db.padding/2)
         end
-        if (Gladdy.db.cooldownYPos == "RIGHT") then
-            verticalMargin = verticalMargin + Gladdy.db.cooldownSize/2 + Gladdy.db.padding/2
+        if (Gladdy.db.cooldownYPos == "RIGHT" and Gladdy.db.cooldown) then
+            verticalMargin = verticalMargin + (Gladdy.db.buffsIconSize/2 + Gladdy.db.padding/2)
         end
-        self.frames[unit]:SetPoint("LEFT", Gladdy.buttons[unit].healthBar, "RIGHT", horizontalMargin + Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset -verticalMargin)
+        self.frames[unit]:SetPoint("LEFT", Gladdy.buttons[unit].healthBar, "RIGHT", horizontalMargin + Gladdy.db.buffsXOffset, Gladdy.db.buffsYOffset + verticalMargin)
     end
     for i=1, #self.frames[unit].auras[AURA_TYPE_BUFF] do
         styleIcon(self.frames[unit].auras[AURA_TYPE_BUFF][i])
@@ -517,9 +531,11 @@ function BuffsDebuffs:UpdateAurasOnUnit(unit)
     end
 end
 
-function BuffsDebuffs:DEBUFF_FADE(eventType, destUnit, spellID, stacks, sourceGUID)
+function BuffsDebuffs:DEBUFF_FADE(eventType, destUnit, spellID, spellName, stacks, sourceGUID)
     if eventType == "SPELL_AURA_REMOVED_DOSE" or eventType == "SPELL_PERIODIC_AURA_REMOVED_DOSE" then
-        self:AddOrRefreshAura(destUnit, spellID, AURA_TYPE_DEBUFF, nil, nil, stacks, nil, sourceGUID == "NONE" and "NONE")
+        if spellDurations[spellID] and Gladdy.db.trackedDebuffs[spellName] then
+            self:AddOrRefreshAura(destUnit, spellID, AURA_TYPE_DEBUFF, nil, nil, stacks, spellDurations[spellID].buffType, sourceGUID == "NONE" and "NONE")
+        end
     else
         self:RemoveAura(destUnit, spellID, AURA_TYPE_DEBUFF)
     end
@@ -540,20 +556,20 @@ local function iconTimer(auraFrame, elapsed)
         auraFrame.timeLeft = timeLeftMilliSec
         --auraFrame.cooldowncircle:SetCooldown(auraFrame.startTime, auraFrame.endtime)
         if timeLeftSec >= 60 then
-            auraFrame.cooldown:SetTextColor(0.7, 1, 0)
+            if Gladdy.db.buffsDynamicColor then auraFrame.cooldown:SetTextColor(0.7, 1, 0) end
             auraFrame.cooldown:SetFormattedText("%dm", ceil(timeLeftSec / 60))
         elseif timeLeftSec < 60 and timeLeftSec >= 11 then
             --if it's less than 60s
-            auraFrame.cooldown:SetTextColor(0.7, 1, 0)
+            if Gladdy.db.buffsDynamicColor then auraFrame.cooldown:SetTextColor(0.7, 1, 0) end
             auraFrame.cooldown:SetFormattedText("%d", timeLeftSec)
         elseif timeLeftSec <= 10 and timeLeftSec >= 5 then
-            auraFrame.cooldown:SetTextColor(1, 0.7, 0)
+            if Gladdy.db.buffsDynamicColor then auraFrame.cooldown:SetTextColor(1, 0.7, 0) end
             auraFrame.cooldown:SetFormattedText("%d", timeLeftSec)
         elseif timeLeftSec <= 4 and timeLeftSec >= 3 then
-            auraFrame.cooldown:SetTextColor(1, 0, 0)
+            if Gladdy.db.buffsDynamicColor then auraFrame.cooldown:SetTextColor(1, 0, 0) end
             auraFrame.cooldown:SetFormattedText("%d", timeLeftSec)
         elseif timeLeftMilliSec <= 3 and timeLeftMilliSec > 0 then
-            auraFrame.cooldown:SetTextColor(1, 0, 0)
+            if Gladdy.db.buffsDynamicColor then auraFrame.cooldown:SetTextColor(1, 0, 0) end
             auraFrame.cooldown:SetFormattedText("%.1f", timeLeftMilliSec)
         elseif timeLeftMilliSec <= 0 and timeLeftMilliSec > -0.05 then -- 50ms ping max wait for SPELL_AURA_REMOVED event
             auraFrame.cooldown:SetText("")
@@ -564,7 +580,6 @@ local function iconTimer(auraFrame, elapsed)
 end
 
 function BuffsDebuffs:AddAura(unit, spellID, auraType, duration, timeLeft, stacks, spellSchool, sourceGUID)
-    --Gladdy:Print("AddAura", unit, spellID, type, duration, timeLeft, stacks)
     local aura
     if not self.frames[unit].auras then
         self.frames[unit].auras = {[AURA_TYPE_DEBUFF] = {}, [AURA_TYPE_BUFF] = {}}
@@ -740,7 +755,7 @@ end
 
 function BuffsDebuffs:GetOptions()
     return {
-        headerDiminishings = {
+        headerBuffs = {
             type = "header",
             name = L["Buffs and Debuffs"],
             order = 2,
@@ -751,11 +766,16 @@ function BuffsDebuffs:GetOptions()
             desc = L["Enabled Buffs and Debuffs module"],
             order = 3,
         }),
+        headerBuffsFrame = {
+            type = "header",
+            name = L["Frame"],
+            order = 4,
+        },
         buffsIconSize = Gladdy:option({
             type = "range",
             name = L["Icon Size"],
             desc = L["Size of the DR Icons"],
-            order = 4,
+            order = 5,
             min = 5,
             max = 50,
             step = 1,
@@ -763,7 +783,7 @@ function BuffsDebuffs:GetOptions()
         buffsDisableCircle = Gladdy:option({
             type = "toggle",
             name = L["No Cooldown Circle"],
-            order = 5,
+            order = 6,
         }),
         buffsCooldownAlpha = Gladdy:option({
             type = "range",
@@ -771,7 +791,7 @@ function BuffsDebuffs:GetOptions()
             min = 0,
             max = 1,
             step = 0.1,
-            order = 6,
+            order = 7,
         }),
         headerFont = {
             type = "header",
@@ -786,13 +806,6 @@ function BuffsDebuffs:GetOptions()
             dialogControl = "LSM30_Font",
             values = AceGUIWidgetLSMlists.font,
         }),
-        buffsFontColor = Gladdy:colorOption({
-            type = "color",
-            name = L["Font color"],
-            desc = L["Color of the text"],
-            order = 13,
-            hasAlpha = true,
-        }),
         buffsFontScale = Gladdy:option({
             type = "range",
             name = L["Font scale"],
@@ -801,6 +814,19 @@ function BuffsDebuffs:GetOptions()
             min = 0.1,
             max = 2,
             step = 0.1,
+        }),
+        buffsDynamicColor = Gladdy:option({
+            type = "toggle",
+            name = L["Dynamic Timer Color"],
+            desc = L["Show dynamic color on cooldown numbers"],
+            order = 13,
+        }),
+        buffsFontColor = Gladdy:colorOption({
+            type = "color",
+            name = L["Font color"],
+            desc = L["Color of the cooldown timer and stacks"],
+            order = 14,
+            hasAlpha = true,
         }),
         headerPosition = {
             type = "header",
@@ -833,16 +859,16 @@ function BuffsDebuffs:GetOptions()
             type = "range",
             name = L["Horizontal offset"],
             order = 22,
-            min = -300,
-            max = 300,
+            min = -400,
+            max = 400,
             step = 0.1,
         }),
         buffsYOffset = Gladdy:option({
             type = "range",
             name = L["Vertical offset"],
             order = 23,
-            min = -300,
-            max = 300,
+            min = -400,
+            max = 400,
             step = 0.1,
         }),
         headerBorder = {
@@ -856,46 +882,51 @@ function BuffsDebuffs:GetOptions()
             order = 31,
             values = Gladdy:GetIconStyles()
         }),
+        headerBorder = {
+            type = "header",
+            name = L["Spell School Colors"],
+            order = 40,
+        },
         buffsBorderColorCurse = Gladdy:colorOption({
             type = "color",
             name = L["Curse"],
             desc = L["Color of the border"],
-            order = 32,
+            order = 41,
             hasAlpha = true,
         }),
         buffsBorderColorMagic = Gladdy:colorOption({
             type = "color",
             name = L["Magic"],
             desc = L["Color of the border"],
-            order = 33,
+            order = 42,
             hasAlpha = true,
         }),
         buffsBorderColorPoison = Gladdy:colorOption({
             type = "color",
             name = L["Poison"],
             desc = L["Color of the border"],
-            order = 32,
+            order = 43,
             hasAlpha = true,
         }),
         buffsBorderColorPhysical = Gladdy:colorOption({
             type = "color",
             name = L["Physical"],
             desc = L["Color of the border"],
-            order = 32,
+            order = 44,
             hasAlpha = true,
         }),
         buffsBorderColorImmune = Gladdy:colorOption({
             type = "color",
             name = L["Immune"],
             desc = L["Color of the border"],
-            order = 32,
+            order = 45,
             hasAlpha = true,
         }),
         buffsBorderColorDisease = Gladdy:colorOption({
             type = "color",
             name = L["Disease"],
             desc = L["Color of the border"],
-            order = 32,
+            order = 46,
             hasAlpha = true,
         }),
         spellList = {

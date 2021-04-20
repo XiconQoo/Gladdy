@@ -146,21 +146,21 @@ function Gladdy:UpdateFrame()
     extraBarHeight = extraBarHeight + self.db.powerBarHeight
 
     -- Cooldown
-    margin = margin + self.db.padding + self.db.highlightBorderSize * 2 + 1 -- + 1 space between health and power bar
+    margin = margin + 1 + self.db.highlightBorderSize * 2 + 1 -- + 1 space between health and power bar
     height = height + self.db.highlightBorderSize * teamSize
 
-    if self.db.cooldownYPos == "TOP" or self.db.cooldownYPos == "BOTTOM" then
+    if (self.db.cooldownYPos == "TOP" or self.db.cooldownYPos == "BOTTOM") and self.db.cooldown then
         margin = margin + self.db.cooldownSize
         height = height + self.db.cooldownSize * teamSize
     end
-    if self.db.buffsCooldownPos == "TOP" or self.db.buffsCooldownPos == "BOTTOM" then
+    if (self.db.buffsCooldownPos == "TOP" or self.db.buffsCooldownPos == "BOTTOM") and self.db.cooldown then
         margin = margin + self.db.buffsIconSize
         height = height + self.db.buffsIconSize * teamSize
     end
-    if self.db.buffsCooldownPos == "TOP" and self.db.cooldownYPos == "TOP" then
+    if self.db.buffsCooldownPos == "TOP" and self.db.cooldownYPos == "TOP" and self.db.cooldown and self.db.buffsEnabled then
         margin = margin + 1
     end
-    if self.db.buffsCooldownPos == "BOTTOM" and self.db.cooldownYPos == "BOTTOM" then
+    if self.db.buffsCooldownPos == "BOTTOM" and self.db.cooldownYPos == "BOTTOM" and self.db.cooldown and self.db.buffsEnabled then
         margin = margin + 1
     end
 
@@ -213,16 +213,16 @@ function Gladdy:UpdateFrame()
         button.secure:ClearAllPoints()
         if (self.db.growUp) then
             if (i == 1) then
-                button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", self.db.padding + 2, self.db.padding)
-                button.secure:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", self.db.padding + 2, self.db.padding)
+                button:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", self.db.padding + 2, 0)
+                button.secure:SetPoint("BOTTOMLEFT", self.frame, "BOTTOMLEFT", self.db.padding + 2, 0)
             else
                 button:SetPoint("BOTTOMLEFT", self.buttons["arena" .. (i - 1)], "TOPLEFT", 0, margin + self.db.bottomMargin)
                 button.secure:SetPoint("BOTTOMLEFT", self.buttons["arena" .. (i - 1)], "TOPLEFT", 0, margin + self.db.bottomMargin)
             end
         else
             if (i == 1) then
-                button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self.db.padding + 2, -self.db.padding)
-                button.secure:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self.db.padding + 2, -self.db.padding)
+                button:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self.db.padding + 2, 0)
+                button.secure:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self.db.padding + 2, 0)
             else
                 button:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "BOTTOMLEFT", 0, -margin - self.db.bottomMargin)
                 button.secure:SetPoint("TOPLEFT", self.buttons["arena" .. (i - 1)], "BOTTOMLEFT", 0, -margin - self.db.bottomMargin)
@@ -262,9 +262,12 @@ function Gladdy:UpdateFrame()
                     verticalMargin = verticalMargin + Gladdy.db.drIconSize/2 + Gladdy.db.padding/2
                 end
                 if (Gladdy.db.castBarPos == "LEFT") then
-                    verticalMargin = verticalMargin +
+                    verticalMargin = verticalMargin -
                             ((Gladdy.db.castBarHeight < Gladdy.db.castBarIconSize) and Gladdy.db.castBarIconSize
                                     or Gladdy.db.castBarHeight)/2 + Gladdy.db.padding/2
+                end
+                if (Gladdy.db.buffsCooldownPos == "LEFT" and Gladdy.db.buffsEnabled) then
+                    verticalMargin = verticalMargin - (Gladdy.db.buffsIconSize/2 + Gladdy.db.padding/2)
                 end
                 button.spellCooldownFrame:SetPoint("RIGHT", button.healthBar, "LEFT", -horizontalMargin + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset + verticalMargin)
             elseif self.db.cooldownYPos == "RIGHT" then
@@ -285,9 +288,12 @@ function Gladdy:UpdateFrame()
                     verticalMargin = verticalMargin + Gladdy.db.drIconSize/2 + Gladdy.db.padding/2
                 end
                 if (Gladdy.db.castBarPos == "RIGHT") then
-                    verticalMargin = verticalMargin +
+                    verticalMargin = verticalMargin -
                             ((Gladdy.db.castBarHeight < Gladdy.db.castBarIconSize) and Gladdy.db.castBarIconSize
                                     or Gladdy.db.castBarHeight)/2 + Gladdy.db.padding/2
+                end
+                if (Gladdy.db.buffsCooldownPos == "RIGHT" and Gladdy.db.buffsEnabled) then
+                    verticalMargin = verticalMargin - (Gladdy.db.buffsIconSize/2 + Gladdy.db.padding/2)
                 end
                 button.spellCooldownFrame:SetPoint("LEFT", button.healthBar, "RIGHT", horizontalMargin + Gladdy.db.cooldownXOffset, Gladdy.db.cooldownYOffset + verticalMargin)
             end
@@ -307,7 +313,7 @@ function Gladdy:UpdateFrame()
                     if (j == 1) then
                         icon:SetPoint("RIGHT", button.spellCooldownFrame, "RIGHT", 0, 0)
                     elseif (mod(j-1,Gladdy.db.cooldownMaxIconsPerLine) == 0) then
-                        if (self.db.cooldownYPos == "BOTTOM") then
+                        if (self.db.cooldownYPos == "BOTTOM" or self.db.cooldownYPos == "LEFT" or self.db.cooldownYPos == "RIGHT") then
                             icon:SetPoint("TOP", button.spellCooldownFrame["icon" .. o], "BOTTOM", 0, -1)
                         else
                             icon:SetPoint("BOTTOM", button.spellCooldownFrame["icon" .. o], "TOP", 0, 1)
@@ -321,7 +327,7 @@ function Gladdy:UpdateFrame()
                     if (j == 1) then
                         icon:SetPoint("LEFT", button.spellCooldownFrame, "LEFT", 0, 0)
                     elseif (mod(j-1,Gladdy.db.cooldownMaxIconsPerLine) == 0) then
-                        if (self.db.cooldownYPos == "BOTTOM") then
+                        if (self.db.cooldownYPos == "BOTTOM" or self.db.cooldownYPos == "LEFT" or self.db.cooldownYPos == "RIGHT") then
                             icon:SetPoint("TOP", button.spellCooldownFrame["icon" .. o], "BOTTOM", 0, -1)
                         else
                             icon:SetPoint("BOTTOM", button.spellCooldownFrame["icon" .. o], "TOP", 0, 1)

@@ -198,10 +198,13 @@ function Castbar:UpdateFrame(unit)
             end
         end
         if (Gladdy.db.cooldownYPos == "LEFT" and Gladdy.db.cooldown) then
-            verticalMargin = verticalMargin - Gladdy.db.cooldownSize/2 - Gladdy.db.padding/2
+            verticalMargin = verticalMargin + (Gladdy.db.cooldownSize/2 + Gladdy.db.padding/2)
         end
         if (Gladdy.db.drCooldownPos == "LEFT" and Gladdy.db.drEnabled) then
             verticalMargin = verticalMargin + (Gladdy.db.drIconSize/2 + Gladdy.db.padding/2)
+        end
+        if (Gladdy.db.buffsCooldownPos == "LEFT" and Gladdy.db.buffsEnabled) then
+            verticalMargin = verticalMargin + Gladdy.db.buffsIconSize/2 + Gladdy.db.padding/2
         end
         castBar:SetPoint("RIGHT", button.healthBar, "LEFT", -horizontalMargin - leftMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset + verticalMargin)
     end
@@ -218,10 +221,13 @@ function Castbar:UpdateFrame(unit)
             end
         end
         if (Gladdy.db.cooldownYPos == "RIGHT" and Gladdy.db.cooldown) then
-            verticalMargin = verticalMargin - Gladdy.db.cooldownSize/2 - Gladdy.db.padding/2
+            verticalMargin = verticalMargin + (Gladdy.db.cooldownSize/2 + Gladdy.db.padding/2)
         end
         if (Gladdy.db.drCooldownPos == "RIGHT" and Gladdy.db.drEnabled) then
             verticalMargin = verticalMargin + (Gladdy.db.drIconSize/2 + Gladdy.db.padding/2)
+        end
+        if (Gladdy.db.buffsCooldownPos == "RIGHT" and Gladdy.db.buffsEnabled) then
+            verticalMargin = verticalMargin + Gladdy.db.buffsIconSize/2 + Gladdy.db.padding/2
         end
         castBar:SetPoint("LEFT", button.healthBar, "RIGHT", horizontalMargin + rightMargin + Gladdy.db.castBarXOffset, Gladdy.db.castBarYOffset + verticalMargin)
     end
@@ -437,16 +443,16 @@ function Castbar:GetOptions()
             type = "range",
             name = L["Horizontal offset"],
             order = 33,
-            min = -300,
-            max = 300,
+            min = -400,
+            max = 400,
             step = 0.1,
         }),
         castBarYOffset = option({
             type = "range",
             name = L["Vertical offset"],
             order = 34,
-            min = -300,
-            max = 300,
+            min = -400,
+            max = 400,
             step = 0.1,
         }),
         --Font
