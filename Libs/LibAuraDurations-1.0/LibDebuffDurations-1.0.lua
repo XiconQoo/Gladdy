@@ -202,7 +202,8 @@ Spell({ 5530 }, { duration = 3, buffType = "physical"}, "WARRIOR") -- Mace Stun 
 Spell({ 16511, 17347, 17348, 26864 }, { duration = 15, buffType = "physical" }, "ROGUE") -- Hemorrhage
 Spell({ 3409, 11201 }, { duration = 12, buffType = "poison" }, "ROGUE") -- Crippling Poison
 Spell({ 13218, 13222, 13223, 13224, 27189 }, { duration = 15, buffType = "poison" }, "ROGUE") -- Wound Poison
-Spell({ 2818, 2819, 11353, 11354, 25349, 26968, 27187 }, { duration = 12, stacking = true, buffType = "poison", preEvent = { "SWING_DAMAGE", "SPELL_DAMAGE"} }, "ROGUE") -- Deadly Poison
+Spell({ 26679 }, {duration = 6, buffType = "physical"}, "ROGUE") -- Deadly Throw Slow
+Spell({ 2818, 2819, 11353, 11354, 25349, 26968, 27187 }, { duration = 12, stacking = true, buffType = "poison", preEvent = { {event = "SPELL_DAMAGE", spellID = 5940}, "SWING_DAMAGE" }}, "ROGUE") -- Deadly Poison
 Spell({ 5760, 8692, 11398 }, {
     duration = function(spellID)
         if spellID == 5760 then return 10
