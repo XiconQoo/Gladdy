@@ -289,8 +289,9 @@ local RealmNames = {
     ["Smolderforge"] = "smolderforge.com",
     ["Tournament"] = "endless.gg",
     ["Sunstrider"] = "endless.gg",
+    ["Windrunner"] = "endless.gg",
     ["Karazhan"] = "atlantis.org",
-    ["Netherwing"] = "atlantis.org"
+    ["Netherwing"] = "atlantis.org",
 }
 local immunityIDs = {
     [1020] = 1, -- Divine Shield
