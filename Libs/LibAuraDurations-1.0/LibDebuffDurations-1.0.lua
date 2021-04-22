@@ -52,29 +52,29 @@ LibAuraDurations.GetClassSpells = getClassSpells
 -- GLOBAL
 ------------------
 
-Spell({ 2479 }, { duration = 30 }, "GLOBAL") -- Honorless Target
-Spell({ 1604 }, { duration = 4 }, "GLOBAL") -- Common Daze
-Spell({ 11196 }, { duration = 60 }, "GLOBAL") -- Recently Bandaged
+Spell({ 2479 }, { duration = 30, buffType = "physical" }, "GLOBAL") -- Honorless Target
+Spell({ 1604 }, { duration = 4, buffType = "physical" }, "GLOBAL") -- Common Daze
+Spell({ 11196 }, { duration = 60, buffType = "physical" }, "GLOBAL") -- Recently Bandaged
 
 Spell({ 13099, 13138, 16566 }, {
     duration = function(spellID)
         if spellID == 13138 then return 20 -- backfire
         elseif spellID == 16566 then return 30 -- backfire
         else return 10 end
-    end
+    end, buffType = "physical"
 }, "GLOBAL") -- Net-o-Matic
 
-Spell({ 23451 }, { duration = 10 }, "GLOBAL") -- Battleground speed buff
-Spell({ 23493 }, { duration = 10 }, "GLOBAL") -- Battleground heal buff
-Spell({ 23505 }, { duration = 60 }, "GLOBAL") -- Battleground damage buff
-Spell({ 4068 }, { duration = 3 }, "GLOBAL") -- Iron Grenade
-Spell({ 19769 }, { duration = 3 }, "GLOBAL") -- Thorium Grenade
-Spell({ 1090 }, { duration = 30 }, "GLOBAL") -- Magic Dust
-Spell({ 13327 }, { duration = 30 }, "GLOBAL") -- Reckless Charge
-Spell({ 26740, 13181 }, { duration = 20 }, "GLOBAL") -- Mind Control Cap + Backfire
-Spell({ 6727 }, { duration = 30 }, "GLOBAL") -- Violet Tragan
-Spell({ 5134 }, { duration = 10 }, "GLOBAL") -- Flash Bomb
-Spell({ 13237 }, { duration = 3 }, "GLOBAL") -- Goblin Mortar trinket
+Spell({ 23451 }, { duration = 10, buffType = "physical" }, "GLOBAL") -- Battleground speed buff
+Spell({ 23493 }, { duration = 10, buffType = "physical" }, "GLOBAL") -- Battleground heal buff
+Spell({ 23505 }, { duration = 60, buffType = "physical" }, "GLOBAL") -- Battleground damage buff
+Spell({ 4068 }, { duration = 3, buffType = "physical" }, "GLOBAL") -- Iron Grenade
+Spell({ 19769 }, { duration = 3, buffType = "physical" }, "GLOBAL") -- Thorium Grenade
+Spell({ 1090 }, { duration = 30, buffType = "physical" }, "GLOBAL") -- Magic Dust
+Spell({ 13327 }, { duration = 30, buffType = "physical" }, "GLOBAL") -- Reckless Charge
+Spell({ 26740, 13181 }, { duration = 20, buffType = "physical" }, "GLOBAL") -- Mind Control Cap + Backfire
+Spell({ 6727 }, { duration = 30, buffType = "physical" }, "GLOBAL") -- Violet Tragan
+Spell({ 5134 }, { duration = 10, buffType = "physical" }, "GLOBAL") -- Flash Bomb
+Spell({ 13237 }, { duration = 3, buffType = "physical" }, "GLOBAL") -- Goblin Mortar trinket
 
 -------------
 -- PRIEST
@@ -99,14 +99,22 @@ Spell({ 15269 }, {duration = 3, buffType = "magic"}, "PRIEST")
 ---------------
 Spell({ 33786 }, {duration = 6, buffType = "immune"}, "DRUID") -- Cyclone
 Spell({ 19675 }, { duration = 4 }, "DRUID") -- Feral Charge
-Spell({ 19975, 16810, 16811, 16812, 16813, 17329, 27009 }, { duration = function(spellID)
+Spell( {22570}, {buffType = "physical", duration = function(spellID, isSrcPlayer, comboPoints)
+    local duration = 1 -- 1cp 2s, 2cp 3s, 3cp 4s, 4cp 5s, 5cp 6s
+    if isSrcPlayer then
+        return duration + comboPoints
+    else
+        return duration + 5 -- just assume 5cp i guess
+    end
+end}, "DRUID") -- Maim
+Spell({ 19975, 19974, 19973, 19972, 19971,19970, 27010 }, { duration = function(spellID)
     if spellID == 19975 then return 12
-    elseif spellID == 16810 then return 15
-    elseif spellID == 16811 then return 18
-    elseif spellID == 16812 then return 21
-    elseif spellID == 16813 then return 24
+    elseif spellID == 19974 then return 15
+    elseif spellID == 19973 then return 18
+    elseif spellID == 19972 then return 21
+    elseif spellID == 19971 then return 24
     else return 27 end
-end, pvpduration = 10, buffType = "magic" }, "DRUID") -- Nature's Grasp root
+end, pvpduration = 10, buffType = "magic", altName = select(1, GetSpellInfo(27010)) .. " (Nature's Grasp)"  }, "DRUID") -- Nature's Grasp root
 Spell({ 339, 1062, 5195, 5196, 9852, 9853, 26989 }, {
     pvpduration = 10,
     buffType = "magic",
@@ -119,7 +127,7 @@ Spell({ 339, 1062, 5195, 5196, 9852, 9853, 26989 }, {
         else return 27 end
     end
 }, "DRUID") -- Entangling Roots
-Spell({ 19975, 19974, 19973, 19972, 19971,19970, 27010 }, {pvpduration = 10, buffType = "magic" }) -- Entangling Roots (Nature's Grasp)
+--Spell({ 19975, 19974, 19973, 19972, 19971,19970, 27010 }, {pvpduration = 10, buffType = "magic", altName = "Entangling Roots (Nature's Grasp)" }) -- Entangling Roots (Nature's Grasp)
 Spell({ 770, 778, 9749, 9907, 26993 }, { duration = 40, buffType = "magic"  }, "DRUID") -- Faerie Fire
 Spell({ 16857, 17390, 17391, 17392, 27011 }, { duration = 40, buffType = "magic"  }, "DRUID") -- Faerie Fire (Feral)
 Spell({ 2637, 18657, 18658 }, {
@@ -317,7 +325,7 @@ Spell({ 6358 }, { pvpduration = 10, duration = 15, buffType = "magic" }, "WARLOC
 Spell({ 30108, 30404, 30405 }, { duration = 18, buffType = "magic", stacking = true, preEvent = "SPELL_CAST_START" }, "WARLOCK") -- Unstable Affliction
 Spell({ 31117, 43523 }, { duration = 5, buffType = "magic", altName = "Unstable Affliction Silence" }, "WARLOCK") -- Unstable Affliction Silence
 Spell({ 18093 } ,{ duration = 3, buffType = "physical" }, "WARLOCK") -- Pyroclasm
-Spell({ 17877, 18867, 18868, 18869, 18870, 18871, 27263, 30546 }, { duration = 5, buffType = "None", stacking = true, preEvent = "SPELL_CAST_SUCCESS" }, "WARLOCK") -- Shadowburn Debuff
+Spell({ 17877, 18867, 18868, 18869, 18870, 18871, 27263, 30546 }, { duration = 5, buffType = "physical", stacking = true, preEvent = "SPELL_CAST_SUCCESS" }, "WARLOCK") -- Shadowburn Debuff
 
 ---------------
 -- SHAMAN
