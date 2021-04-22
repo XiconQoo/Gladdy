@@ -1271,8 +1271,22 @@ function Gladdy:EnemySpotted(name, guid, class, classLoc, raceLoc, race)
         return
     end
 
+    local units = {[1] = 0,[2] = 0, [3] = 0}
+    for i=1, self.curBracket do
+        if self.buttons["arena" .. i] and (self.buttons["arena" .. i].name ~= "" and self.buttons["arena" .. i].name) then
+            units[i] = 1
+        end
+    end
+    for i=1,#units do
+        if units[i] == 0 then
+            self.curUnit = i
+            break
+        end
+    end
+    if (class == "ROGUE" or class == "WARRIOR" or class == "HUNTER") and units[self.curBracket] == 0 then
+        self.curUnit = self.curBracket
+    end
     local unit = "arena" .. self.curUnit
-    self.curUnit = self.curUnit + 1
     self.guids[guid] = unit
 
     local button = self.buttons[unit]
