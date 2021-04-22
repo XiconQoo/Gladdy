@@ -1,7 +1,7 @@
 # Gladdy - Macumba / XiCoN Edit
 
 ### The most powerful arena addon for WoW TBC 2.4.3
-## [v1.2-Release Download Here](https://github.com/XiconQoo/Gladdy/releases/download/v1.2-Release/Gladdy-MX-Edit-v1.2-Release.zip)
+## [v1.3-Release Download Here](https://github.com/XiconQoo/Gladdy/releases/download/v1.3-Release/Gladdy-MX-Edit-v1.3-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="../readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -37,6 +37,33 @@ Based on https://github.com/Schaka/gladdy
 ```
 
 ### Changes
+
+v1.3-Release
+- **NEW** module **BuffsDebuffs**!
+  - tracks debuffs on gladdy frames
+  - highly configurable
+  - list for every class let's you configure what debuffs to track
+  - by default does not display CC, which is normally shown on class icon (configurable)
+  - tracks multiple debuffs of same type (like rupture or corruption)
+  - not 100% accurate especially on tracking dispel on two debuffs with the same spellID
+- add own LibDebuffDuration-1.0
+- add DRData-1.0 and track DR on spell remove and spell refresh
+   - added missing DRs like Frostmages Chill effect
+- fix Click module (custom macros with placeholder **#name#** are now possible)
+  ```
+  /targetexact #name#
+  /cast Polymorph
+  /targetlasttarget
+  ```
+- Cooldown fix (thanks DrainTheLock)
+- Trinket/Classicon width now adjustable
+- added spells to ClassIcon (Unstable Affliction Silence, Starfire Stun)
+- add button for Gladdy config in blizz interface options
+- highlight border color add alpha
+- add icon padding option
+- optimizations for less CPU resources
+- add Windrunner realm to TrinketTracker ignore list
+- force Warriors/Rogues/Hunters on last position (eg arena2 in 2v2 or arena3 in 3v3)
 
 v1.2-Release
 - fixed castbar timer formats
