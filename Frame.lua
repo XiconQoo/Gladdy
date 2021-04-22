@@ -118,7 +118,9 @@ local function StyleActionButton(f)
     cooldown:SetAlpha(Gladdy.db.cooldownCooldownAlpha)
 
     button:SetNormalTexture(Gladdy.db.cooldownBorderStyle)
-    normalTex:SetVertexColor(Gladdy.db.cooldownBorderColor.r, Gladdy.db.cooldownBorderColor.g, Gladdy.db.cooldownBorderColor.b, Gladdy.db.cooldownBorderColor.a)
+    normalTex:SetVertexColor(0,0,0,0)
+    f.border:SetTexture(Gladdy.db.cooldownBorderStyle)
+    f.border:SetVertexColor(Gladdy.db.cooldownBorderColor.r, Gladdy.db.cooldownBorderColor.g, Gladdy.db.cooldownBorderColor.b, Gladdy.db.cooldownBorderColor.a)
 
     icon:SetTexCoord(.1, .9, .1, .9)
     icon:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
@@ -314,13 +316,13 @@ function Gladdy:UpdateFrame()
                         icon:SetPoint("RIGHT", button.spellCooldownFrame, "RIGHT", 0, 0)
                     elseif (mod(j-1,Gladdy.db.cooldownMaxIconsPerLine) == 0) then
                         if (self.db.cooldownYPos == "BOTTOM" or self.db.cooldownYPos == "LEFT" or self.db.cooldownYPos == "RIGHT") then
-                            icon:SetPoint("TOP", button.spellCooldownFrame["icon" .. o], "BOTTOM", 0, -1)
+                            icon:SetPoint("TOP", button.spellCooldownFrame["icon" .. o], "BOTTOM", 0, -Gladdy.db.cooldownIconPadding)
                         else
-                            icon:SetPoint("BOTTOM", button.spellCooldownFrame["icon" .. o], "TOP", 0, 1)
+                            icon:SetPoint("BOTTOM", button.spellCooldownFrame["icon" .. o], "TOP", 0, Gladdy.db.cooldownIconPadding)
                         end
                         o = o + tonumber(Gladdy.db.cooldownMaxIconsPerLine)
                     else
-                        icon:SetPoint("RIGHT", button.spellCooldownFrame["icon" .. j - 1], "LEFT", -1, 0)
+                        icon:SetPoint("RIGHT", button.spellCooldownFrame["icon" .. j - 1], "LEFT", -Gladdy.db.cooldownIconPadding, 0)
                     end
                 end
                 if (self.db.cooldownXPos == "LEFT") then
@@ -328,13 +330,13 @@ function Gladdy:UpdateFrame()
                         icon:SetPoint("LEFT", button.spellCooldownFrame, "LEFT", 0, 0)
                     elseif (mod(j-1,Gladdy.db.cooldownMaxIconsPerLine) == 0) then
                         if (self.db.cooldownYPos == "BOTTOM" or self.db.cooldownYPos == "LEFT" or self.db.cooldownYPos == "RIGHT") then
-                            icon:SetPoint("TOP", button.spellCooldownFrame["icon" .. o], "BOTTOM", 0, -1)
+                            icon:SetPoint("TOP", button.spellCooldownFrame["icon" .. o], "BOTTOM", 0, -Gladdy.db.cooldownIconPadding)
                         else
-                            icon:SetPoint("BOTTOM", button.spellCooldownFrame["icon" .. o], "TOP", 0, 1)
+                            icon:SetPoint("BOTTOM", button.spellCooldownFrame["icon" .. o], "TOP", 0, Gladdy.db.cooldownIconPadding)
                         end
                         o = o + tonumber(Gladdy.db.cooldownMaxIconsPerLine)
                     else
-                        icon:SetPoint("LEFT", button.spellCooldownFrame["icon" .. j - 1], "RIGHT", 1, 0)
+                        icon:SetPoint("LEFT", button.spellCooldownFrame["icon" .. j - 1], "RIGHT", Gladdy.db.cooldownIconPadding, 0)
                     end
                 end
 
@@ -427,6 +429,9 @@ function Gladdy:CreateButton(i)
         icon.cooldownFrame:ClearAllPoints()
         icon.cooldownFrame:SetPoint("TOPLEFT", icon, "TOPLEFT")
         icon.cooldownFrame:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT")
+        icon.border = icon.cooldownFrame:CreateTexture(nil, "OVERLAY")
+        icon.border:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
+        icon.border:SetAllPoints(icon)
         icon.cooldownFont = icon.cooldownFrame:CreateFontString(nil, "OVERLAY")
         icon:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), self.db.cooldownSize / 2  * Gladdy.db.cooldownFontScale, "OUTLINE")
         icon.cooldownFont:SetTextColor(Gladdy.db.cooldownFontColor.r, Gladdy.db.cooldownFontColor.g, Gladdy.db.cooldownFontColor.b, Gladdy.db.cooldownFontColor.a)

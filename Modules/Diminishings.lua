@@ -24,6 +24,8 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drBorderColor = { r = 1, g = 1, b = 1, a = 1 },
     drDisableCircle = false,
     drCooldownAlpha = 1,
+    drBorderColorsEnabled = true,
+    drIconPadding = 1,
     drHalfColor = {r = 1, g = 1, b = 0, a = 1 },
     drQuarterColor = {r = 1, g = 0.7, b = 0, a = 1 },
     drNullColor = {r = 1, g = 0, b = 0, a = 1 },
@@ -39,11 +41,6 @@ local function getDiminishColor(dr)
     end
 end
 
-local function setDiminishColor(icon)
-    icon.border:SetVertexColor(getDiminishColor(icon.diminishing))
-    --icon.timeText:SetTextColor(getDiminishColor(icon.diminishing))
-end
-
 local function StyleActionButton(f)
     local name = f:GetName()
     local button = _G[name]
@@ -55,9 +52,13 @@ local function StyleActionButton(f)
     normalTex:SetWidth(button:GetWidth())
     normalTex:SetPoint("CENTER")
 
-    --f.border:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
-    button:SetNormalTexture(Gladdy.db.drBorderStyle)
-    normalTex:SetVertexColor(Gladdy.db.drBorderColor.r, Gladdy.db.drBorderColor.g, Gladdy.db.drBorderColor.b, Gladdy.db.drBorderColor.a)
+    if Gladdy.db.drBorderStyle == "Interface\\AddOns\\Gladdy\\Images\\Border_Gloss" then
+        f.border:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
+    else
+        f.border:SetTexture(Gladdy.db.drBorderStyle)
+    end
+
+    normalTex:SetVertexColor(0, 0 , 0, 0)
 
     icon:SetTexCoord(.1, .9, .1, .9)
     icon:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
@@ -247,19 +248,24 @@ function Diminishings:UpdateFrame(unit)
             icon.cooldown:SetAlpha(Gladdy.db.drCooldownAlpha)
         end
 
+        if Gladdy.db.drBorderColorsEnabled then
+            icon.border:SetVertexColor(getDiminishColor(icon.diminishing))
+        else
+            icon.border:SetVertexColor(Gladdy.db.drBorderColor.r, Gladdy.db.drBorderColor.g, Gladdy.db.drBorderColor.b, Gladdy.db.drBorderColor.a)
+        end
 
         icon:ClearAllPoints()
         if (Gladdy.db.drCooldownPos == "LEFT") then
             if (i == 1) then
                 icon:SetPoint("TOPRIGHT")
             else
-                icon:SetPoint("RIGHT", drFrame["icon" .. (i - 1)], "LEFT")
+                icon:SetPoint("RIGHT", drFrame["icon" .. (i - 1)], "LEFT", -Gladdy.db.drIconPadding, 0)
             end
         else
             if (i == 1) then
                 icon:SetPoint("TOPLEFT")
             else
-                icon:SetPoint("LEFT", drFrame["icon" .. (i - 1)], "RIGHT")
+                icon:SetPoint("LEFT", drFrame["icon" .. (i - 1)], "RIGHT", Gladdy.db.drIconPadding, 0)
             end
         end
 
@@ -326,7 +332,11 @@ function Diminishings:Fade(unit, spell, spellID)
     lastIcon.dr = drCat
     lastIcon.timeLeft = drDuration
     lastIcon.diminishing = DRData:NextDR(lastIcon.diminishing)
-    setDiminishColor(lastIcon)
+    if Gladdy.db.drBorderColorsEnabled then
+        lastIcon.border:SetVertexColor(getDiminishColor(lastIcon.diminishing))
+    else
+        lastIcon.border:SetVertexColor(Gladdy.db.drBorderColor.r, Gladdy.db.drBorderColor.g, Gladdy.db.drBorderColor.b, Gladdy.db.drBorderColor.a)
+    end
     lastIcon.cooldown:SetCooldown(GetTime(), drDuration)
     lastIcon.texture:SetTexture(select(3, GetSpellInfo(spellID)))
     lastIcon.active = true
@@ -352,13 +362,13 @@ function Diminishings:Positionate(unit)
                 if (not lastIcon) then
                     icon:SetPoint("TOPRIGHT")
                 else
-                    icon:SetPoint("RIGHT", lastIcon, "LEFT")
+                    icon:SetPoint("RIGHT", lastIcon, "LEFT", -Gladdy.db.drIconPadding, 0)
                 end
             else
                 if (not lastIcon) then
                     icon:SetPoint("TOPLEFT")
                 else
-                    icon:SetPoint("LEFT", lastIcon, "RIGHT")
+                    icon:SetPoint("LEFT", lastIcon, "RIGHT", Gladdy.db.drIconPadding, 0)
                 end
             end
 
@@ -394,10 +404,19 @@ function Diminishings:GetOptions()
             max = 50,
             step = 1,
         }),
+        drIconPadding = Gladdy:option({
+            type = "range",
+            name = L["Icon Padding"],
+            desc = L["Space between Icons"],
+            order = 6,
+            min = 0,
+            max = 10,
+            step = 0.1,
+        }),
         drDisableCircle = Gladdy:option({
             type = "toggle",
             name = L["No Cooldown Circle"],
-            order = 6,
+            order = 7,
         }),
         drCooldownAlpha = Gladdy:option({
             type = "range",
@@ -405,7 +424,7 @@ function Diminishings:GetOptions()
             min = 0,
             max = 1,
             step = 0.1,
-            order = 7,
+            order = 8,
         }),
         headerFont = {
             type = "header",
@@ -490,25 +509,32 @@ function Diminishings:GetOptions()
             name = L["DR Border Colors"],
             order = 40,
         },
+        drBorderColorsEnabled = Gladdy:option({
+            type = "toggle",
+            name = L["Dr Border Colors Enabled"],
+            desc = L["Colors borders of DRs in respective DR-color below"],
+            order = 41,
+            width = "full",
+        }),
         drHalfColor = Gladdy:colorOption({
             type = "color",
             name = L["Half"],
             desc = L["Color of the border"],
-            order = 41,
+            order = 42,
             hasAlpha = true,
         }),
         drQuarterColor = Gladdy:colorOption({
             type = "color",
             name = L["Quarter"],
             desc = L["Color of the border"],
-            order = 42,
+            order = 43,
             hasAlpha = true,
         }),
         drNullColor = Gladdy:colorOption({
             type = "color",
             name = L["Immune"],
             desc = L["Color of the border"],
-            order = 43,
+            order = 44,
             hasAlpha = true,
         }),
     }

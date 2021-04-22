@@ -95,6 +95,7 @@ local defaultTrackedDebuffs = select(2, Gladdy:GetDebuffs())
 local BuffsDebuffs = Gladdy:NewModule("BuffsDebuffs", nil, {
     buffsEnabled = true,
     buffsIconSize = 30,
+    buffsIconPadding = 1,
     buffsDisableCircle = false,
     buffsCooldownAlpha = 1,
     buffsFont = "DorisPP",
@@ -107,6 +108,7 @@ local BuffsDebuffs = Gladdy:NewModule("BuffsDebuffs", nil, {
     buffsYOffset = 0,
     buffsBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_squared_blp",
     buffsBorderColor = {r = 1, g = 1, b = 1, a = 1},
+    buffsBorderColorsEnabled = true,
     trackedDebuffs = defaultTrackedDebuffs,
     buffsBorderColorCurse = auraTypeColor["curse"],
     buffsBorderColorMagic = auraTypeColor["magic"],
@@ -118,10 +120,14 @@ local BuffsDebuffs = Gladdy:NewModule("BuffsDebuffs", nil, {
 
 local spellSchoolToOptionValueTable
 local function spellSchoolToOptionValue(spellSchool)
-    return spellSchoolToOptionValueTable[spellSchool].r,
+    if Gladdy.db.buffsBorderColorsEnabled and spellSchool then
+        return spellSchoolToOptionValueTable[spellSchool].r,
         spellSchoolToOptionValueTable[spellSchool].g,
         spellSchoolToOptionValueTable[spellSchool].b,
         spellSchoolToOptionValueTable[spellSchool].a
+    else
+        return Gladdy.db.buffsBorderColor.r,Gladdy.db.buffsBorderColor.g,Gladdy.db.buffsBorderColor.b,Gladdy.db.buffsBorderColor.a
+    end
 end
 
 function BuffsDebuffs:OnEvent(event, ...)
@@ -397,6 +403,7 @@ local function styleIcon(aura)
     aura:SetHeight(Gladdy.db.buffsIconSize)
     aura.cooldowncircle:SetAlpha(Gladdy.db.buffsCooldownAlpha)
     aura.border:SetTexture(Gladdy.db.buffsBorderStyle)
+    aura.border:SetVertexColor(spellSchoolToOptionValue(aura.spellSchool))
     aura.cooldown:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.buffsFont), (Gladdy.db.buffsIconSize/2 - 1) * Gladdy.db.buffsFontScale, "OUTLINE")
     aura.cooldown:SetTextColor(Gladdy.db.buffsFontColor.r, Gladdy.db.buffsFontColor.g, Gladdy.db.buffsFontColor.b, Gladdy.db.buffsFontColor.a)
     aura.stacks:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.buffsFont), (Gladdy.db.buffsIconSize/3 - 1) * Gladdy.db.buffsFontScale, "OUTLINE")
@@ -503,10 +510,10 @@ function BuffsDebuffs:UpdateAurasOnUnit(unit)
         else
             if Gladdy.db.buffsCooldownGrowDirection == "LEFT" then
                 self.frames[unit].auras[AURA_TYPE_BUFF][i]:ClearAllPoints()
-                self.frames[unit].auras[AURA_TYPE_BUFF][i]:SetPoint("RIGHT", self.frames[unit].auras[AURA_TYPE_BUFF][i - 1], "LEFT", -1, 0)
+                self.frames[unit].auras[AURA_TYPE_BUFF][i]:SetPoint("RIGHT", self.frames[unit].auras[AURA_TYPE_BUFF][i - 1], "LEFT", -Gladdy.db.buffsIconPadding, 0)
             else
                 self.frames[unit].auras[AURA_TYPE_BUFF][i]:ClearAllPoints()
-                self.frames[unit].auras[AURA_TYPE_BUFF][i]:SetPoint("LEFT", self.frames[unit].auras[AURA_TYPE_BUFF][i - 1], "RIGHT", 1, 0)
+                self.frames[unit].auras[AURA_TYPE_BUFF][i]:SetPoint("LEFT", self.frames[unit].auras[AURA_TYPE_BUFF][i - 1], "RIGHT", Gladdy.db.buffsIconPadding, 0)
             end
         end
     end
@@ -522,10 +529,10 @@ function BuffsDebuffs:UpdateAurasOnUnit(unit)
         else
             if Gladdy.db.buffsCooldownGrowDirection == "LEFT" then
                 self.frames[unit].auras[AURA_TYPE_DEBUFF][i]:ClearAllPoints()
-                self.frames[unit].auras[AURA_TYPE_DEBUFF][i]:SetPoint("RIGHT", self.frames[unit].auras[AURA_TYPE_DEBUFF][i - 1], "LEFT", -1, 0)
+                self.frames[unit].auras[AURA_TYPE_DEBUFF][i]:SetPoint("RIGHT", self.frames[unit].auras[AURA_TYPE_DEBUFF][i - 1], "LEFT", -Gladdy.db.buffsIconPadding, 0)
             else
                 self.frames[unit].auras[AURA_TYPE_DEBUFF][i]:ClearAllPoints()
-                self.frames[unit].auras[AURA_TYPE_DEBUFF][i]:SetPoint("LEFT", self.frames[unit].auras[AURA_TYPE_DEBUFF][i - 1], "RIGHT", 1, 0)
+                self.frames[unit].auras[AURA_TYPE_DEBUFF][i]:SetPoint("LEFT", self.frames[unit].auras[AURA_TYPE_DEBUFF][i - 1], "RIGHT", Gladdy.db.buffsIconPadding, 0)
             end
         end
     end
@@ -780,10 +787,19 @@ function BuffsDebuffs:GetOptions()
             max = 50,
             step = 1,
         }),
+        buffsIconPadding = Gladdy:option({
+            type = "range",
+            name = L["Icon Padding"],
+            desc = L["Space between Icons"],
+            order = 6,
+            min = 0,
+            max = 10,
+            step = 0.1,
+        }),
         buffsDisableCircle = Gladdy:option({
             type = "toggle",
             name = L["No Cooldown Circle"],
-            order = 6,
+            order = 7,
         }),
         buffsCooldownAlpha = Gladdy:option({
             type = "range",
@@ -791,7 +807,7 @@ function BuffsDebuffs:GetOptions()
             min = 0,
             max = 1,
             step = 0.1,
-            order = 7,
+            order = 8,
         }),
         headerFont = {
             type = "header",
@@ -887,46 +903,53 @@ function BuffsDebuffs:GetOptions()
             name = L["Spell School Colors"],
             order = 40,
         },
+        buffsBorderColorsEnabled = Gladdy:option({
+            type = "toggle",
+            name = L["Spell School Colors Enabled"],
+            desc = L["Show border colors by spell school"],
+            order = 41,
+            width = "full",
+        }),
         buffsBorderColorCurse = Gladdy:colorOption({
             type = "color",
             name = L["Curse"],
             desc = L["Color of the border"],
-            order = 41,
+            order = 42,
             hasAlpha = true,
         }),
         buffsBorderColorMagic = Gladdy:colorOption({
             type = "color",
             name = L["Magic"],
             desc = L["Color of the border"],
-            order = 42,
+            order = 43,
             hasAlpha = true,
         }),
         buffsBorderColorPoison = Gladdy:colorOption({
             type = "color",
             name = L["Poison"],
             desc = L["Color of the border"],
-            order = 43,
+            order = 44,
             hasAlpha = true,
         }),
         buffsBorderColorPhysical = Gladdy:colorOption({
             type = "color",
             name = L["Physical"],
             desc = L["Color of the border"],
-            order = 44,
+            order = 45,
             hasAlpha = true,
         }),
         buffsBorderColorImmune = Gladdy:colorOption({
             type = "color",
             name = L["Immune"],
             desc = L["Color of the border"],
-            order = 45,
+            order = 46,
             hasAlpha = true,
         }),
         buffsBorderColorDisease = Gladdy:colorOption({
             type = "color",
             name = L["Disease"],
             desc = L["Color of the border"],
-            order = 46,
+            order = 47,
             hasAlpha = true,
         }),
         spellList = {
