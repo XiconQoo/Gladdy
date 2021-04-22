@@ -94,6 +94,7 @@ local L = Gladdy.L
 local defaultTrackedDebuffs = select(2, Gladdy:GetDebuffs())
 local BuffsDebuffs = Gladdy:NewModule("BuffsDebuffs", nil, {
     buffsEnabled = true,
+    buffsShowAuraDebuffs = false,
     buffsIconSize = 30,
     buffsIconPadding = 1,
     buffsDisableCircle = false,
@@ -308,6 +309,9 @@ function BuffsDebuffs:COMBAT_LOG_EVENT_UNFILTERED(timestamp, eventType, sourceGU
     local Auras = Gladdy.modules.Auras
     spellName = (spellID == 31117 or spellID ==  43523) and "Unstable Affliction Silence" or spellName
     local aura = Auras.auras[spellName]
+    if Gladdy.db.buffsShowAuraDebuffs then
+        aura = false
+    end
 
     local duration
     if not aura and Gladdy.eventGrps[eventType] == "BUFF" and spellDurations[spellID] and Gladdy.db.trackedDebuffs[spellName] then
@@ -773,16 +777,22 @@ function BuffsDebuffs:GetOptions()
             desc = L["Enabled Buffs and Debuffs module"],
             order = 3,
         }),
+        buffsShowAuraDebuffs = Gladdy:option({
+            type = "toggle",
+            name = L["Show CC"],
+            desc = L["Shows all debuffs, which are displayed on the ClassIcon as well"],
+            order = 4,
+        }),
         headerBuffsFrame = {
             type = "header",
             name = L["Frame"],
-            order = 4,
+            order = 5,
         },
         buffsIconSize = Gladdy:option({
             type = "range",
             name = L["Icon Size"],
             desc = L["Size of the DR Icons"],
-            order = 5,
+            order = 6,
             min = 5,
             max = 50,
             step = 1,
@@ -791,7 +801,7 @@ function BuffsDebuffs:GetOptions()
             type = "range",
             name = L["Icon Padding"],
             desc = L["Space between Icons"],
-            order = 6,
+            order = 7,
             min = 0,
             max = 10,
             step = 0.1,
@@ -799,7 +809,7 @@ function BuffsDebuffs:GetOptions()
         buffsDisableCircle = Gladdy:option({
             type = "toggle",
             name = L["No Cooldown Circle"],
-            order = 7,
+            order = 8,
         }),
         buffsCooldownAlpha = Gladdy:option({
             type = "range",
@@ -807,7 +817,7 @@ function BuffsDebuffs:GetOptions()
             min = 0,
             max = 1,
             step = 0.1,
-            order = 8,
+            order = 9,
         }),
         headerFont = {
             type = "header",
