@@ -1,7 +1,7 @@
 local pairs = pairs
 
 local GetSpellInfo = GetSpellInfo
-local CreateFrame = CreateFrame
+local CreateFrame, GetTime = CreateFrame, GetTime
 
 local Gladdy = LibStub("Gladdy")
 local L = Gladdy.L
@@ -39,8 +39,7 @@ function Auras:CreateFrame(unit)
 
     auraFrame.cooldownFrame = CreateFrame("Frame", nil, auraFrame)
     auraFrame.cooldownFrame:ClearAllPoints()
-    auraFrame.cooldownFrame:SetPoint("TOPLEFT", auraFrame, "TOPLEFT")
-    auraFrame.cooldownFrame:SetPoint("BOTTOMRIGHT", auraFrame, "BOTTOMRIGHT")
+    auraFrame.cooldownFrame:SetAllPoints(auraFrame)
     auraFrame.cooldownFrame:SetFrameStrata("MEDIUM")
     auraFrame.cooldownFrame:SetFrameLevel(5)
 
@@ -83,7 +82,7 @@ function Auras:UpdateFrame(unit)
         return
     end
 
-    local width, height = Gladdy.db.classIconSize - Gladdy.db.classIconSize * 0.1, Gladdy.db.classIconSize
+    local width, height = Gladdy.db.classIconSize * Gladdy.db.classIconWidthFactor, Gladdy.db.classIconSize
 
     auraFrame:SetWidth(width)
     auraFrame:SetHeight(height)
@@ -315,6 +314,7 @@ function Auras:GetAuraList()
             track = "debuff",
             duration = 6,
             priority = 40,
+            spellID = 33786,
         },
         -- Hibername
         [GetSpellInfo(18658)] = {
@@ -322,6 +322,7 @@ function Auras:GetAuraList()
             duration = 10,
             priority = 40,
             magic = true,
+            spellID = 18658,
         },
         -- Entangling Roots
         [GetSpellInfo(26989)] = {
@@ -331,6 +332,7 @@ function Auras:GetAuraList()
             onDamage = true,
             magic = true,
             root = true,
+            spellID = 26989,
         },
         -- Feral Charge
         [GetSpellInfo(16979)] = {
@@ -338,18 +340,21 @@ function Auras:GetAuraList()
             duration = 4,
             priority = 30,
             root = true,
+            spellID = 16979,
         },
         -- Bash
         [GetSpellInfo(8983)] = {
             track = "debuff",
             duration = 4,
             priority = 30,
+            spellID = 8983,
         },
         -- Pounce
         [GetSpellInfo(9005)] = {
             track = "debuff",
             duration = 3,
             priority = 40,
+            spellID = 9005,
         },
         -- Maim
         [GetSpellInfo(22570)] = {
@@ -357,12 +362,22 @@ function Auras:GetAuraList()
             duration = 6,
             priority = 40,
             incapacite = true,
+            spellID = 22570,
         },
         -- Innervate
         [GetSpellInfo(29166)] = {
             track = "buff",
             duration = 20,
             priority = 10,
+            spellID = 29166,
+        },
+        -- Imp Starfire Stun
+        [GetSpellInfo(16922)] = {
+            track = "debuff",
+            duration = 3,
+            priority = 40,
+            spellSchool = "physical",
+            id = 16922,
         },
 
 
@@ -373,6 +388,7 @@ function Auras:GetAuraList()
             priority = 40,
             onDamage = true,
             magic = true,
+            spellID = 14309,
         },
         -- Wyvern Sting
         [GetSpellInfo(19386)] = {
@@ -382,6 +398,7 @@ function Auras:GetAuraList()
             onDamage = true,
             poison = true,
             sleep = true,
+            spellID = 19386,
         },
         -- Scatter Shot
         [GetSpellInfo(19503)] = {
@@ -389,6 +406,7 @@ function Auras:GetAuraList()
             duration = 4,
             priority = 40,
             onDamage = true,
+            spellID = 19503,
         },
         -- Silencing Shot
         [GetSpellInfo(34490)] = {
@@ -396,18 +414,21 @@ function Auras:GetAuraList()
             duration = 3,
             priority = 15,
             magic = true,
+            spellID = 34490,
         },
         -- Intimidation
         [GetSpellInfo(19577)] = {
             track = "debuff",
             duration = 2,
             priority = 40,
+            spellID = 19577,
         },
         -- The Beast Within
         [GetSpellInfo(34692)] = {
             track = "buff",
             duration = 18,
             priority = 20,
+            spellID = 34692,
         },
 
 
@@ -418,6 +439,7 @@ function Auras:GetAuraList()
             priority = 40,
             onDamage = true,
             magic = true,
+            spellID = 12826,
         },
         -- Dragon's Breath
         [GetSpellInfo(31661)] = {
@@ -426,6 +448,7 @@ function Auras:GetAuraList()
             priority = 40,
             onDamage = true,
             magic = true,
+            spellID = 31661,
         },
         -- Frost Nova
         [GetSpellInfo(27088)] = {
@@ -435,6 +458,7 @@ function Auras:GetAuraList()
             onDamage = true,
             magic = true,
             root = true,
+            spellID = 27088,
         },
         -- Freeze (Water Elemental)
         [GetSpellInfo(33395)] = {
@@ -444,6 +468,7 @@ function Auras:GetAuraList()
             onDamage = true,
             magic = true,
             root = true,
+            spellID = 33395,
         },
         -- Counterspell - Silence
         [GetSpellInfo(18469)] = {
@@ -451,14 +476,22 @@ function Auras:GetAuraList()
             duration = 4,
             priority = 15,
             magic = true,
+            spellID = 18469,
         },
         -- Ice Block
         [GetSpellInfo(45438)] = {
             track = "buff",
             duration = 10,
             priority = 20,
+            spellID = 45438,
         },
-
+        -- Impact
+        [GetSpellInfo(12355)] = {
+            track = "debuff",
+            duration = 2,
+            priority = 40,
+            spellID = 12355,
+        },
 
         -- Hammer of Justice
         [GetSpellInfo(10308)] = {
@@ -466,6 +499,7 @@ function Auras:GetAuraList()
             duration = 6,
             priority = 40,
             magic = true,
+            spellID = 10308,
         },
         -- Repentance
         [GetSpellInfo(20066)] = {
@@ -475,24 +509,28 @@ function Auras:GetAuraList()
             onDamage = true,
             magic = true,
             incapacite = true,
+            spellID = 20066,
         },
         -- Blessing of Protection
         [GetSpellInfo(10278)] = {
             track = "buff",
             duration = 10,
             priority = 10,
+            spellID = 10278,
         },
         -- Blessing of Freedom
         [GetSpellInfo(1044)] = {
             track = "buff",
             duration = 14,
             priority = 10,
+            spellID = 1044,
         },
         -- Divine Shield
         [GetSpellInfo(642)] = {
             track = "buff",
             duration = 12,
             priority = 20,
+            spellID = 642,
         },
 
 
@@ -504,6 +542,7 @@ function Auras:GetAuraList()
             onDamage = true,
             fear = true,
             magic = true,
+            spellID = 8122,
         },
         -- Chastise
         [GetSpellInfo(44047)] = {
@@ -511,6 +550,7 @@ function Auras:GetAuraList()
             duration = 8,
             priority = 30,
             root = true,
+            spellID = 44047,
         },
         -- Mind Control
         [GetSpellInfo(605)] = {
@@ -518,6 +558,7 @@ function Auras:GetAuraList()
             duration = 10,
             priority = 40,
             magic = true,
+            spellID = 605,
         },
         -- Silence
         [GetSpellInfo(15487)] = {
@@ -525,12 +566,14 @@ function Auras:GetAuraList()
             duration = 5,
             priority = 15,
             magic = true,
+            spellID = 15487,
         },
         -- Pain Suppression
         [GetSpellInfo(33206)] = {
             track = "buff",
             duration = 8,
             priority = 10,
+            spellID = 33206,
         },
 
 
@@ -541,6 +584,7 @@ function Auras:GetAuraList()
             priority = 40,
             onDamage = true,
             incapacite = true,
+            spellID = 6770,
         },
         -- Blind
         [GetSpellInfo(2094)] = {
@@ -548,18 +592,21 @@ function Auras:GetAuraList()
             duration = 10,
             priority = 40,
             onDamage = true,
+            spellID = 2094,
         },
         -- Cheap Shot
         [GetSpellInfo(1833)] = {
             track = "debuff",
             duration = 4,
             priority = 40,
+            spellID = 1833,
         },
         -- Kidney Shot
         [GetSpellInfo(8643)] = {
             track = "debuff",
             duration = 6,
             priority = 40,
+            spellID = 8643,
         },
         -- Gouge
         [GetSpellInfo(1776)] = {
@@ -568,24 +615,28 @@ function Auras:GetAuraList()
             priority = 40,
             onDamage = true,
             incapacite = true,
+            spellID = 1776,
         },
         -- Kick - Silence
         [GetSpellInfo(18425)] = {
             track = "debuff",
             duration = 2,
             priority = 15,
+            spellID = 18425,
         },
         -- Garrote - Silence
         [GetSpellInfo(1330)] = {
             track = "debuff",
             duration = 3,
             priority = 15,
+            spellID = 1330,
         },
         -- Cloak of Shadows
         [GetSpellInfo(31224)] = {
             track = "buff",
             duration = 5,
             priority = 20,
+            spellID = 31224,
         },
 
 
@@ -597,12 +648,14 @@ function Auras:GetAuraList()
             onDamage = true,
             fear = true,
             magic = true,
+            spellID = 5782,
         },
         -- Death Coil
         [GetSpellInfo(27223)] = {
             track = "debuff",
             duration = 3,
             priority = 40,
+            spellID = 27223,
         },
         -- Shadowfury
         [GetSpellInfo(30283)] = {
@@ -610,6 +663,7 @@ function Auras:GetAuraList()
             duration = 2,
             priority = 40,
             magic = true,
+            spellID = 30283,
         },
         -- Seduction (Succubus)
         [GetSpellInfo(6358)] = {
@@ -619,6 +673,7 @@ function Auras:GetAuraList()
             onDamage = true,
             fear = true,
             magic = true,
+            spellID = 6358,
         },
         -- Howl of Terror
         [GetSpellInfo(5484)] = {
@@ -628,6 +683,7 @@ function Auras:GetAuraList()
             onDamage = true,
             fear = true,
             magic = true,
+            spellID = 5484,
         },
         -- Spell Lock (Felhunter)
         [GetSpellInfo(24259)] = {
@@ -635,13 +691,15 @@ function Auras:GetAuraList()
             duration = 3,
             priority = 15,
             magic = true,
+            spellID = 24259,
         },
-        -- Unstable Affliction
-        [GetSpellInfo(31117)] = {
+        -- Unstable Affliction Silence
+        ["Unstable Affliction Silence"] = { -- GetSpellInfo returns "Unstable Affliction"
             track = "debuff",
             duration = 5,
             priority = 15,
             magic = true,
+            spellID = 31117,
         },
 
 
@@ -652,24 +710,36 @@ function Auras:GetAuraList()
             priority = 15,
             onDamage = true,
             fear = true,
+            spellID = 5246,
         },
         -- Concussion Blow
         [GetSpellInfo(12809)] = {
             track = "debuff",
             duration = 5,
             priority = 40,
+            spellID = 12809,
         },
         -- Intercept Stun
         [GetSpellInfo(25274)] = {
             track = "debuff",
             duration = 3,
             priority = 40,
+            spellID = 25274,
         },
         -- Spell Reflection
         [GetSpellInfo(23920)] = {
             track = "buff",
             duration = 5,
-            priority = 10,
+            priority = 50,
+            spellID = 23920,
+        },
+        -- Shield Bash - Silenced
+        [GetSpellInfo(18498)] = {
+            track = "debuff",
+            duration = 3,
+            priority = 15,
+            spellSchool = "magic",
+            id = 18498,
         },
 
 
@@ -678,6 +748,7 @@ function Auras:GetAuraList()
             track = "debuff",
             duration = 2,
             priority = 40,
+            spellID = 20549,
         },
         -- Arcane Torrent
         [GetSpellInfo(28730)] = {
@@ -685,6 +756,7 @@ function Auras:GetAuraList()
             duration = 2,
             priority = 15,
             magic = true,
+            spellID = 28730,
         },
     }
 end

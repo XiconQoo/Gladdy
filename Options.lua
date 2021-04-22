@@ -7,6 +7,7 @@ local tsort = table.sort
 local InterfaceOptionsFrame_OpenToFrame = InterfaceOptionsFrame_OpenToFrame
 
 local Gladdy = LibStub("Gladdy")
+local LibAuraDurations = LibStub("LibAuraDurations-1.0")
 local L = Gladdy.L
 
 Gladdy.defaults = {
@@ -236,8 +237,8 @@ function Gladdy:SetupOptions()
                         name = L["Bottom margin"],
                         desc = L["Margin between each button"],
                         order = 7,
-                        min = 0,
-                        max = 50,
+                        min = -100,
+                        max = 100,
                         step = 1,
                     },
                     headerCooldown = {
@@ -254,7 +255,8 @@ function Gladdy:SetupOptions()
                             local b = Gladdy.db.cooldownDisableCircle
                             local c = Gladdy.db.trinketDisableCircle
                             local d = Gladdy.db.drDisableCircle
-                            if (a == b and a == c and a == d) then
+                            local e = Gladdy.db.buffsDisableCircle
+                            if (a == b and a == c and a == d and a == e) then
                                 return a
                             else
                                 return ""
@@ -265,6 +267,7 @@ function Gladdy:SetupOptions()
                             Gladdy.db.cooldownDisableCircle = value
                             Gladdy.db.trinketDisableCircle = value
                             Gladdy.db.drDisableCircle = value
+                            Gladdy.db.buffsDisableCircle = value
                             Gladdy:UpdateFrame()
                         end,
                         width= "full",
@@ -281,7 +284,8 @@ function Gladdy:SetupOptions()
                             local b = Gladdy.db.drCooldownAlpha
                             local c = Gladdy.db.auraCooldownAlpha
                             local d = Gladdy.db.trinketCooldownAlpha
-                            if (a == b and a == c and a == d) then
+                            local e = Gladdy.db.buffsCooldownAlpha
+                            if (a == b and a == c and a == d and a == e) then
                                 return a
                             else
                                 return ""
@@ -292,6 +296,7 @@ function Gladdy:SetupOptions()
                             Gladdy.db.drCooldownAlpha = value
                             Gladdy.db.auraCooldownAlpha = value
                             Gladdy.db.trinketCooldownAlpha = value
+                            Gladdy.db.buffsCooldownAlpha = value
                             Gladdy:UpdateFrame()
                         end
                     },
@@ -315,7 +320,8 @@ function Gladdy:SetupOptions()
                             local e = Gladdy.db.cooldownFont
                             local f = Gladdy.db.drFont
                             local g = Gladdy.db.auraFont
-                            if (a == b and a == c and a == d and a == e and a == f and a == g) then
+                            local h = Gladdy.db.buffsFont
+                            if (a == b and a == c and a == d and a == e and a == f and a == g and a == h) then
                                 return a
                             else
                                 return ""
@@ -329,6 +335,7 @@ function Gladdy:SetupOptions()
                             Gladdy.db.cooldownFont = value
                             Gladdy.db.drFont = value
                             Gladdy.db.auraFont = value
+                            Gladdy.db.buffsFont = value
                             Gladdy:UpdateFrame()
                         end,
                     },
@@ -375,6 +382,9 @@ function Gladdy:SetupOptions()
                             if (Gladdy.db.classIconBorderStyle == Gladdy.db.trinketBorderStyle
                                     and Gladdy.db.classIconBorderStyle == Gladdy.db.castBarIconStyle
                                     and Gladdy.db.classIconBorderStyle == Gladdy.db.auraBorderStyle
+                                    and Gladdy.db.classIconBorderStyle == Gladdy.db.cooldownBorderStyle
+                                    and Gladdy.db.classIconBorderStyle == Gladdy.db.buffsBorderStyle
+                                    and Gladdy.db.classIconBorderStyle == Gladdy.db.drBorderStyle
                                     and Gladdy.db.classIconBorderStyle == Gladdy.db.npTotemPlatesBorderStyle) then
                                 return Gladdy.db.classIconBorderStyle
                             else
@@ -387,6 +397,9 @@ function Gladdy:SetupOptions()
                             Gladdy.db.castBarIconStyle = value
                             Gladdy.db.auraBorderStyle = value
                             Gladdy.db.npTotemPlatesBorderStyle = value
+                            Gladdy.db.cooldownBorderStyle = value
+                            Gladdy.db.buffsBorderStyle = value
+                            Gladdy.db.drBorderStyle = value
                             Gladdy:UpdateFrame()
                         end,
                     },
@@ -413,6 +426,9 @@ function Gladdy:SetupOptions()
                             Gladdy.db.trinketBorderColor = rgb
                             Gladdy.db.castBarIconColor = rgb
                             Gladdy.db.npTotemPlatesBorderColor = rgb
+                            Gladdy.db.drBorderColor = rgb
+                            Gladdy.db.cooldownBorderColor = rgb
+                            Gladdy.db.buffsBorderColor = rgb
                             Gladdy:UpdateFrame()
                         end,
                     },
@@ -521,11 +537,147 @@ function Gladdy:SetupOptions()
         order = order + 1
     end
 
+    local options = {
+        name = "Gladdy",
+        type = "group",
+        args = {
+            load = {
+                name = "Load configuration",
+                desc = "Load configuration options",
+                type = "execute",
+                func = function()
+                    HideUIPanel(InterfaceOptionsFrame)
+                    HideUIPanel(GameMenuFrame)
+                    LibStub("AceConfigDialog-3.0"):Open("Gladdy")
+                end,
+            },
+        },
+    }
+
     self.options.plugins.profiles = { profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.dbi) }
+    LibStub("AceConfig-3.0"):RegisterOptionsTable("Gladdy_blizz", options)
+    LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Gladdy_blizz", "Gladdy")
     LibStub("AceConfig-3.0"):RegisterOptionsTable("Gladdy", self.options)
-    LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Gladdy", "Gladdy")
+
 end
 
 function Gladdy:ShowOptions()
     InterfaceOptionsFrame_OpenToFrame("Gladdy")
+end
+
+function Gladdy:GetDebuffs()
+    local spells = {
+        ckeckAll = {
+            order = 1,
+            width = "0.7",
+            name = "Check All",
+            type = "execute",
+            func = function(info)
+                for k,v in pairs(Gladdy.dbi.profile.trackedDebuffs) do
+                    Gladdy.dbi.profile.trackedDebuffs[k] = true
+                end
+            end,
+        },
+        uncheckAll = {
+            order = 2,
+            width = "0.7",
+            name = "Uncheck All",
+            type = "execute",
+            func = function(info)
+                for k,v in pairs(Gladdy.dbi.profile.trackedDebuffs) do
+                    Gladdy.dbi.profile.trackedDebuffs[k] = false
+                end
+            end,
+        },
+        druid = {
+            order = 3,
+            type = "group",
+            name = "Druid",
+            args = {},
+        },
+        hunter = {
+            order = 4,
+            type = "group",
+            name = "Hunter",
+            args = {},
+        },
+        mage = {
+            order = 5,
+            type = "group",
+            name = "Mage",
+            args = {},
+        },
+        paladin = {
+            order = 6,
+            type = "group",
+            name = "Paladin",
+            args = {},
+        },
+        priest = {
+            order = 7,
+            type = "group",
+            name = "Priest",
+            args = {},
+        },
+        rogue = {
+            order = 8,
+            type = "group",
+            name = "Rogue",
+            args = {},
+        },
+        shaman = {
+            order = 9,
+            type = "group",
+            name = "Shaman",
+            args = {},
+        },
+        warlock = {
+            order = 10,
+            type = "group",
+            name = "Warlock",
+            args = {},
+        },
+        warrior = {
+            order = 10,
+            type = "group",
+            name = "Warrior",
+            args = {},
+        },
+    }
+    local defaultDebuffs = {}
+    local assignForClass = function(class)
+        local args = {}
+        local classSpells = LibAuraDurations.GetClassSpells(class)
+        table.sort(classSpells, function(a, b)
+            return a.name:upper() < b.name:upper()
+        end)
+        for i=1, #classSpells do
+            local spellName, _, texture = GetSpellInfo(classSpells[i].id[#classSpells[i].id])
+            spellName = (classSpells[i].id[#classSpells[i].id] == 31117 or classSpells[i].id[#classSpells[i].id] ==  43523) and "Unstable Affliction Silence" or spellName
+            if classSpells[i].texture then
+                texture = classSpells[i].texture
+            end
+            args[classSpells[i].name] = {
+                order = i,
+                name = classSpells[i].name,
+                type = "toggle",
+                image = texture,
+                width = "2",
+                --desc = format("Duration: %ds", druidSpells[i].duration),
+                arg = classSpells[i].name
+            }
+            defaultDebuffs[classSpells[i].name] = true
+        end
+        return args
+    end
+    spells.druid.args = assignForClass("DRUID")
+    spells.hunter.args = assignForClass("HUNTER")
+    spells.mage.args = assignForClass("MAGE")
+    spells.paladin.args = assignForClass("PALADIN")
+    spells.priest.args = assignForClass("PRIEST")
+    spells.rogue.args = assignForClass("ROGUE")
+    spells.shaman.args = assignForClass("SHAMAN")
+    spells.warlock.args = assignForClass("WARLOCK")
+    spells.warrior.args = assignForClass("WARRIOR")
+    return spells, defaultDebuffs
 end

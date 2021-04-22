@@ -156,7 +156,7 @@ function Clicks:SetupAttribute(button, key, mod, action, spell)
     local text = ""
 
     if (action == "macro") then
-        text = spell:gsub("*name*", button.name)
+        text = spell:gsub("%*name%*", button.name)
     elseif (action ~= "disabled") then
         text = "/targetexact " .. button.name
 
@@ -239,4 +239,8 @@ function Clicks:GetOptions()
     end
 
     return options
+end
+
+function Clicks:UpdateFrame(unit)
+    Clicks:SetupAttributes(unit)
 end

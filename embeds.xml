@@ -11,4 +11,6 @@
     <Include file="libs\AceHook-3.0\AceHook-3.0.xml"/>
     <Include file="libs\LibSharedMedia-3.0\lib.xml"/>
     <Include file="libs\AceGUI-3.0-SharedMediaWidgets\widget.xml"/>
+    <Include file="libs\DRData-1.0\DRData-1.0.xml"/>
+    <Include file="libs\LibAuraDurations-1.0\lib.xml"/>
 </Ui>
