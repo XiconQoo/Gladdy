@@ -255,7 +255,8 @@ function Gladdy:SetupOptions()
                             local b = Gladdy.db.cooldownDisableCircle
                             local c = Gladdy.db.trinketDisableCircle
                             local d = Gladdy.db.drDisableCircle
-                            if (a == b and a == c and a == d) then
+                            local e = Gladdy.db.buffsDisableCircle
+                            if (a == b and a == c and a == d and a == e) then
                                 return a
                             else
                                 return ""
@@ -266,6 +267,7 @@ function Gladdy:SetupOptions()
                             Gladdy.db.cooldownDisableCircle = value
                             Gladdy.db.trinketDisableCircle = value
                             Gladdy.db.drDisableCircle = value
+                            Gladdy.db.buffsDisableCircle = value
                             Gladdy:UpdateFrame()
                         end,
                         width= "full",
@@ -282,7 +284,8 @@ function Gladdy:SetupOptions()
                             local b = Gladdy.db.drCooldownAlpha
                             local c = Gladdy.db.auraCooldownAlpha
                             local d = Gladdy.db.trinketCooldownAlpha
-                            if (a == b and a == c and a == d) then
+                            local e = Gladdy.db.buffsCooldownAlpha
+                            if (a == b and a == c and a == d and a == e) then
                                 return a
                             else
                                 return ""
@@ -293,6 +296,7 @@ function Gladdy:SetupOptions()
                             Gladdy.db.drCooldownAlpha = value
                             Gladdy.db.auraCooldownAlpha = value
                             Gladdy.db.trinketCooldownAlpha = value
+                            Gladdy.db.buffsCooldownAlpha = value
                             Gladdy:UpdateFrame()
                         end
                     },
@@ -316,7 +320,8 @@ function Gladdy:SetupOptions()
                             local e = Gladdy.db.cooldownFont
                             local f = Gladdy.db.drFont
                             local g = Gladdy.db.auraFont
-                            if (a == b and a == c and a == d and a == e and a == f and a == g) then
+                            local h = Gladdy.db.buffsFont
+                            if (a == b and a == c and a == d and a == e and a == f and a == g and a == h) then
                                 return a
                             else
                                 return ""
@@ -330,6 +335,7 @@ function Gladdy:SetupOptions()
                             Gladdy.db.cooldownFont = value
                             Gladdy.db.drFont = value
                             Gladdy.db.auraFont = value
+                            Gladdy.db.buffsFont = value
                             Gladdy:UpdateFrame()
                         end,
                     },
@@ -376,6 +382,9 @@ function Gladdy:SetupOptions()
                             if (Gladdy.db.classIconBorderStyle == Gladdy.db.trinketBorderStyle
                                     and Gladdy.db.classIconBorderStyle == Gladdy.db.castBarIconStyle
                                     and Gladdy.db.classIconBorderStyle == Gladdy.db.auraBorderStyle
+                                    and Gladdy.db.classIconBorderStyle == Gladdy.db.cooldownBorderStyle
+                                    and Gladdy.db.classIconBorderStyle == Gladdy.db.buffsBorderStyle
+                                    and Gladdy.db.classIconBorderStyle == Gladdy.db.drBorderStyle
                                     and Gladdy.db.classIconBorderStyle == Gladdy.db.npTotemPlatesBorderStyle) then
                                 return Gladdy.db.classIconBorderStyle
                             else
@@ -388,6 +397,9 @@ function Gladdy:SetupOptions()
                             Gladdy.db.castBarIconStyle = value
                             Gladdy.db.auraBorderStyle = value
                             Gladdy.db.npTotemPlatesBorderStyle = value
+                            Gladdy.db.cooldownBorderStyle = value
+                            Gladdy.db.buffsBorderStyle = value
+                            Gladdy.db.drBorderStyle = value
                             Gladdy:UpdateFrame()
                         end,
                     },
@@ -414,6 +426,9 @@ function Gladdy:SetupOptions()
                             Gladdy.db.trinketBorderColor = rgb
                             Gladdy.db.castBarIconColor = rgb
                             Gladdy.db.npTotemPlatesBorderColor = rgb
+                            Gladdy.db.drBorderColor = rgb
+                            Gladdy.db.cooldownBorderColor = rgb
+                            Gladdy.db.buffsBorderColor = rgb
                             Gladdy:UpdateFrame()
                         end,
                     },
@@ -642,16 +657,16 @@ function Gladdy:GetDebuffs()
             if classSpells[i].texture then
                 texture = classSpells[i].texture
             end
-            args[spellName] = {
+            args[classSpells[i].name] = {
                 order = i,
-                name = spellName,
+                name = classSpells[i].name,
                 type = "toggle",
                 image = texture,
                 width = "2",
                 --desc = format("Duration: %ds", druidSpells[i].duration),
-                arg = spellName
+                arg = classSpells[i].name
             }
-            defaultDebuffs[spellName] = true
+            defaultDebuffs[classSpells[i].name] = true
         end
         return args
     end
