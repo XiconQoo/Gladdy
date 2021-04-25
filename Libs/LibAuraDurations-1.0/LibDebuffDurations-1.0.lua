@@ -176,7 +176,9 @@ Spell({ 772, 6546, 6547, 6548, 11572, 11573, 11574, 25208 }, {
     end,
     preEvent = "SPELL_CAST_SUCCESS"
 }, "WARRIOR") -- Rend
-Spell({ 12721, 43104 }, { duration = 12, stacking = true, buffType = "physical", preEvent = "SWING_DAMAGE" }, "WARRIOR") -- Deep Wounds
+Spell({ 12721, 43104 }, { duration = 12, stacking = true, buffType = "physical", preEvent = {
+    {event = "SPELL_DAMAGE", spellID = { 11584, 29707, 25266, 25236, 25231, 25242, 24428, 30330 }}, "SWING_DAMAGE" } -- 11584 OP, 29707 Heroic Strike, 25266 Mocking Blow, 25236 Execute, 25231 Cleave, 25242 Slam, 24428 Victory Rush, 30330 MS
+}, "WARRIOR") -- Deep Wounds
 Spell({ 12323 }, {duration = 6, buffType = "physical"}, "WARRIOR") -- Piercing Howl
 Spell({ 1715, 7372, 7373, 25212 }, { duration = 15, pvpduration = 10, buffType = "physical" }, "WARRIOR") -- Hamstring
 Spell({ 23694 } , { duration = 5, buffType = "physical" }, "WARRIOR") -- Improved Hamstring

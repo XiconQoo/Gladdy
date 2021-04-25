@@ -248,16 +248,16 @@ local function findSourceGUID(event, spellid, destGUID)
             if event == "SPELL_CAST_START" then
                 if spellid == entry.spellID then
                     entry.spellID = "nil" -- remove from list
-                    return entry.srcGUID
+                    return entry.srcGUID, entry.timestamp
                 end
             else
                 if spellid == entry.spellID and tostring(entry.destGUID) == tostring(destGUID) then
                     entry.spellID = "nil"  -- remove from list
-                    return entry.srcGUID
+                    return entry.srcGUID, entry.timestamp
                 end
             end
         elseif tostring(entry.destGUID) == tostring(destGUID) then
-            return entry.srcGUID
+            return entry.srcGUID, entry.timestamp
         end
     end
     return nil
@@ -267,15 +267,40 @@ local function getSourceGUID(spellID, destinationGUID)
         if spellDurations[spellID].preEvent then
             local sourceGUID
             if (type(spellDurations[spellID].preEvent) == "table") then
-                for i=1,#spellDurations[spellID].preEvent do
-                    if (type(spellDurations[spellID].preEvent[i]) == "table") then
-                        sourceGUID = findSourceGUID(spellDurations[spellID].preEvent[i].event, spellDurations[spellID].preEvent[i].spellID, destinationGUID)
+                if spellDurations[spellID].preEvent[1].event == "SPELL_DAMAGE" and spellDurations[spellID].preEvent[2] == "SWING_DAMAGE" then
+                    local sourceGUIDSwingDamage, sourceGUIDSpellDamage, timestampSpellDamage, timestampSwingDamage
+                    if type(spellDurations[spellID].preEvent[1].spellID) == "table" then
+                        local sg, ts
+                        for i=1, #spellDurations[spellID].preEvent[1].spellID do
+                            sg, ts = findSourceGUID(spellDurations[spellID].preEvent[1].event, spellDurations[spellID].preEvent[1].spellID[i], destinationGUID)
+                            if ts and (timestampSpellDamage == nil or timestampSpellDamage < ts) then
+                                sourceGUIDSpellDamage, timestampSpellDamage = sg, ts
+                            end
+                        end
                     else
-                        sourceGUID = findSourceGUID(spellDurations[spellID].preEvent[i], spellID, destinationGUID)
+                        sourceGUIDSpellDamage, timestampSpellDamage = findSourceGUID(spellDurations[spellID].preEvent[1].event, spellDurations[spellID].preEvent[1].spellID, destinationGUID)
                     end
+                    sourceGUIDSwingDamage, timestampSwingDamage = findSourceGUID(spellDurations[spellID].preEvent[2], spellID, destinationGUID)
+                    if timestampSwingDamage and timestampSpellDamage and timestampSwingDamage > timestampSpellDamage then
+                        sourceGUID = sourceGUIDSpellDamage
+                    elseif timestampSwingDamage and timestampSpellDamage and timestampSwingDamage < timestampSpellDamage then
+                        sourceGUID = sourceGUIDSwingDamage
+                    elseif not timestampSwingDamage and timestampSpellDamage then
+                        sourceGUID = sourceGUIDSpellDamage
+                    elseif not timestampSpellDamage and timestampSwingDamage then
+                        sourceGUID = sourceGUIDSwingDamage
+                    end
+                else
+                    for i=1,#spellDurations[spellID].preEvent do
+                        if (type(spellDurations[spellID].preEvent[i]) == "table") then
+                            sourceGUID = findSourceGUID(spellDurations[spellID].preEvent[i].event, spellDurations[spellID].preEvent[i].spellID, destinationGUID)
+                        else
+                            sourceGUID = findSourceGUID(spellDurations[spellID].preEvent[i], spellID, destinationGUID)
+                        end
 
-                    if sourceGUID then
-                        return sourceGUID
+                        if sourceGUID then
+                            return sourceGUID
+                        end
                     end
                 end
             else
@@ -295,15 +320,15 @@ function BuffsDebuffs:COMBAT_LOG_EVENT_UNFILTERED(timestamp, eventType, sourceGU
     local srcUnit = Gladdy.guids[sourceGUID]
     local isFriendlyUnit = bit_band(sourceFlags, COMBATLOG_OBJECT_REACTION_FRIENDLY) > 0
     if (eventType == "SPELL_CAST_SUCCESS" or "SPELL_CAST_START") and isFriendlyUnit and spellDurations[spellID] then
-        Queue.reduce(CAST_SUCCESS_queue, timestamp, MAX_CL_BUFFER_TIME)
         Queue.pushright(CAST_SUCCESS_queue, { spellName = spellName, spellID = spellID, timestamp = timestamp, srcGUID = sourceGUID, destGUID = destinationGUID})
-    elseif eventType == "SPELL_DAMAGE" and isFriendlyUnit and (spellDurations[spellID] or spellID == 5940) then -- Shiv deadly poison
-        Queue.reduce(SPELL_DAMAGE_queue, timestamp, MAX_CL_BUFFER_TIME)
+    elseif eventType == "SPELL_DAMAGE" and isFriendlyUnit then -- Shiv deadly poison
         Queue.pushright(SPELL_DAMAGE_queue, { spellName = spellName, spellID = spellID, timestamp = timestamp, srcGUID = sourceGUID, destGUID = destinationGUID})
     elseif eventType == "SWING_DAMAGE" and isFriendlyUnit then
-        Queue.reduce(SWING_DAMAGE_queue, timestamp, MAX_CL_BUFFER_TIME)
         Queue.pushright(SWING_DAMAGE_queue, { spellName = spellName, spellID = spellID, timestamp = timestamp, srcGUID = sourceGUID, destGUID = destinationGUID})
     end
+    Queue.reduce(CAST_SUCCESS_queue, timestamp, MAX_CL_BUFFER_TIME)
+    Queue.reduce(SPELL_DAMAGE_queue, timestamp, MAX_CL_BUFFER_TIME)
+    Queue.reduce(SWING_DAMAGE_queue, timestamp, MAX_CL_BUFFER_TIME)
 
     if not destUnit or srcUnit then return end
     local Auras = Gladdy.modules.Auras
