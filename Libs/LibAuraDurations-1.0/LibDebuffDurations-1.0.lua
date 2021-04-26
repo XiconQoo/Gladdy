@@ -31,9 +31,11 @@ local function Spell(id, opts, class)
     if type(id) == "table" then
         for _, spellID in ipairs(id) do
             spells[spellID] = opts
+            spells[spellID].class = class
         end
     else
         spells[id] = opts
+        spells[id].class = class
     end
 end
 

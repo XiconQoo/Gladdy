@@ -6,7 +6,7 @@ local bit_band = bit.band
 local auraTypeColor = { }
 local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
 local COMBATLOG_OBJECT_REACTION_FRIENDLY = COMBATLOG_OBJECT_REACTION_FRIENDLY
-local UnitBuff, UnitDebuff, GetSpellLink = UnitBuff, UnitDebuff, GetSpellLink
+local UnitBuff, UnitDebuff, GetSpellLink, GetNumPartyMembers, UnitClass = UnitBuff, UnitDebuff, GetSpellLink, GetNumPartyMembers, UnitClass
 auraTypeColor["none"]     = { r = 0.80, g = 0, b = 0 , a = 1}
 auraTypeColor["magic"]    = { r = 0.20, g = 0.60, b = 1.00, a = 1}
 auraTypeColor["curse"]    = { r = 0.60, g = 0.00, b = 1.00, a = 1 }
@@ -167,6 +167,29 @@ function BuffsDebuffs:Reset()
         self.framePool[i]:Hide()
     end
     self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    self.comp = nil
+end
+
+function BuffsDebuffs:CheckComp()
+    if GetNumPartyMembers() + 1 ~= Gladdy.curBracket then -- 2 for debug
+        return
+    else
+        local classesCount = {}
+        classesCount[select(2, UnitClass("player"))] = 1
+        for i=1,GetNumPartyMembers() do
+            local class = select(2, UnitClass("party" .. i))
+            if class then
+                if not classesCount[class] then
+                    Gladdy:Print(class, 1)
+                    classesCount[class] = 1
+                else
+                    Gladdy:Print(class,classesCount[class] + 1)
+                    classesCount[class] = classesCount[class] + 1
+                end
+            end
+        end
+        self.comp = classesCount
+    end
 end
 
 function BuffsDebuffs:Test(unit)
@@ -264,6 +287,12 @@ local function findSourceGUID(event, spellid, destGUID)
 end
 local function getSourceGUID(spellID, destinationGUID)
     if spellDurations[spellID].stacking then
+        if BuffsDebuffs.comp == nil then
+            BuffsDebuffs:CheckComp()
+        end
+        if BuffsDebuffs.comp[spellDurations[spellID].class] and BuffsDebuffs.comp[spellDurations[spellID].class] < 2 then
+            return "NONE"
+        end
         if spellDurations[spellID].preEvent then
             local sourceGUID
             if (type(spellDurations[spellID].preEvent) == "table") then
