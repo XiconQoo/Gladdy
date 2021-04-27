@@ -1,6 +1,6 @@
 ## Interface: 20400
 ## Title: Gladdy - Macumba/XiCoN Edit
-## Version: 1.3-Release
+## Version: 1.3.1-Release
 ## Notes: The most powerful arena AddOn for WoW 2.4.3
 ## Author: Mikhail "miraage" Osher / Schaka / Knall / Macumba
 ## X-Email: miraage.wow@gmail.com / schakaqt@gmail.com / https://discord.gg/5qVu56M
@@ -33,3 +33,4 @@ Modules\ArenaIdentify.lua
 Modules\ArenaCountDown.lua
 Modules\VersionCheck.lua
 Modules\BuffsDebuffs.lua
+Modules\XiconProfiles.lua

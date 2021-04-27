@@ -155,7 +155,7 @@ function Gladdy:UpdateFrame()
         margin = margin + self.db.cooldownSize
         height = height + self.db.cooldownSize * teamSize
     end
-    if (self.db.buffsCooldownPos == "TOP" or self.db.buffsCooldownPos == "BOTTOM") and self.db.cooldown then
+    if (self.db.buffsCooldownPos == "TOP" or self.db.buffsCooldownPos == "BOTTOM") and self.db.buffsEnabled then
         margin = margin + self.db.buffsIconSize
         height = height + self.db.buffsIconSize * teamSize
     end
