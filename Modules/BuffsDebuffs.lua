@@ -180,10 +180,8 @@ function BuffsDebuffs:CheckComp()
             local class = select(2, UnitClass("party" .. i))
             if class then
                 if not classesCount[class] then
-                    Gladdy:Print(class, 1)
                     classesCount[class] = 1
                 else
-                    Gladdy:Print(class,classesCount[class] + 1)
                     classesCount[class] = classesCount[class] + 1
                 end
             end
