@@ -1,7 +1,7 @@
 # Gladdy - Macumba / XiCoN Edit
 
 ### The most powerful arena addon for WoW TBC 2.4.3
-## [v1.3-Release Download Here](https://github.com/XiconQoo/Gladdy/releases/download/v1.3-Release/Gladdy-MX-Edit-v1.3-Release.zip)
+## [v1.3.1-Release Download Here](https://github.com/XiconQoo/Gladdy/releases/download/v1.3.1-Release/Gladdy-MX-Edit-v1.3.1-Release.zip)
 
 ###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="../readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
 
@@ -37,6 +37,13 @@ Based on https://github.com/Schaka/gladdy
 ```
 
 ### Changes
+
+v1.3.1-Release
+- **new module XiconProfiles**
+  - added basic starter profiles (Classic Gladdy, Knall's & Klimp's profiles)
+- fix Deep Wounds tracking in Debuff Module
+- some minor adjustments to debuff tracking in general
+- icons can be stretched now as well
 
 v1.3-Release
 - **NEW** module **BuffsDebuffs**!
