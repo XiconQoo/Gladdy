@@ -234,9 +234,9 @@ function Trinket:GetOptions()
         }),
         trinketWidthFactor = Gladdy:option({
             type = "range",
-            name = L["Trinket width factor"],
-            min = 0.1,
-            max = 1,
+            name = L["Icon width factor"],
+            min = 0.5,
+            max = 2,
             step = 0.05,
             order = 6,
         }),

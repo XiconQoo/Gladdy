@@ -1,9 +1,13 @@
 # Gladdy - Macumba / XiCoN Edit
 
 ### The most powerful arena addon for WoW TBC 2.4.3
-## [v1.3-Release Download Here](https://github.com/XiconQoo/Gladdy/releases/download/v1.3-Release/Gladdy-MX-Edit-v1.3-Release.zip)
+## [v1.3.1-Release Download Here](https://github.com/XiconQoo/Gladdy/releases/download/v1.3.1-Release/Gladdy-MX-Edit-v1.3.1-Release.zip)
 
-###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="../readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
+###### <a target="_blank" rel="noopener noreferrer" href="https://www.paypal.me/xiconqoo/10"><img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/Paypal-Donate.png" height="30" style="margin-top:-30px;position:relative;top:20px;"></a> Please consider donating if you like my work
+
+### Origin
+
+Based on https://github.com/Schaka/gladdy
 
 ### Motivation for this edit
 
@@ -21,24 +25,20 @@ Aloft, ShaguPlates, SoHighPlates, ElvUI and Plates (by by siggestardust) !**
 
 ## Screenshots
 
-![Screenshot](../readme-media/sample1.jpg)
-
-![Screenshot](../readme-media/sample2.jpg)
-
-### Origin
-
-Forked from https://github.com/SunstriderEmu/GladdyEndless with following changes
-```
-Based on https://github.com/Schaka/gladdy
-
-- Removed TrinketTracker module that guessed when PvP trinket was used. Now using a server message to reliably show trinket usage.
-- Updates the "seconds until game starts" if the start time changes (a ready button has been clicked and the game starts earlier).
-- Added a version check (upon receiving a message from the server)
-```
+<img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample1.jpg">
+<img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample3.png" width="48.5%">
+<img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample2.jpg" align="right" width="48.5%">
 
 ### Changes
 
-v1.3-Release
+#### v1.3.1-Release
+- **new module XiconProfiles**
+  - added basic starter profiles (Classic Gladdy, Knall's & Klimp's profiles)
+- fix Deep Wounds tracking in Debuff Module
+- some minor adjustments to debuff tracking in general
+- icons can be stretched now as well
+
+#### v1.3-Release
 - **NEW** module **BuffsDebuffs**!
   - tracks debuffs on gladdy frames
   - highly configurable
@@ -65,18 +65,18 @@ v1.3-Release
 - add Windrunner realm to TrinketTracker ignore list
 - force Warriors/Rogues/Hunters on last position (eg arena2 in 2v2 or arena3 in 3v3)
 
-v1.2-Release
+#### v1.2-Release
 - fixed castbar timer formats
 - added option to show timeleft, total or both to castbars
 - option to add a custom TotemName that appears on the totemicons
 - cooldowns can be positioned LEFT or RIGHT now as well
 - option cooldowns max icons per row added
 
-v1.1.2
+#### v1.1.2
 
 - fix cooldown numbers reset
 
-v1.1
+#### v1.1
 
 - **`/gladdy ui` opens it's own window now. More space to configure AND movable**
 - **global options to style font / border-style / color of frame borders**
@@ -106,7 +106,7 @@ v1.1
 - minor styling issues fixed
 - minor bugfixes
 
-v1.0-Release
+#### v1.0-Release
 - `/gladdy test` now activates **everything** for maximum configurability
 - added black borders to all frames
 - added cooldown numbers to all elements (no need to use OmniCC or similar)

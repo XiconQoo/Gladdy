@@ -96,8 +96,8 @@ function Classicon:GetOptions()
         classIconWidthFactor = Gladdy:option({
             type = "range",
             name = L["Icon width factor"],
-            min = 0.1,
-            max = 1,
+            min = 0.5,
+            max = 2,
             step = 0.05,
             order = 4,
         }),

@@ -155,7 +155,7 @@ function Gladdy:UpdateFrame()
         margin = margin + self.db.cooldownSize
         height = height + self.db.cooldownSize * teamSize
     end
-    if (self.db.buffsCooldownPos == "TOP" or self.db.buffsCooldownPos == "BOTTOM") and self.db.cooldown then
+    if (self.db.buffsCooldownPos == "TOP" or self.db.buffsCooldownPos == "BOTTOM") and self.db.buffsEnabled then
         margin = margin + self.db.buffsIconSize
         height = height + self.db.buffsIconSize * teamSize
     end
@@ -307,7 +307,7 @@ function Gladdy:UpdateFrame()
             for j = 1, 14 do
                 local icon = button.spellCooldownFrame["icon" .. j]
                 icon:SetHeight(self.db.cooldownSize)
-                icon:SetWidth(self.db.cooldownSize)
+                icon:SetWidth(self.db.cooldownSize * self.db.cooldownWidthFactor)
                 icon.cooldownFont:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.cooldownFont), self.db.cooldownSize / 2 * Gladdy.db.cooldownFontScale, "OUTLINE")
                 icon.cooldownFont:SetTextColor(Gladdy.db.cooldownFontColor.r, Gladdy.db.cooldownFontColor.g, Gladdy.db.cooldownFontColor.b, Gladdy.db.cooldownFontColor.a)
                 icon:ClearAllPoints()

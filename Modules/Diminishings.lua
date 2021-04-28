@@ -29,6 +29,7 @@ local Diminishings = Gladdy:NewModule("Diminishings", nil, {
     drHalfColor = {r = 1, g = 1, b = 0, a = 1 },
     drQuarterColor = {r = 1, g = 0.7, b = 0, a = 1 },
     drNullColor = {r = 1, g = 0, b = 0, a = 1 },
+    drWidthFactor = 1,
 })
 
 local function getDiminishColor(dr)
@@ -51,14 +52,13 @@ local function StyleActionButton(f)
     normalTex:SetHeight(button:GetHeight())
     normalTex:SetWidth(button:GetWidth())
     normalTex:SetPoint("CENTER")
+    normalTex:SetVertexColor(0, 0 , 0, 0)
 
     if Gladdy.db.drBorderStyle == "Interface\\AddOns\\Gladdy\\Images\\Border_Gloss" then
         f.border:SetTexture("Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp")
     else
         f.border:SetTexture(Gladdy.db.drBorderStyle)
     end
-
-    normalTex:SetVertexColor(0, 0 , 0, 0)
 
     icon:SetTexCoord(.1, .9, .1, .9)
     icon:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
@@ -234,7 +234,7 @@ function Diminishings:UpdateFrame(unit)
     for i = 1, 16 do
         local icon = drFrame["icon" .. i]
 
-        icon:SetWidth(Gladdy.db.drIconSize)
+        icon:SetWidth(Gladdy.db.drIconSize * Gladdy.db.drWidthFactor)
         icon:SetHeight(Gladdy.db.drIconSize)
 
         icon.text:SetFont(Gladdy.LSM:Fetch("font", Gladdy.db.drFont), (Gladdy.db.drIconSize/2 - 1) * Gladdy.db.drFontScale, "OUTLINE")
@@ -404,11 +404,20 @@ function Diminishings:GetOptions()
             max = 50,
             step = 1,
         }),
+        drWidthFactor = Gladdy:option({
+            type = "range",
+            name = L["Icon Width Factor"],
+            desc = L["Stretches the icon"],
+            order = 6,
+            min = 0.5,
+            max = 2,
+            step = 0.05,
+        }),
         drIconPadding = Gladdy:option({
             type = "range",
             name = L["Icon Padding"],
             desc = L["Space between Icons"],
-            order = 6,
+            order = 7,
             min = 0,
             max = 10,
             step = 0.1,
@@ -416,7 +425,7 @@ function Diminishings:GetOptions()
         drDisableCircle = Gladdy:option({
             type = "toggle",
             name = L["No Cooldown Circle"],
-            order = 7,
+            order = 8,
         }),
         drCooldownAlpha = Gladdy:option({
             type = "range",
@@ -424,7 +433,7 @@ function Diminishings:GetOptions()
             min = 0,
             max = 1,
             step = 0.1,
-            order = 8,
+            order = 9,
         }),
         headerFont = {
             type = "header",

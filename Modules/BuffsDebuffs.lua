@@ -6,7 +6,7 @@ local bit_band = bit.band
 local auraTypeColor = { }
 local AURA_TYPE_DEBUFF, AURA_TYPE_BUFF = AURA_TYPE_DEBUFF, AURA_TYPE_BUFF
 local COMBATLOG_OBJECT_REACTION_FRIENDLY = COMBATLOG_OBJECT_REACTION_FRIENDLY
-local UnitBuff, UnitDebuff, GetSpellLink = UnitBuff, UnitDebuff, GetSpellLink
+local UnitBuff, UnitDebuff, GetSpellLink, GetNumPartyMembers, UnitClass = UnitBuff, UnitDebuff, GetSpellLink, GetNumPartyMembers, UnitClass
 auraTypeColor["none"]     = { r = 0.80, g = 0, b = 0 , a = 1}
 auraTypeColor["magic"]    = { r = 0.20, g = 0.60, b = 1.00, a = 1}
 auraTypeColor["curse"]    = { r = 0.60, g = 0.00, b = 1.00, a = 1 }
@@ -96,6 +96,7 @@ local BuffsDebuffs = Gladdy:NewModule("BuffsDebuffs", nil, {
     buffsEnabled = true,
     buffsShowAuraDebuffs = false,
     buffsIconSize = 30,
+    buffsWidthFactor = 1,
     buffsIconPadding = 1,
     buffsDisableCircle = false,
     buffsCooldownAlpha = 1,
@@ -167,6 +168,27 @@ function BuffsDebuffs:Reset()
         self.framePool[i]:Hide()
     end
     self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    self.comp = nil
+end
+
+function BuffsDebuffs:CheckComp()
+    if GetNumPartyMembers() + 1 ~= Gladdy.curBracket then -- 2 for debug
+        return
+    else
+        local classesCount = {}
+        classesCount[select(2, UnitClass("player"))] = 1
+        for i=1,GetNumPartyMembers() do
+            local class = select(2, UnitClass("party" .. i))
+            if class then
+                if not classesCount[class] then
+                    classesCount[class] = 1
+                else
+                    classesCount[class] = classesCount[class] + 1
+                end
+            end
+        end
+        self.comp = classesCount
+    end
 end
 
 function BuffsDebuffs:Test(unit)
@@ -248,34 +270,65 @@ local function findSourceGUID(event, spellid, destGUID)
             if event == "SPELL_CAST_START" then
                 if spellid == entry.spellID then
                     entry.spellID = "nil" -- remove from list
-                    return entry.srcGUID
+                    return entry.srcGUID, entry.timestamp
                 end
             else
                 if spellid == entry.spellID and tostring(entry.destGUID) == tostring(destGUID) then
                     entry.spellID = "nil"  -- remove from list
-                    return entry.srcGUID
+                    return entry.srcGUID, entry.timestamp
                 end
             end
         elseif tostring(entry.destGUID) == tostring(destGUID) then
-            return entry.srcGUID
+            return entry.srcGUID, entry.timestamp
         end
     end
     return nil
 end
 local function getSourceGUID(spellID, destinationGUID)
     if spellDurations[spellID].stacking then
+        if BuffsDebuffs.comp == nil then
+            BuffsDebuffs:CheckComp()
+        end
+        if BuffsDebuffs.comp[spellDurations[spellID].class] and BuffsDebuffs.comp[spellDurations[spellID].class] < 2 then
+            return "NONE"
+        end
         if spellDurations[spellID].preEvent then
             local sourceGUID
             if (type(spellDurations[spellID].preEvent) == "table") then
-                for i=1,#spellDurations[spellID].preEvent do
-                    if (type(spellDurations[spellID].preEvent[i]) == "table") then
-                        sourceGUID = findSourceGUID(spellDurations[spellID].preEvent[i].event, spellDurations[spellID].preEvent[i].spellID, destinationGUID)
+                if spellDurations[spellID].preEvent[1].event == "SPELL_DAMAGE" and spellDurations[spellID].preEvent[2] == "SWING_DAMAGE" then
+                    local sourceGUIDSwingDamage, sourceGUIDSpellDamage, timestampSpellDamage, timestampSwingDamage
+                    if type(spellDurations[spellID].preEvent[1].spellID) == "table" then
+                        local sg, ts
+                        for i=1, #spellDurations[spellID].preEvent[1].spellID do
+                            sg, ts = findSourceGUID(spellDurations[spellID].preEvent[1].event, spellDurations[spellID].preEvent[1].spellID[i], destinationGUID)
+                            if ts and (timestampSpellDamage == nil or timestampSpellDamage < ts) then
+                                sourceGUIDSpellDamage, timestampSpellDamage = sg, ts
+                            end
+                        end
                     else
-                        sourceGUID = findSourceGUID(spellDurations[spellID].preEvent[i], spellID, destinationGUID)
+                        sourceGUIDSpellDamage, timestampSpellDamage = findSourceGUID(spellDurations[spellID].preEvent[1].event, spellDurations[spellID].preEvent[1].spellID, destinationGUID)
                     end
+                    sourceGUIDSwingDamage, timestampSwingDamage = findSourceGUID(spellDurations[spellID].preEvent[2], spellID, destinationGUID)
+                    if timestampSwingDamage and timestampSpellDamage and timestampSwingDamage > timestampSpellDamage then
+                        sourceGUID = sourceGUIDSpellDamage
+                    elseif timestampSwingDamage and timestampSpellDamage and timestampSwingDamage < timestampSpellDamage then
+                        sourceGUID = sourceGUIDSwingDamage
+                    elseif not timestampSwingDamage and timestampSpellDamage then
+                        sourceGUID = sourceGUIDSpellDamage
+                    elseif not timestampSpellDamage and timestampSwingDamage then
+                        sourceGUID = sourceGUIDSwingDamage
+                    end
+                else
+                    for i=1,#spellDurations[spellID].preEvent do
+                        if (type(spellDurations[spellID].preEvent[i]) == "table") then
+                            sourceGUID = findSourceGUID(spellDurations[spellID].preEvent[i].event, spellDurations[spellID].preEvent[i].spellID, destinationGUID)
+                        else
+                            sourceGUID = findSourceGUID(spellDurations[spellID].preEvent[i], spellID, destinationGUID)
+                        end
 
-                    if sourceGUID then
-                        return sourceGUID
+                        if sourceGUID then
+                            return sourceGUID
+                        end
                     end
                 end
             else
@@ -295,15 +348,15 @@ function BuffsDebuffs:COMBAT_LOG_EVENT_UNFILTERED(timestamp, eventType, sourceGU
     local srcUnit = Gladdy.guids[sourceGUID]
     local isFriendlyUnit = bit_band(sourceFlags, COMBATLOG_OBJECT_REACTION_FRIENDLY) > 0
     if (eventType == "SPELL_CAST_SUCCESS" or "SPELL_CAST_START") and isFriendlyUnit and spellDurations[spellID] then
-        Queue.reduce(CAST_SUCCESS_queue, timestamp, MAX_CL_BUFFER_TIME)
         Queue.pushright(CAST_SUCCESS_queue, { spellName = spellName, spellID = spellID, timestamp = timestamp, srcGUID = sourceGUID, destGUID = destinationGUID})
-    elseif eventType == "SPELL_DAMAGE" and isFriendlyUnit and (spellDurations[spellID] or spellID == 5940) then -- Shiv deadly poison
-        Queue.reduce(SPELL_DAMAGE_queue, timestamp, MAX_CL_BUFFER_TIME)
+    elseif eventType == "SPELL_DAMAGE" and isFriendlyUnit then -- Shiv deadly poison
         Queue.pushright(SPELL_DAMAGE_queue, { spellName = spellName, spellID = spellID, timestamp = timestamp, srcGUID = sourceGUID, destGUID = destinationGUID})
     elseif eventType == "SWING_DAMAGE" and isFriendlyUnit then
-        Queue.reduce(SWING_DAMAGE_queue, timestamp, MAX_CL_BUFFER_TIME)
         Queue.pushright(SWING_DAMAGE_queue, { spellName = spellName, spellID = spellID, timestamp = timestamp, srcGUID = sourceGUID, destGUID = destinationGUID})
     end
+    Queue.reduce(CAST_SUCCESS_queue, timestamp, MAX_CL_BUFFER_TIME)
+    Queue.reduce(SPELL_DAMAGE_queue, timestamp, MAX_CL_BUFFER_TIME)
+    Queue.reduce(SWING_DAMAGE_queue, timestamp, MAX_CL_BUFFER_TIME)
 
     if not destUnit or srcUnit then return end
     local Auras = Gladdy.modules.Auras
@@ -403,7 +456,7 @@ function BuffsDebuffs:CreateFrame(unit)
 end
 
 local function styleIcon(aura)
-    aura:SetWidth(Gladdy.db.buffsIconSize)
+    aura:SetWidth(Gladdy.db.buffsIconSize * Gladdy.db.buffsWidthFactor)
     aura:SetHeight(Gladdy.db.buffsIconSize)
     aura.cooldowncircle:SetAlpha(Gladdy.db.buffsCooldownAlpha)
     aura.border:SetTexture(Gladdy.db.buffsBorderStyle)
@@ -797,11 +850,20 @@ function BuffsDebuffs:GetOptions()
             max = 50,
             step = 1,
         }),
+        buffsWidthFactor = Gladdy:option({
+            type = "range",
+            name = L["Icon Width Factor"],
+            desc = L["Stretches the icon"],
+            order = 7,
+            min = 0.5,
+            max = 2,
+            step = 0.05,
+        }),
         buffsIconPadding = Gladdy:option({
             type = "range",
             name = L["Icon Padding"],
             desc = L["Space between Icons"],
-            order = 7,
+            order = 8,
             min = 0,
             max = 10,
             step = 0.1,
@@ -809,7 +871,7 @@ function BuffsDebuffs:GetOptions()
         buffsDisableCircle = Gladdy:option({
             type = "toggle",
             name = L["No Cooldown Circle"],
-            order = 8,
+            order = 9,
         }),
         buffsCooldownAlpha = Gladdy:option({
             type = "range",
@@ -817,18 +879,18 @@ function BuffsDebuffs:GetOptions()
             min = 0,
             max = 1,
             step = 0.1,
-            order = 9,
+            order = 10,
         }),
         headerFont = {
             type = "header",
             name = L["Font"],
-            order = 10,
+            order = 11,
         },
         buffsFont = Gladdy:option({
             type = "select",
             name = L["Font"],
             desc = L["Font of the cooldown"],
-            order = 11,
+            order = 12,
             dialogControl = "LSM30_Font",
             values = AceGUIWidgetLSMlists.font,
         }),
@@ -836,7 +898,7 @@ function BuffsDebuffs:GetOptions()
             type = "range",
             name = L["Font scale"],
             desc = L["Scale of the text"],
-            order = 12,
+            order = 13,
             min = 0.1,
             max = 2,
             step = 0.1,
@@ -845,13 +907,13 @@ function BuffsDebuffs:GetOptions()
             type = "toggle",
             name = L["Dynamic Timer Color"],
             desc = L["Show dynamic color on cooldown numbers"],
-            order = 13,
+            order = 14,
         }),
         buffsFontColor = Gladdy:colorOption({
             type = "color",
             name = L["Font color"],
             desc = L["Color of the cooldown timer and stacks"],
-            order = 14,
+            order = 15,
             hasAlpha = true,
         }),
         headerPosition = {

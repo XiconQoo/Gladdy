@@ -11,6 +11,7 @@ local Cooldown = Gladdy:NewModule("Cooldown", nil, {
     cooldownYOffset = 0,
     cooldownXOffset = 0,
     cooldownSize = 30,
+    cooldownWidthFactor = 1,
     cooldownIconPadding = 1,
     cooldownMaxIconsPerLine = 9,
     cooldownBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_Gloss",
@@ -78,11 +79,20 @@ function Cooldown:GetOptions()
             min = 5,
             max = (Gladdy.db.healthBarHeight + Gladdy.db.castBarHeight + Gladdy.db.powerBarHeight + Gladdy.db.bottomMargin) / 2,
         }),
+        cooldownWidthFactor = Gladdy:option({
+            type = "range",
+            name = L["Icon Width Factor"],
+            desc = L["Stretches the icon"],
+            order = 5,
+            min = 0.5,
+            max = 2,
+            step = 0.05,
+        }),
         cooldownIconPadding = Gladdy:option({
             type = "range",
             name = L["Icon Padding"],
             desc = L["Space between Icons"],
-            order = 5,
+            order = 6,
             min = 0,
             max = 10,
             step = 0.1,
@@ -90,7 +100,7 @@ function Cooldown:GetOptions()
         cooldownMaxIconsPerLine = Gladdy:option({
             type = "range",
             name = L["Max Icons per row"],
-            order = 6,
+            order = 7,
             min = 3,
             max = 14,
             step = 1,
@@ -98,7 +108,7 @@ function Cooldown:GetOptions()
         cooldownDisableCircle = Gladdy:option({
             type = "toggle",
             name = L["No Cooldown Circle"],
-            order = 7,
+            order = 8,
         }),
         cooldownCooldownAlpha = Gladdy:option({
             type = "range",
@@ -106,7 +116,7 @@ function Cooldown:GetOptions()
             min = 0,
             max = 1,
             step = 0.1,
-            order = 8,
+            order = 9,
         }),
         headerFont = {
             type = "header",
