@@ -96,6 +96,7 @@ local BuffsDebuffs = Gladdy:NewModule("BuffsDebuffs", nil, {
     buffsEnabled = true,
     buffsShowAuraDebuffs = false,
     buffsIconSize = 30,
+    buffsWidthFactor = 1,
     buffsIconPadding = 1,
     buffsDisableCircle = false,
     buffsCooldownAlpha = 1,
@@ -455,7 +456,7 @@ function BuffsDebuffs:CreateFrame(unit)
 end
 
 local function styleIcon(aura)
-    aura:SetWidth(Gladdy.db.buffsIconSize)
+    aura:SetWidth(Gladdy.db.buffsIconSize * Gladdy.db.buffsWidthFactor)
     aura:SetHeight(Gladdy.db.buffsIconSize)
     aura.cooldowncircle:SetAlpha(Gladdy.db.buffsCooldownAlpha)
     aura.border:SetTexture(Gladdy.db.buffsBorderStyle)
@@ -849,11 +850,20 @@ function BuffsDebuffs:GetOptions()
             max = 50,
             step = 1,
         }),
+        buffsWidthFactor = Gladdy:option({
+            type = "range",
+            name = L["Icon Width Factor"],
+            desc = L["Stretches the icon"],
+            order = 7,
+            min = 0.5,
+            max = 2,
+            step = 0.05,
+        }),
         buffsIconPadding = Gladdy:option({
             type = "range",
             name = L["Icon Padding"],
             desc = L["Space between Icons"],
-            order = 7,
+            order = 8,
             min = 0,
             max = 10,
             step = 0.1,
@@ -861,7 +871,7 @@ function BuffsDebuffs:GetOptions()
         buffsDisableCircle = Gladdy:option({
             type = "toggle",
             name = L["No Cooldown Circle"],
-            order = 8,
+            order = 9,
         }),
         buffsCooldownAlpha = Gladdy:option({
             type = "range",
@@ -869,18 +879,18 @@ function BuffsDebuffs:GetOptions()
             min = 0,
             max = 1,
             step = 0.1,
-            order = 9,
+            order = 10,
         }),
         headerFont = {
             type = "header",
             name = L["Font"],
-            order = 10,
+            order = 11,
         },
         buffsFont = Gladdy:option({
             type = "select",
             name = L["Font"],
             desc = L["Font of the cooldown"],
-            order = 11,
+            order = 12,
             dialogControl = "LSM30_Font",
             values = AceGUIWidgetLSMlists.font,
         }),
@@ -888,7 +898,7 @@ function BuffsDebuffs:GetOptions()
             type = "range",
             name = L["Font scale"],
             desc = L["Scale of the text"],
-            order = 12,
+            order = 13,
             min = 0.1,
             max = 2,
             step = 0.1,
@@ -897,13 +907,13 @@ function BuffsDebuffs:GetOptions()
             type = "toggle",
             name = L["Dynamic Timer Color"],
             desc = L["Show dynamic color on cooldown numbers"],
-            order = 13,
+            order = 14,
         }),
         buffsFontColor = Gladdy:colorOption({
             type = "color",
             name = L["Font color"],
             desc = L["Color of the cooldown timer and stacks"],
-            order = 14,
+            order = 15,
             hasAlpha = true,
         }),
         headerPosition = {

@@ -227,6 +227,7 @@ local TotemPlates = Gladdy:NewModule("TotemPlates", nil, {
     npTotems = true,
     npTotemPlatesBorderStyle = "Interface\\AddOns\\Gladdy\\Images\\Border_rounded_blp",
     npTotemPlatesSize = 40,
+    npTotemPlatesWidthFactor = 1,
     npTremorFont = "DorisPP",
     npTremorFontSize = 10,
     npTremorFontXOffset = 0,
@@ -443,7 +444,7 @@ function TotemPlates:SkinTotem(nameplate, nameplateName, addonName)
                 nameplate.gladdyTotemFrame.parent = nameplate
                 nameplate.gladdyTotemFrame:ClearAllPoints()
                 nameplate.gladdyTotemFrame:SetPoint("CENTER", nameplate, "CENTER", 0, 0)
-                nameplate.gladdyTotemFrame:SetWidth(Gladdy.db.npTotemPlatesSize)
+                nameplate.gladdyTotemFrame:SetWidth(Gladdy.db.npTotemPlatesSize * Gladdy.db.npTotemPlatesWidthFactor)
                 nameplate.gladdyTotemFrame:SetHeight(Gladdy.db.npTotemPlatesSize)
                 nameplate.gladdyTotemFrame.totemIcon:ClearAllPoints()
                 nameplate.gladdyTotemFrame.totemIcon:SetPoint("TOPLEFT", nameplate.gladdyTotemFrame, "TOPLEFT")
@@ -478,7 +479,7 @@ function TotemPlates:SkinTotem(nameplate, nameplateName, addonName)
                 nameplate.gladdyTotemFrame:SetAlpha(0.95)
             end
 
-            nameplate.gladdyTotemFrame:SetWidth(Gladdy.db.npTotemPlatesSize)
+            nameplate.gladdyTotemFrame:SetWidth(Gladdy.db.npTotemPlatesSize * Gladdy.db.npTotemPlatesWidthFactor)
             nameplate.gladdyTotemFrame:SetHeight(Gladdy.db.npTotemPlatesSize)
             nameplate.gladdyTotemFrame:SetFrameLevel(totemDataEntry.priority or 0)
             nameplate.gladdyTotemFrame.totemIcon:SetTexture(totemDataEntry.texture)
@@ -526,14 +527,28 @@ function TotemPlates:GetOptions()
             desc = L["Turns totem icons instead of nameplates on or off. (Requires reload)"],
             order = 3,
         }),
+        headerTotemFrame = {
+            type = "header",
+            name = L["Totem Icon"],
+            order = 4,
+        },
         npTotemPlatesSize = Gladdy:option({
             type = "range",
             name = L["Totem size"],
             desc = L["Size of totem icons"],
-            order = 4,
+            order = 5,
             min = 20,
             max = 100,
             step = 1,
+        }),
+        npTotemPlatesWidthFactor = Gladdy:option({
+            type = "range",
+            name = L["Icon Width Factor"],
+            desc = L["Stretches the icon"],
+            order = 6,
+            min = 0.5,
+            max = 2,
+            step = 0.05,
         }),
         headerFont = {
             type = "header",
