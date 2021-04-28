@@ -49,9 +49,9 @@ Aloft, ShaguPlates, SoHighPlates, ElvUI and Plates (by by siggestardust) !**
 - add own LibDebuffDuration-1.0
 - add DRData-1.0 and track DR on spell remove and spell refresh
    - added missing DRs like Frostmages Chill effect
-- fix Click module (custom macros with placeholder **#name#** are now possible)
+- fix Click module (custom macros with placeholder **\*name*** are now possible)
   ```
-  /targetexact #name#
+  /targetexact *name*
   /cast Polymorph
   /targetlasttarget
   ```
