@@ -77,6 +77,7 @@ function XiconProfiles:ApplyKlimp()
     Gladdy.db.buffsCooldownAlpha = 0.8
     Gladdy.db.trinketWidthFactor = 1
     Gladdy.db.frameScale = 1
+    Gladdy.db.drWidthFactor = 1.3
     Gladdy:UpdateFrame()
 end
 
@@ -138,7 +139,7 @@ function XiconProfiles:ApplyClassic()
     Gladdy.db["buffsXOffset"] = -1
     Gladdy.db["drXOffset"] = -1
     Gladdy.db["classIconBorderColor"]["a"] = 0
-    Gladdy.db["cooldownYOffset"] = 3.600000000000023
+    Gladdy.db["cooldownYOffset"] = 10
     Gladdy.db["auraBorderStyle"] = "Interface\\AddOns\\Gladdy\\Images\\Border_squared_blp"
     Gladdy.db["powerBarHeight"] = 16
     Gladdy.db["powerBarFontSize"] = 10.21056747436523
