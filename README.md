@@ -26,8 +26,8 @@ Aloft, ShaguPlates, SoHighPlates, ElvUI and Plates (by by siggestardust) !**
 ## Screenshots
 
 <img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample1.jpg">
-<img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample3.png" width="48.5%">
 <img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample2.jpg" align="right" width="48.5%">
+<img src="https://raw.githubusercontent.com/XiconQoo/Gladdy/readme-media/sample3.png" width="48.5%">
 
 ### Changes
 
